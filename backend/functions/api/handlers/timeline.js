@@ -1,0 +1,138 @@
+const { pool } = require('../database/connection');
+const { successResponse, errorResponse } = require('../utils/responses');
+const { handleDatabaseError } = require('../utils/errors');
+const { getTenantContext } = require('../middleware/auth');
+
+const handleGetTimelineEntries = async (queryParams, event) => {
+    try {
+        const client = await pool.connect();
+        const { userId, tenantId } = getTenantContext(event);
+        const { date = null, limit = 50 } = queryParams;
+        
+        let query = `
+            SELECT 
+                te.id,
+                te.entry_time,
+                te.entry_type,
+                te.content,
+                te.severity,
+                te.protocol_compliant,
+                te.created_at,
+                je.entry_date
+            FROM timeline_entries te
+            JOIN journal_entries je ON te.journal_entry_id = je.id
+            WHERE te.user_id = $1 AND te.tenant_id = $2
+        `;
+        
+        const values = [userId, tenantId];
+        
+        if (date) {
+            query += ` AND je.entry_date = $3`;
+            values.push(date);
+        }
+        
+        query += ` ORDER BY je.entry_date DESC, te.entry_time DESC LIMIT $${values.length + 1}`;
+        values.push(limit);
+        
+        const result = await client.query(query, values);
+        client.release();
+        
+        return successResponse({
+            entries: result.rows,
+            total: result.rows.length
+        });
+        
+    } catch (error) {
+        const appError = handleDatabaseError(error, 'fetch timeline entries');
+        return errorResponse(appError.message, appError.statusCode);
+    }
+};
+
+const handleCreateTimelineEntry = async (body, event) => {
+    try {
+        const client = await pool.connect();
+        const { userId, tenantId } = getTenantContext(event);
+        
+        const {
+            entryDate,
+            entryTime,
+            entryType,
+            content,
+            severity = null,
+            selectedFoods = []
+        } = body;
+        
+        await client.query('BEGIN');
+        
+        let journalEntryId;
+        const journalQuery = `
+            INSERT INTO journal_entries (tenant_id, user_id, entry_date)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (user_id, tenant_id, entry_date) 
+            DO UPDATE SET updated_at = NOW()
+            RETURNING id
+        `;
+        
+        const journalResult = await client.query(journalQuery, [tenantId, userId, entryDate]);
+        journalEntryId = journalResult.rows[0].id;
+        
+        const timelineQuery = `
+            INSERT INTO timeline_entries (
+                journal_entry_id, user_id, tenant_id, entry_time, 
+                entry_type, content, severity, protocol_compliant
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING *
+        `;
+        
+        const protocolCompliant = entryType === 'food' ? 
+            await checkProtocolCompliance(selectedFoods, userId, client) : null;
+        
+        const timelineValues = [
+            journalEntryId, userId, tenantId, entryTime,
+            entryType, content, severity, protocolCompliant
+        ];
+        
+        const timelineResult = await client.query(timelineQuery, timelineValues);
+        
+        await client.query('COMMIT');
+        client.release();
+        
+        return successResponse({
+            message: 'Timeline entry created successfully',
+            entry: timelineResult.rows[0]
+        }, 201);
+        
+    } catch (error) {
+        const appError = handleDatabaseError(error, 'create timeline entry');
+        return errorResponse(appError.message, appError.statusCode);
+    }
+};
+
+const checkProtocolCompliance = async (selectedFoods, userId, client) => {
+    if (!selectedFoods || selectedFoods.length === 0) return null;
+    
+    try {
+        const query = `
+            SELECT COUNT(*) as avoid_count
+            FROM protocol_food_rules pfr
+            JOIN user_protocols up ON pfr.protocol_id = up.protocol_id
+            JOIN food_properties fp ON pfr.food_id = fp.id
+            WHERE up.user_id = $1 
+            AND up.active = true
+            AND fp.name = ANY($2)
+            AND pfr.status = 'avoid'
+        `;
+        
+        const result = await client.query(query, [userId, selectedFoods]);
+        return parseInt(result.rows[0].avoid_count) === 0;
+        
+    } catch (error) {
+        console.error('Protocol compliance check failed:', error);
+        return null;
+    }
+};
+
+module.exports = {
+    handleGetTimelineEntries,
+    handleCreateTimelineEntry
+};
