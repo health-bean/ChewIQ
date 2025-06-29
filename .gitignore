@@ -164,3 +164,6 @@ Thumbs.db
 docs/build/
 docs/.docusaurus/
 .DS_Store
+frontend/shared/components/.DS_Store
+frontend/.DS_Store
+.DS_Store
