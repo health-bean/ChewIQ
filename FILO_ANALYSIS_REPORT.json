@@ -4,7 +4,7 @@
       {
         "name": "FILO_ANALYSIS_REPORT.json",
         "type": "file",
-        "size": 43746
+        "size": 44361
       },
       {
         "name": "FILO_API_ANALYSIS.json",
@@ -129,134 +129,31 @@
             "size": 774
           },
           {
-            "name": "blog",
-            "type": "directory",
-            "children": [
-              {
-                "name": "2019-05-28-first-blog-post.md",
-                "type": "file",
-                "size": 312
-              },
-              {
-                "name": "2019-05-29-long-blog-post.md",
-                "type": "file",
-                "size": 3122
-              },
-              {
-                "name": "2021-08-01-mdx-blog-post.mdx",
-                "type": "file",
-                "size": 512
-              },
-              {
-                "name": "2021-08-26-welcome",
-                "type": "directory",
-                "children": [
-                  {
-                    "name": "docusaurus-plushie-banner.jpeg",
-                    "type": "file",
-                    "size": 96122
-                  },
-                  {
-                    "name": "index.md",
-                    "type": "file",
-                    "size": 846
-                  }
-                ]
-              },
-              {
-                "name": "authors.yml",
-                "type": "file",
-                "size": 707
-              },
-              {
-                "name": "tags.yml",
-                "type": "file",
-                "size": 347
-              }
-            ]
-          },
-          {
             "name": "docs",
             "type": "directory",
             "children": [
               {
-                "name": "intro.md",
+                "name": "components",
+                "type": "directory",
+                "children": [
+                  {
+                    "name": "overview.md",
+                    "type": "file",
+                    "size": 8900
+                  }
+                ]
+              },
+              {
+                "name": "index.md",
                 "type": "file",
-                "size": 1403
-              },
-              {
-                "name": "tutorial-basics",
-                "type": "directory",
-                "children": [
-                  {
-                    "name": "_category_.json",
-                    "type": "file",
-                    "size": 180
-                  },
-                  {
-                    "name": "congratulations.md",
-                    "type": "file",
-                    "size": 1078
-                  },
-                  {
-                    "name": "create-a-blog-post.md",
-                    "type": "file",
-                    "size": 886
-                  },
-                  {
-                    "name": "create-a-document.md",
-                    "type": "file",
-                    "size": 1042
-                  },
-                  {
-                    "name": "create-a-page.md",
-                    "type": "file",
-                    "size": 1015
-                  },
-                  {
-                    "name": "deploy-your-site.md",
-                    "type": "file",
-                    "size": 702
-                  },
-                  {
-                    "name": "markdown-features.mdx",
-                    "type": "file",
-                    "size": 3006
-                  }
-                ]
-              },
-              {
-                "name": "tutorial-extras",
-                "type": "directory",
-                "children": [
-                  {
-                    "name": "_category_.json",
-                    "type": "file",
-                    "size": 99
-                  },
-                  {
-                    "name": "img",
-                    "type": "directory",
-                    "children": null
-                  },
-                  {
-                    "name": "manage-docs-versions.md",
-                    "type": "file",
-                    "size": 1232
-                  },
-                  {
-                    "name": "translate-your-site.md",
-                    "type": "file",
-                    "size": 1587
-                  }
-                ]
+                "size": 3098
               }
             ]
           },
           {
             "name": "docusaurus.config.js",
             "type": "file",
-            "size": 4609
+            "size": 4555
           },
           {
             "name": "package-lock.json",
@@ -303,16 +200,6 @@
                 "name": "pages",
                 "type": "directory",
                 "children": [
-                  {
-                    "name": "index.js",
-                    "type": "file",
-                    "size": 1252
-                  },
-                  {
-                    "name": "index.module.css",
-                    "type": "file",
-                    "size": 365
-                  },
                   {
                     "name": "markdown-page.md",
                     "type": "file",
@@ -642,15 +529,25 @@
         "children": []
       },
       {
+        "name": "package-lock.json",
+        "type": "file",
+        "size": 473992
+      },
+      {
+        "name": "package.json",
+        "type": "file",
+        "size": 630
+      },
+      {
         "name": "scripts",
         "type": "directory",
         "children": []
       }
     ],
     "stats": {
-      "totalFiles": 334,
-      "directories": 191,
-      "lastModified": "2025-06-29T15:40:33.346Z"
+      "totalFiles": 361,
+      "directories": 205,
+      "lastModified": "2025-06-29T16:32:28.907Z"
     }
   },
   "frontend": {
@@ -1285,6 +1182,19 @@
           "serve": "docusaurus serve",
           "write-translations": "docusaurus write-translations",
           "write-heading-ids": "docusaurus write-heading-ids"
+        }
+      },
+      "root": {
+        "dependencies": {},
+        "devDependencies": {},
+        "scripts": {
+          "analyze": "node analyze-codebase.js",
+          "analyze-api": "node analyze-apis.js",
+          "generate-docs": "node generate-docs.js",
+          "docs:dev": "cd docs && npm start",
+          "docs:build": "cd docs && npm run build",
+          "web:dev": "cd frontend/web-app && npm run dev",
+          "web:build": "cd frontend/web-app && npm run build"
         }
       }
     }
