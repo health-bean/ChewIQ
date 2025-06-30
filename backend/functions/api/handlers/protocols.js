@@ -4,7 +4,11 @@ const { handleDatabaseError } = require('../utils/errors');
 const { getAccessibleUserIds, requireAuth } = require('../middleware/auth');
 
 const handleGetProtocols = async (queryParams, event) => {
-    }
+    // Require authentication (disabled for development)
+    // const authError = await requireAuth(event);
+    // if (authError) {
+    //     return authError;
+    // }
 
     try {
         // Get all user IDs this user can access (patient sees own, practitioner sees patients)

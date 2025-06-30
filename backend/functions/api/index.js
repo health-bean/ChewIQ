@@ -1,3 +1,4 @@
+const { handleGetCorrelationInsights } = require('./handlers/correlations');
 const { handleCors } = require('./middleware/cors');
 const { handleAuth } = require('./handlers/auth');
 const { handleGetUser, handleUpdateUser, handleGetUserProtocols, handleGetUserPreferences, handleUpdateUserPreferences } = require('./handlers/users');
@@ -33,6 +34,25 @@ exports.handler = async (event) => {
         }
         else if (path === '/api/v1/users' && method === 'GET') {
             response = await handleGetUser(event);
+        }
+        else if (path === '/api/v1/correlations/insights' && method === 'GET') {
+            response = await handleGetCorrelationInsights(queryParams, event);
+        }
+        // ALTERNATIVE: Future-proof correlation routing (OPTIONAL FOR POC)
+        else if (path.startsWith('/api/v1/correlations/') && method === 'GET') {
+            if (path === '/api/v1/correlations/insights') {
+                response = await handleGetCorrelationInsights(queryParams, event);
+            }
+            // Future endpoints can go here:
+            // else if (path === '/api/v1/correlations/user-patterns') {
+            //     response = await handleGetUserPatterns(queryParams, event);
+            // }
+            // else if (path === '/api/v1/correlations/food-triggers') {
+            //     response = await handleGetFoodTriggers(queryParams, event);
+            // }
+            else {
+                response = errorResponse('Correlation endpoint not found', 404);
+            }
         }
         else if (path === '/api/v1/users' && method === 'POST') {
             response = await handleUpdateUser(body, event);
@@ -107,6 +127,7 @@ const handleNotFound = (path, method) => {
             'POST /api/v1/users',
             'GET /api/v1/user/protocols',
             'GET /api/v1/protocols',
+            'GET /api/v1/correlations/insights',
             'GET /api/v1/foods/search',
             'GET /api/v1/symptoms/search',
             'GET /api/v1/supplements/search',
