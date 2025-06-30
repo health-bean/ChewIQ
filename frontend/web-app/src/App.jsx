@@ -8,9 +8,15 @@ import useUserPreferences from '../../shared/hooks/useUserPreferences';
 import useExposureTypes from '../../shared/hooks/useExposureTypes';
 import useDetoxTypes from '../../shared/hooks/useDetoxTypes';
 
+// FIXED IMPORT: Updated path for moved useReflectionData
+import useReflectionData from '../../shared/hooks/useReflectionData';
+
 // Import app-specific hooks and features
-import useReflectionData from './hooks/useReflectionData';
 import SetupWizard from './features/setup/SetupWizard';
+
+// NEW IMPORTS: Add feature components for correlation insights and protocol foods
+import CorrelationInsights from './components/features/insights/CorrelationInsights';
+import ProtocolFoods from './components/features/foods/ProtocolFoods';
 
 // =================
 // API CONFIGURATION
@@ -489,12 +495,6 @@ useEffect(() => {
     return dailyEntries.some(entry => entry.protocol_compliant === false);
   };
 
-  // Future: Add this function when you implement new insights detection
-  // const hasNewInsights = () => {
-  //   // Example logic: check if there are new insights since last viewed
-  //   // return someInsightsData.some(insight => insight.isNew && !insight.isUrgent);
-  //   return false;
-  // };
 
   if (showSetup) {
     return <SetupWizard onComplete={() => {
@@ -1132,94 +1132,14 @@ useEffect(() => {
           </div>
         )}
 
+        {/* UPDATED: Real AI Correlation Insights */}
         {activeView === 'insights' && (
-          <div className="space-y-6">
-            <Card title="Health Dashboard" icon={TrendingUp} variant="primary">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">
-                    {preferences.protocols.length > 0 ? '100%' : '--'}
-                  </div>
-                  <div className="text-sm text-gray-600">Protocol Setup</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{dailyEntries.length}</div>
-                  <div className="text-sm text-gray-600">Entries Today</div>
-                </div>
-              </div>
-            </Card>
-
-            {hasCriticalInsights() && (
-              <Card title="Critical Insights" variant="warning">
-                <Alert variant="danger" title="Protocol Compliance Alert">
-                  Some entries today were not compliant with your selected protocols. Review your timeline for details.
-                </Alert>
-              </Card>
-            )}
-
-            <Card title="Platform Status" variant="success">
-              <Alert variant="info" title="System Ready">
-                Your app is running with sophisticated multi-protocol support, working quick checks system, detox tracking, and functional reflection data persistence. Ready for AI insights when backend is enhanced.
-              </Alert>
-            </Card>
-
-            <Card title="AI Insights Preview" variant="primary">
-              <div className="space-y-3 text-sm text-gray-600">
-                <p><strong>Future insights will include:</strong></p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Food-symptom correlation analysis</li>
-                  <li>Sleep quality impact on daily energy</li>
-                  <li>Protocol compliance effectiveness</li>
-                  <li>Environmental exposure patterns</li>
-                  <li>Detox activity benefits tracking</li>
-                  <li>Mood and energy trend analysis</li>
-                </ul>
-                <p className="text-xs text-gray-500 mt-3">
-                  <em>AI analysis will activate once sufficient data is collected (typically 2-4 weeks of consistent tracking).</em>
-                </p>
-              </div>
-            </Card>
-          </div>
+          <CorrelationInsights />
         )}
 
+        {/* UPDATED: Real Protocol Foods Browser */}
         {activeView === 'protocol' && (
-          <div className="space-y-6">
-            <Card title="Protocol Foods Browser" icon={Search} variant="primary">
-              {preferences.protocols.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">Select protocols in your header to browse compliant foods.</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-sm text-gray-600">
-                    Browse foods for: <span className="font-medium">{getProtocolDisplayText()}</span>
-                  </p>
-                  
-                  <div className="grid gap-4">
-                    <Card variant="success" title="✅ Safe for All Protocols">
-                      <div className="text-sm text-gray-600">
-                        Foods that comply with all your selected protocols will appear here when the protocol foods API is connected.
-                        <br />
-                        <em className="text-xs">API endpoint needed: /api/v1/protocol-foods/[protocol-id]</em>
-                      </div>
-                    </Card>
-                    
-                    <Card variant="warning" title="⚠️ Mixed Guidance">
-                      <div className="text-sm text-gray-600">
-                        Foods with conflicting guidance between your protocols will appear here.
-                      </div>
-                    </Card>
-                    
-                    <Card variant="danger" title="❌ Avoid">
-                      <div className="text-sm text-gray-600">
-                        Foods to avoid on your current protocols will appear here.
-                      </div>
-                    </Card>
-                  </div>
-                </div>
-              )}
-            </Card>
-          </div>
+          <ProtocolFoods protocolId={preferences.protocols[0]} />
         )}
       </div>
 
