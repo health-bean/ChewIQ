@@ -4,10 +4,6 @@ const { handleDatabaseError } = require('../utils/errors');
 const { getCurrentUser, getAccessibleUserIds, requireAuth } = require('../middleware/auth');
 
 const handleGetTimelineEntries = async (queryParams, event) => {
-    // Require authentication
-    const authError = await requireAuth(event);
-    if (authError) {
-        return authError;
     }
 
     try {
@@ -57,10 +53,6 @@ const handleGetTimelineEntries = async (queryParams, event) => {
 };
 
 const handleCreateTimelineEntry = async (body, event) => {
-    // Require authentication
-    const authError = await requireAuth(event);
-    if (authError) {
-        return authError;
     }
 
     try {

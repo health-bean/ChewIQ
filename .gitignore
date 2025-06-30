@@ -172,3 +172,6 @@ backend/.DS_Store
 backend/functions/.DS_Store
 backend/functions/api/.DS_Store
 backend/functions/api/.DS_Store
+*.zip
+backend/functions/api/*.zip
+**/.DS_Store

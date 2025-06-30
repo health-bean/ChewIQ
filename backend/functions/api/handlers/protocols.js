@@ -4,10 +4,6 @@ const { handleDatabaseError } = require('../utils/errors');
 const { getAccessibleUserIds, requireAuth } = require('../middleware/auth');
 
 const handleGetProtocols = async (queryParams, event) => {
-    // Require authentication
-    const authError = await requireAuth(event);
-    if (authError) {
-        return authError;
     }
 
     try {
