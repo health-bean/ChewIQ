@@ -1126,9 +1126,9 @@ function AppContent() {
 // Main App component with AuthProvider.jsx
 function App() {
   return (
-    <AuthProvider.jsx>
+    <AuthProvider>
       <AppContent />
-    </AuthProvider.jsx>
+    </AuthProvider>
   );
 }
 
