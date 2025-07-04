@@ -14,3 +14,6 @@ applications:
         baseDirectory: dist
         files:
           - '**/*'
+    environment:
+      variables:
+        VITE_API_BASE_URL: https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/
