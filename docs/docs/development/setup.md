@@ -13,7 +13,7 @@
 
 ```bash
 git clone https://github.com/deebyrne26/health-platform.git
-cd health-platform
+cd web-app
 ```
 
 ### 2. Install Dependencies
@@ -38,7 +38,7 @@ nano frontend/web-app/.env
 
 **Required Environment Variables:**
 ```env
-VITE_API_BASE_URL=https://9ob6wg0l1e.execute-api.us-east-1.amazonaws.com/dev
+VITE_API_BASE_URL=https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/
 VITE_APP_ENV=development
 ```
 
@@ -58,7 +58,7 @@ npm run analyze
 ## Project Structure
 
 ```
-Health Platform/
+Web App/
 ├── frontend/
 │   ├── shared/           # 6 shared components
 │   └── web-app/          # Main React application

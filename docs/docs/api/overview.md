@@ -2,9 +2,9 @@
 
 ## Overview
 
-The Health Platform API provides endpoints for managing health protocols, timeline entries, and user data.
+The Web App API provides endpoints for managing health protocols, timeline entries, and user data.
 
-**Base URL:** `https://9ob6wg0l1e.execute-api.us-east-1.amazonaws.com/dev`
+**Base URL:** `https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/`
 **Current Status:** Active Development
 
 ## Authentication
@@ -329,11 +329,11 @@ npm run analyze-api
 ### Manual Testing
 ```bash
 # Test working endpoints
-curl https://9ob6wg0l1e.execute-api.us-east-1.amazonaws.com/dev/api/v1/protocols
+curl https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev//api/v1/protocols
 
 # Test with authentication (when available)
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     https://9ob6wg0l1e.execute-api.us-east-1.amazonaws.com/dev/api/v1/user-preferences
+     https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev//api/v1/user-preferences
 ```
 
 ---

@@ -2,12 +2,12 @@
 
 ## Overview
 
-The Health Platform follows a modern monorepo architecture with clear separation of concerns and scalable design patterns.
+The Web App follows a modern monorepo architecture with clear separation of concerns and scalable design patterns.
 
 ## Project Structure
 
 ```
-Health Platform/
+Web App/
 ├── frontend/
 │   ├── web-app/          # Main React application
 │   ├── mobile-app/       # Future mobile app (not planned)
@@ -63,7 +63,7 @@ Health Platform/
 ### AWS Infrastructure
 
 - **API Gateway:** REST API endpoints
-- **Base URL:** `https://9ob6wg0l1e.execute-api.us-east-1.amazonaws.com/dev`
+- **Base URL:** `https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/`
 - **Lambda Functions:** Serverless compute
 - **Working Endpoints:** 4
 - **Protected Endpoints:** 5
