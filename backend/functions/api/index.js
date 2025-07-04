@@ -1,139 +1,100 @@
-const { handleGetCorrelationInsights } = require('./handlers/correlations');
-const { handleCors } = require('./middleware/cors');
 const { handleLogin, handleRegister, handleLogout, handleVerify } = require('./handlers/auth');
-const { handleGetUser, handleUpdateUser, handleGetUserProtocols, handleGetUserPreferences, handleUpdateUserPreferences } = require('./handlers/users');
-const { handleGetJournalEntries, handleCreateJournalEntry, handleGetJournalEntry, handleUpdateJournalEntry } = require('./handlers/journal');
-const { handleGetTimelineEntries, handleCreateTimelineEntry } = require('./handlers/timeline');
-const { handleGetProtocols } = require('./handlers/protocols');
-const { handleSearchFoods, handleGetProtocolFoods } = require('./handlers/foods');
-const { handleSearchSymptoms } = require('./handlers/symptoms');
-const { handleSearchSupplements } = require('./handlers/supplements');
-const { handleSearchMedications } = require('./handlers/medications');
-const { handleSearchDetoxTypes } = require('./handlers/detox');
-const { successResponse, errorResponse } = require('./utils/responses');
+const { handleGetJournals, handleCreateJournal, handleUpdateJournal, handleDeleteJournal } = require('./handlers/journal');
+const { handleGetGoals, handleCreateGoal, handleUpdateGoal, handleDeleteGoal } = require('./handlers/goals');
+const { handleGetInsights } = require('./handlers/insights');
 
-exports.handler = async (event) => {
-    console.log('Event:', JSON.stringify(event, null, 2));
+exports.handler = async (event, context) => {
+  try {
+    const { httpMethod, path, pathParameters } = event;
+    const route = path || event.resource;
     
-    const corsResponse = handleCors(event);
-    if (corsResponse) return corsResponse;
+    console.log(`Processing ${httpMethod} ${route}`);
     
-    try {
-        const path = event.path;
-        const method = event.httpMethod;
-        const body = event.body ? JSON.parse(event.body) : {};
-        const pathParams = event.pathParameters || {};
-        const queryParams = event.queryStringParameters || {};
-        
-        console.log(`${method} ${path}`);
-        
-        let response;
-        
-        if (path === "/api/v1/auth/login" && method === "POST") {
-            response = await handleLogin(body);
-        } else if (path === "/api/v1/auth/register" && method === "POST") {
-            response = await handleRegister(body);
-        } else if (path === "/api/v1/auth/logout" && method === "POST") {
-            response = await handleLogout(body);
-        } else if (path === "/api/v1/auth/verify" && method === "GET") {
-            response = await handleVerify(null, event);        }
-        else if (path === '/api/v1/users' && method === 'GET') {
-            response = await handleGetUser(event);
-        }
-        else if (path === '/api/v1/users' && method === 'POST') {
-            response = await handleUpdateUser(body, event);
-        }
-        else if (path === '/api/v1/user/protocols' && method === 'GET') {
-            response = await handleGetUserProtocols(event);
-        }
-        else if (path === '/api/v1/user/preferences' && method === 'GET') {
-            response = await handleGetUserPreferences(event);
-        }
-        else if (path === '/api/v1/user/preferences' && method === 'POST') {
-            response = await handleUpdateUserPreferences(body, event);
-        }
-        else if (path === '/api/v1/correlations/insights' && method === 'GET') {
-            response = await handleGetCorrelationInsights(queryParams, event);
-        }
-        else if (path === '/api/v1/protocols' && method === 'GET') {
-            response = await handleGetProtocols(queryParams, event);
-        }
-        else if (path === '/api/v1/foods/search' && method === 'GET') {
-            response = await handleSearchFoods(queryParams, event);
-        }
-        else if (path === '/api/v1/foods/by-protocol' && method === 'GET') {
-            console.log("Protocol foods route hit!");
-            response = await handleGetProtocolFoods(queryParams, event);
-        }
-        else if (path === '/api/v1/symptoms/search' && method === 'GET') {
-            response = await handleSearchSymptoms(queryParams, event);
-        }
-        else if (path === '/api/v1/supplements/search' && method === 'GET') {
-            response = await handleSearchSupplements(queryParams, event);
-        }
-        else if (path === '/api/v1/medications/search' && method === 'GET') {
-            response = await handleSearchMedications(queryParams, event);
-        }
-        else if (path === '/api/v1/detox-types/search' && method === 'GET') {
-            response = await handleSearchDetoxTypes(queryParams, event);
-        }
-        else if (path === '/api/v1/journal/entries' && method === 'GET') {
-            response = await handleGetJournalEntries(queryParams, event);
-        }
-        else if (path === '/api/v1/journal/entries' && method === 'POST') {
-            response = await handleCreateJournalEntry(body, event);
-        }
-        else if (path.startsWith('/api/v1/journal/entries/') && method === 'GET') {
-            const date = path.split('/').pop();
-            response = await handleGetJournalEntry(date, event);
-        }
-        else if (path.startsWith('/api/v1/journal/entries/') && method === 'PUT') {
-            const date = path.split('/').pop();
-            response = await handleUpdateJournalEntry(date, body, event);
-        }
-        else if (path === '/api/v1/timeline/entries' && method === 'GET') {
-            response = await handleGetTimelineEntries(queryParams, event);
-        }
-        else if (path === '/api/v1/timeline/entries' && method === 'POST') {
-            response = await handleCreateTimelineEntry(body, event);
-        }
-        else {
-            response = handleNotFound(path, method);
-        }
-        
-        return response;
-        
-    } catch (error) {
-        console.error('Error:', error);
-        return errorResponse('Internal server error: ' + error.message, 500);
+    // Auth routes
+    if (route === '/api/v1/auth/login' && httpMethod === 'POST') {
+      return await handleLogin(event, context);
     }
-};
-
-const handleNotFound = (path, method) => {
-    return errorResponse('Endpoint not found', 404, {
-        path: path,
-        method: method,
-        availableEndpoints: [
-            'POST /api/v1/auth/login", "POST /api/v1/auth/register", "POST /api/v1/auth/logout", "GET /api/v1/auth/verify',
-            'GET /api/v1/users',
-            'POST /api/v1/users',
-            'GET /api/v1/user/protocols',
-            'GET /api/v1/user/preferences',
-            'POST /api/v1/user/preferences',
-            'GET /api/v1/correlations/insights',
-            'GET /api/v1/protocols',
-            'GET /api/v1/foods/search',
-            'GET /api/v1/foods/by-protocol',
-            'GET /api/v1/symptoms/search',
-            'GET /api/v1/supplements/search',
-            'GET /api/v1/medications/search',
-            'GET /api/v1/detox-types/search',
-            'GET /api/v1/journal/entries',
-            'POST /api/v1/journal/entries',
-            'GET /api/v1/journal/entries/:date',
-            'PUT /api/v1/journal/entries/:date',
-            'GET /api/v1/timeline/entries',
-            'POST /api/v1/timeline/entries'
-        ]
-    });
+    
+    if (route === '/api/v1/auth/register' && httpMethod === 'POST') {
+      return await handleRegister(event, context);
+    }
+    
+    if (route === '/api/v1/auth/logout' && httpMethod === 'POST') {
+      return await handleLogout(event, context);
+    }
+    
+    if (route === '/api/v1/auth/verify' && httpMethod === 'GET') {
+      return await handleVerify(event, context);
+    }
+    
+    // Journal routes
+    if (route === '/api/v1/journals' && httpMethod === 'GET') {
+      return await handleGetJournals(event, context);
+    }
+    
+    if (route === '/api/v1/journals' && httpMethod === 'POST') {
+      return await handleCreateJournal(event, context);
+    }
+    
+    if (route.startsWith('/api/v1/journals/') && httpMethod === 'PUT') {
+      return await handleUpdateJournal(event, context);
+    }
+    
+    if (route.startsWith('/api/v1/journals/') && httpMethod === 'DELETE') {
+      return await handleDeleteJournal(event, context);
+    }
+    
+    // Goals routes
+    if (route === '/api/v1/goals' && httpMethod === 'GET') {
+      return await handleGetGoals(event, context);
+    }
+    
+    if (route === '/api/v1/goals' && httpMethod === 'POST') {
+      return await handleCreateGoal(event, context);
+    }
+    
+    if (route.startsWith('/api/v1/goals/') && httpMethod === 'PUT') {
+      return await handleUpdateGoal(event, context);
+    }
+    
+    if (route.startsWith('/api/v1/goals/') && httpMethod === 'DELETE') {
+      return await handleDeleteGoal(event, context);
+    }
+    
+    // Insights routes
+    if (route === '/api/v1/insights' && httpMethod === 'GET') {
+      return await handleGetInsights(event, context);
+    }
+    
+    return {
+      statusCode: 404,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      },
+      body: JSON.stringify({
+        error: 'Route not found',
+        route: route,
+        method: httpMethod
+      })
+    };
+    
+  } catch (error) {
+    console.error('Lambda handler error:', error);
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      },
+      body: JSON.stringify({
+        error: 'Internal server error',
+        message: error.message
+      })
+    };
+  }
 };
