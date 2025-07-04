@@ -1,12 +1,12 @@
-# Health Platform
+# Web App
 
 ## Platform Summary
 
-Health Platform is a sophisticated Protocol Management & Healing Platform designed for chronic illness recovery. Built as a comprehensive monorepo with modern React architecture.
+Web App is a sophisticated Protocol Management & Healing Platform designed for chronic illness recovery. Built as a comprehensive monorepo with modern React architecture.
 
 ### Current Statistics
-- **Total Files:** 361
-- **Directories:** 205
+- **Total Files:** 529
+- **Directories:** 279
 - **Last Updated:** 6/29/2025
 - **Components:** 19
 - **Custom Hooks:** 6
@@ -15,7 +15,7 @@ Health Platform is a sophisticated Protocol Management & Healing Platform design
 ## Live Links
 
 - **Source Code:** [https://github.com/deebyrne26/health-platform](https://github.com/deebyrne26/health-platform)
-- **API Base:** `https://9ob6wg0l1e.execute-api.us-east-1.amazonaws.com/dev`
+- **API Base:** `https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/`
 
 ## Current Features
 
@@ -50,7 +50,7 @@ Health Platform is a sophisticated Protocol Management & Healing Platform design
 - **Components:** 6 shared, 13 app-specific
 
 ### Backend
-- **API:** https://9ob6wg0l1e.execute-api.us-east-1.amazonaws.com/dev
+- **API:** https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/
 - **Database:** PostgreSQL (planned for production)
 - **Hosting:** AWS Lambda + API Gateway
 - **Deployment:** AWS Amplify

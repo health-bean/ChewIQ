@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Health Platform includes 19 React components:
+The Web App includes 19 React components:
 - **6 Shared Components** - Reusable across all applications
 - **13 App Components** - Application-specific components
 
@@ -257,7 +257,7 @@ import { Textarea } from 'frontend/shared/components/ui/Textarea';
 
 **File:** `frontend/web-app/src/App.jsx`  
 **Type:** functional-hooks  
-**Description:** Import shared components and hooks
+**Description:** Import shared auth context
 
 ### SetupWizard
 

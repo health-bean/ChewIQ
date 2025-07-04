@@ -46,7 +46,7 @@ applications:
 ```
 
 **Environment Variables:**
-- `VITE_API_BASE_URL`: https://9ob6wg0l1e.execute-api.us-east-1.amazonaws.com/dev
+- `VITE_API_BASE_URL`: https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/
 - `VITE_APP_ENV`: production
 
 ### Documentation Deployment (GitHub Actions)
@@ -100,14 +100,14 @@ VITE_DEBUG_MODE=true
 
 ### Staging Environment
 ```env
-VITE_API_BASE_URL=https://staging-api.health platform.com
+VITE_API_BASE_URL=https://staging-api.web app.com
 VITE_APP_ENV=staging
 VITE_DEBUG_MODE=false
 ```
 
 ### Production Environment
 ```env
-VITE_API_BASE_URL=https://9ob6wg0l1e.execute-api.us-east-1.amazonaws.com/dev
+VITE_API_BASE_URL=https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/
 VITE_APP_ENV=production
 VITE_DEBUG_MODE=false
 VITE_SENTRY_DSN=your_sentry_dsn_here
