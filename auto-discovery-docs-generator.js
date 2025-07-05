@@ -9,6 +9,8 @@ class AutoDiscoveryDocsGenerator {
     this.baseURL = 'https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev';
     this.rootPath = process.cwd();
     this.docsPath = path.join(this.rootPath, 'docs', 'docs');
+    this.repositoryInfo = this.getRepositoryInfo();
+    this.repositoryUrl = this.repositoryInfo.url;
     
     this.discovered = {
       apis: [],
@@ -18,6 +20,54 @@ class AutoDiscoveryDocsGenerator {
       database: {},
       deployment: {},
       architecture: {}
+    };
+  }
+
+  getRepositoryUrl() {
+    try {
+      // Try to get from git remote
+      const { execSync } = require('child_process');
+      const remoteUrl = execSync('git remote get-url origin', { encoding: 'utf8' }).trim();
+      
+      // Convert SSH to HTTPS format if needed
+      if (remoteUrl.startsWith('git@github.com:')) {
+        return remoteUrl.replace('git@github.com:', 'https://github.com/').replace('.git', '');
+      }
+      
+      // Clean up HTTPS URL
+      return remoteUrl.replace('.git', '');
+    } catch (error) {
+      console.log('   ⚠️  Could not auto-detect repository URL, using fallback');
+      // Try to construct from discovered info
+      if (this.discovered.deployment?.organizationName) {
+        return `https://github.com/${this.discovered.deployment.organizationName}/health-platform`;
+      }
+      return 'https://github.com/your-username/health-platform';
+    }
+  }
+
+  getRepositoryInfo() {
+    try {
+      const { execSync } = require('child_process');
+      const remoteUrl = execSync('git remote get-url origin', { encoding: 'utf8' }).trim();
+      
+      // Extract owner and repo from GitHub URL
+      const match = remoteUrl.match(/github\.com[:/]([^/]+)\/([^/.]+)/);
+      if (match) {
+        return {
+          owner: match[1],
+          repo: match[2],
+          url: `https://github.com/${match[1]}/${match[2]}`
+        };
+      }
+    } catch (error) {
+      console.log('   ⚠️  Could not auto-detect repository info');
+    }
+    
+    return {
+      owner: 'your-username',
+      repo: 'health-platform',
+      url: 'https://github.com/your-username/health-platform'
     };
   }
 
@@ -570,7 +620,7 @@ ${this.generateRecentFeatures()}
 *Auto-generated from live system analysis on ${new Date().toLocaleDateString()}*
 `;
 
-    this.writeDocFile('index.md', intro);
+    this.writeDocFile('intro.md', intro);
   }
 
   generateRecentFeatures() {
@@ -615,7 +665,7 @@ ${this.discovered.deployment.type === 'AWS Amplify' ? '- AWS CLI and Amplify CLI
 
 \`\`\`bash
 # Clone the repository
-git clone <repository-url>
+git clone ${this.repositoryUrl}.git
 cd health-platform
 
 # Install dependencies
@@ -674,7 +724,7 @@ ${this.discovered.deployment.type === 'AWS Amplify' ? '- AWS CLI and Amplify CLI
 ## Clone Repository
 
 \`\`\`bash
-git clone <repository-url>
+git clone ${this.repositoryUrl}.git
 cd health-platform
 \`\`\`
 
@@ -1074,7 +1124,7 @@ Configure your environment variables before deployment.`;
 
   generateSidebar() {
     const sidebarItems = [
-      'index',
+      'intro',
       'quick-start',
       {
         type: 'category',
