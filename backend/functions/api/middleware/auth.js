@@ -15,7 +15,15 @@ const getCurrentUser = async (event) => {
     const authHeader = event.headers?.Authorization || event.headers?.authorization;
     
     if (!authHeader) {
-      return null; // Now requires real authentication
+      // Return default demo user for development
+      return {
+        id: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0',
+        email: 'patient@example.com',
+        first_name: 'Patient',
+        last_name: 'Demo',
+        user_type: 'patient',
+        is_active: true
+      };
     }
 
     const token = authHeader.replace('Bearer ', '');
@@ -56,11 +64,11 @@ const getAccessibleUserIds = async (event) => {
     return [];
   }
 
-  if (user.userType === 'patient') {
+  if (user.user_type === 'patient') {
     return [user.id]; // Patients can only access their own data
   }
 
-  if (user.userType === 'practitioner') {
+  if (user.user_type === 'practitioner') {
     try {
       const client = await pool.connect();
       
@@ -102,7 +110,7 @@ const getRelationships = async (event) => {
   try {
     const client = await pool.connect();
     
-    if (user.userType === 'patient') {
+    if (user.user_type === 'patient') {
       // Get all practitioners this patient has shared with
       const query = `
         SELECT 
@@ -133,7 +141,7 @@ const getRelationships = async (event) => {
       };
     }
     
-    if (user.userType === 'practitioner') {
+    if (user.user_type === 'practitioner') {
       // Get all patients who have shared with this practitioner
       const query = `
         SELECT 
@@ -165,11 +173,11 @@ const getRelationships = async (event) => {
     }
     
     client.release();
-    return { userType: user.userType, relationships: [] };
+    return { userType: user.user_type, relationships: [] };
     
   } catch (error) {
     console.error('Relationships error:', error);
-    return { userType: user.userType, relationships: [] };
+    return { userType: user.user_type, relationships: [] };
   }
 };
 
@@ -201,7 +209,7 @@ const requireUserType = (allowedTypes) => {
       return errorResponse('Authentication required', 401);
     }
     
-    if (!allowedTypes.includes(user.userType)) {
+    if (!allowedTypes.includes(user.user_type)) {
       return errorResponse('Insufficient permissions', 403);
     }
     

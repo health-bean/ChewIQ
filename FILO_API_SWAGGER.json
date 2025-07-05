@@ -97,7 +97,7 @@
         }
       },
       "post": {
-        "summary": "Create timeline entry",
+        "summary": "Create timeline entry (test auth)",
         "responses": {
           "500": {
             "description": "Error",
@@ -109,12 +109,17 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
       }
     },
     "/api/v1/users": {
       "get": {
-        "summary": "Get user data",
+        "summary": "Get user data (dev mode: returns demo user)",
         "responses": {
           "401": {
             "description": "Error",
@@ -131,7 +136,7 @@
     },
     "/api/v1/user/protocols": {
       "get": {
-        "summary": "Get user active protocols",
+        "summary": "Get user active protocols (dev mode)",
         "responses": {
           "401": {
             "description": "Error",
@@ -148,7 +153,7 @@
     },
     "/api/v1/user/preferences": {
       "get": {
-        "summary": "Get user preferences",
+        "summary": "Get user preferences (dev mode)",
         "responses": {
           "401": {
             "description": "Error",
@@ -165,7 +170,7 @@
     },
     "/api/v1/journal/entries": {
       "get": {
-        "summary": "Get journal entries with date filter",
+        "summary": "Get journal entries with date filter (dev mode)",
         "responses": {
           "401": {
             "description": "Error",
@@ -231,23 +236,6 @@
         }
       }
     },
-    "/api/v1/exposure-types": {
-      "get": {
-        "summary": "Get exposure types",
-        "responses": {
-          "404": {
-            "description": "Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/detox-types": {
       "get": {
         "summary": "Get detox types",
@@ -263,6 +251,14 @@
             }
           }
         }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
       }
     }
   }

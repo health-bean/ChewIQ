@@ -1,0 +1,203 @@
+{
+  "endpoints": [
+    {
+      "path": "/api/v1/timeline/entries",
+      "method": "POST",
+      "description": "Auto-discovered POST /api/v1/timeline/entries",
+      "url": "https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/api/v1/timeline/entries",
+      "status": 500,
+      "responseTime": 523,
+      "dataType": "object",
+      "dataSize": 52,
+      "sampleData": {
+        "type": "object",
+        "keys": [
+          "error"
+        ],
+        "sample": {
+          "error": "Failed to complete create timeline entry"
+        },
+        "structure": {
+          "error": "string"
+        }
+      },
+      "headers": {
+        "content-type": "application/json",
+        "content-length": "52"
+      },
+      "working": false,
+      "source": "inferred",
+      "isVariation": false,
+      "requiresAuth": false,
+      "rawResponse": "{\"error\":\"Failed to complete create timeline entry\"}"
+    },
+    {
+      "path": "/api/v1/journal/entries",
+      "method": "POST",
+      "description": "Auto-discovered POST /api/v1/journal/entries",
+      "url": "https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/api/v1/journal/entries",
+      "status": 401,
+      "responseTime": 55,
+      "dataType": "object",
+      "dataSize": 35,
+      "sampleData": {
+        "type": "object",
+        "keys": [
+          "error"
+        ],
+        "sample": {
+          "error": "Authentication required"
+        },
+        "structure": {
+          "error": "string"
+        }
+      },
+      "headers": {
+        "content-type": "application/json",
+        "content-length": "35"
+      },
+      "working": false,
+      "source": "inferred",
+      "isVariation": false,
+      "requiresAuth": true,
+      "rawResponse": "{\"error\":\"Authentication required\"}"
+    },
+    {
+      "path": "/api/v1/auth",
+      "method": "POST",
+      "description": "Auto-discovered POST /api/v1/auth",
+      "url": "https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/api/v1/auth",
+      "status": 404,
+      "responseTime": 44,
+      "dataType": "object",
+      "dataSize": 115,
+      "sampleData": {
+        "type": "object",
+        "keys": [
+          "error",
+          "route",
+          "method",
+          "message"
+        ],
+        "sample": {
+          "error": "Route not found",
+          "route": "/api/v1/auth",
+          "method": "POST",
+          "message": "POST /api/v1/auth is not implemented"
+        },
+        "structure": {
+          "error": "string",
+          "route": "string",
+          "method": "string",
+          "message": "string"
+        }
+      },
+      "headers": {
+        "content-type": "application/json",
+        "content-length": "115"
+      },
+      "working": false,
+      "source": "inferred",
+      "isVariation": false,
+      "requiresAuth": false,
+      "rawResponse": "{\"error\":\"Route not found\",\"route\":\"/api/v1/auth\",\"method\":\"POST\",\"message\":\"POST /api/v1/auth is not implemented\"}"
+    },
+    {
+      "path": "/api/v1/users",
+      "method": "POST",
+      "description": "Auto-discovered POST /api/v1/users",
+      "url": "https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/api/v1/users",
+      "status": 404,
+      "responseTime": 42,
+      "dataType": "object",
+      "dataSize": 117,
+      "sampleData": {
+        "type": "object",
+        "keys": [
+          "error",
+          "route",
+          "method",
+          "message"
+        ],
+        "sample": {
+          "error": "Route not found",
+          "route": "/api/v1/users",
+          "method": "POST",
+          "message": "POST /api/v1/users is not implemented"
+        },
+        "structure": {
+          "error": "string",
+          "route": "string",
+          "method": "string",
+          "message": "string"
+        }
+      },
+      "headers": {
+        "content-type": "application/json",
+        "content-length": "117"
+      },
+      "working": false,
+      "source": "inferred",
+      "isVariation": false,
+      "requiresAuth": true,
+      "rawResponse": "{\"error\":\"Route not found\",\"route\":\"/api/v1/users\",\"method\":\"POST\",\"message\":\"POST /api/v1/users is not implemented\"}"
+    }
+  ],
+  "discoveredRoutes": [
+    {
+      "path": "/api/v1/timeline/entries",
+      "method": "POST",
+      "description": "Auto-discovered POST /api/v1/timeline/entries",
+      "source": "inferred",
+      "requiresAuth": false,
+      "body": {
+        "userId": "8e8a568a-c2f8-43a8-abf2-4e54408dbdc0",
+        "entryDate": "2025-07-04",
+        "entryType": "food",
+        "content": "Auto-discovery test entry"
+      }
+    },
+    {
+      "path": "/api/v1/journal/entries",
+      "method": "POST",
+      "description": "Auto-discovered POST /api/v1/journal/entries",
+      "source": "inferred",
+      "requiresAuth": true,
+      "body": {
+        "userId": "8e8a568a-c2f8-43a8-abf2-4e54408dbdc0",
+        "date": "2025-07-04",
+        "mood": "good",
+        "energy": "high"
+      }
+    },
+    {
+      "path": "/api/v1/auth",
+      "method": "POST",
+      "description": "Auto-discovered POST /api/v1/auth",
+      "source": "inferred",
+      "requiresAuth": false,
+      "body": {
+        "email": "patient@example.com",
+        "password": "demo123456"
+      }
+    },
+    {
+      "path": "/api/v1/users",
+      "method": "POST",
+      "description": "Auto-discovered POST /api/v1/users",
+      "source": "inferred",
+      "requiresAuth": true,
+      "body": {
+        "test": true
+      }
+    }
+  ],
+  "status": "degraded",
+  "timestamp": "2025-07-04T23:56:57.196Z",
+  "summary": {
+    "discovered": 4,
+    "working": 0,
+    "broken": 4,
+    "total": 4
+  }
+}

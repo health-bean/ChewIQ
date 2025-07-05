@@ -1,0 +1,53 @@
+{
+  "timestamp": "2025-07-04T23:56:57.196Z",
+  "discovered": [
+    {
+      "path": "/api/v1/timeline/entries",
+      "method": "POST",
+      "description": "Auto-discovered POST /api/v1/timeline/entries",
+      "source": "inferred",
+      "requiresAuth": false,
+      "body": {
+        "userId": "8e8a568a-c2f8-43a8-abf2-4e54408dbdc0",
+        "entryDate": "2025-07-04",
+        "entryType": "food",
+        "content": "Auto-discovery test entry"
+      }
+    },
+    {
+      "path": "/api/v1/journal/entries",
+      "method": "POST",
+      "description": "Auto-discovered POST /api/v1/journal/entries",
+      "source": "inferred",
+      "requiresAuth": true,
+      "body": {
+        "userId": "8e8a568a-c2f8-43a8-abf2-4e54408dbdc0",
+        "date": "2025-07-04",
+        "mood": "good",
+        "energy": "high"
+      }
+    },
+    {
+      "path": "/api/v1/auth",
+      "method": "POST",
+      "description": "Auto-discovered POST /api/v1/auth",
+      "source": "inferred",
+      "requiresAuth": false,
+      "body": {
+        "email": "patient@example.com",
+        "password": "demo123456"
+      }
+    },
+    {
+      "path": "/api/v1/users",
+      "method": "POST",
+      "description": "Auto-discovered POST /api/v1/users",
+      "source": "inferred",
+      "requiresAuth": true,
+      "body": {
+        "test": true
+      }
+    }
+  ],
+  "working": []
+}

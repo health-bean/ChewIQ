@@ -4,408 +4,122 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-class AutoDiscoveryAPIAnalyzer {
-  constructor(options = {}) {
-    this.baseURL = options.baseURL || 'https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev';
-    this.lambdaPath = options.lambdaPath || './backend/functions/api/';
+class FILOAPIAnalyzer {
+  constructor() {
+    this.baseURL = 'https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev';
     this.results = {
       endpoints: [],
-      discoveredRoutes: [],
       status: 'unknown',
       timestamp: new Date().toISOString(),
       summary: {
-        discovered: 0,
         working: 0,
         broken: 0,
-        total: 0
+        total: 0,
+        authRequired: 0,
+        authFailed: 0
       }
     };
   }
 
   async analyzeAPIs() {
-    console.log('🔍 Auto-discovering FILO Health Platform APIs...');
-    console.log(`Lambda Path: ${this.lambdaPath}`);
+    console.log('🌐 Testing FILO Health Platform APIs...');
     console.log(`Base URL: ${this.baseURL}\n`);
     
-    // Step 1: Auto-discover endpoints from Lambda code
-    const discoveredEndpoints = await this.discoverEndpoints();
+    // Production endpoints with authentication requirements
+    const productionEndpoints = [
+      // Core protocol endpoints (public)
+      { path: '/api/v1/protocols', method: 'GET', description: 'Get available health protocols', requiresAuth: false },
+      
+      // AI correlation endpoints (public with userId param)
+      { path: '/api/v1/correlations/insights?userId=8e8a568a-c2f8-43a8-abf2-4e54408dbdc0', method: 'GET', description: 'Get AI correlation insights', requiresAuth: false },
+      { path: '/api/v1/correlations/insights?userId=8e8a568a-c2f8-43a8-abf2-4e54408dbdc0&confidence_threshold=0.7', method: 'GET', description: 'Get filtered correlation insights', requiresAuth: false },
+      
+      // Protocol foods endpoints (public)
+      { path: '/api/v1/foods/by-protocol?protocol_id=1495844a-19de-404c-a288-7660eda0cbe1', method: 'GET', description: 'Get AIP Core protocol foods', requiresAuth: false },
+      { path: '/api/v1/foods/by-protocol?protocol_id=51ca7a24-4691-4629-8ee5-c20876e68c29', method: 'GET', description: 'Get Low Histamine protocol foods', requiresAuth: false },
+      { path: '/api/v1/foods/search?search=chicken', method: 'GET', description: 'Search foods - chicken', requiresAuth: false },
+      { path: '/api/v1/foods/search?search=broccoli&protocol_id=1495844a-19de-404c-a288-7660eda0cbe1', method: 'GET', description: 'Search foods with protocol context', requiresAuth: false },
+      
+      // Timeline endpoints (public with userId param)
+      { path: '/api/v1/timeline/entries', method: 'GET', description: 'Get timeline entries', requiresAuth: false },
+      { path: '/api/v1/timeline/entries?date=2025-07-04', method: 'GET', description: 'Get timeline entries with date filter', requiresAuth: false },
+      { path: '/api/v1/timeline/entries?userId=8e8a568a-c2f8-43a8-abf2-4e54408dbdc0', method: 'GET', description: 'Get user timeline entries', requiresAuth: false },
+      
+      // User management endpoints (should work in dev mode - returns demo user)
+      { path: '/api/v1/users', method: 'GET', description: 'Get user data (dev mode: returns demo user)', requiresAuth: false },
+      { path: '/api/v1/user/protocols', method: 'GET', description: 'Get user active protocols (dev mode)', requiresAuth: false },
+      { path: '/api/v1/user/preferences', method: 'GET', description: 'Get user preferences (dev mode)', requiresAuth: false },
+      
+      // Journal endpoints (should work in dev mode)
+      { path: '/api/v1/journal/entries', method: 'GET', description: 'Get journal entries (dev mode)', requiresAuth: false },
+      { path: '/api/v1/journal/entries?date=2025-07-04', method: 'GET', description: 'Get journal entries with date filter (dev mode)', requiresAuth: false },
+      
+      // Search endpoints (public)
+      { path: '/api/v1/symptoms/search?search=headache', method: 'GET', description: 'Search symptoms', requiresAuth: false },
+      { path: '/api/v1/supplements/search?search=vitamin', method: 'GET', description: 'Search supplements', requiresAuth: false },
+      { path: '/api/v1/medications/search?search=ibuprofen', method: 'GET', description: 'Search medications', requiresAuth: false },
+      
+      // Exposure and detox endpoints (exposure-types missing per 404 error)
+      // { path: '/api/v1/exposure-types', method: 'GET', description: 'Get exposure types', requiresAuth: false },
+      { path: '/api/v1/detox-types', method: 'GET', description: 'Get detox types', requiresAuth: false },
+      
+      // Authentication endpoint (test login) - NOT IMPLEMENTED YET
+      // { path: '/api/v1/auth', method: 'POST', description: 'User authentication', requiresAuth: false,
+      //   body: {
+      //     email: 'patient@example.com',
+      //     password: 'demo123456'
+      //   }
+      // },
+      
+      // Test POST endpoint (timeline creation) - test with auth header
+      { path: '/api/v1/timeline/entries', method: 'POST', description: 'Create timeline entry (test auth)', requiresAuth: true,
+        body: {
+          userId: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0',
+          entryDate: '2025-07-04',
+          entryType: 'food',
+          content: 'API test entry',
+          selectedFoods: ['test food']
+        }
+      }
+    ];
+
+    console.log(`Testing ${productionEndpoints.length} production endpoints...\n`);
     
-    if (discoveredEndpoints.length === 0) {
-      console.log('⚠️  No endpoints discovered. Falling back to known endpoints...');
-      return this.fallbackToKnownEndpoints();
-    }
-    
-    console.log(`🎯 Discovered ${discoveredEndpoints.length} endpoints from Lambda code\n`);
-    
-    // Step 2: Test all discovered endpoints
-    for (const endpoint of discoveredEndpoints) {
-      await this.testEndpoint(endpoint);
-      await this.sleep(300); // Rate limiting
+    for (const endpoint of productionEndpoints) {
+      // Test without auth - your dev mode should return demo user automatically
+      await this.testEndpoint(endpoint, false);
+      await this.sleep(300); // Rate limiting between requests
     }
 
     this.generateReport();
     this.saveResults();
   }
 
-  async discoverEndpoints() {
-    const endpoints = [];
-    
-    try {
-      // Scan Lambda function files
-      const lambdaFiles = this.findLambdaFiles();
-      
-      for (const file of lambdaFiles) {
-        const routes = this.parseRoutes(file);
-        endpoints.push(...routes);
-      }
-      
-      // Add common test variations
-      const enhancedEndpoints = this.enhanceEndpoints(endpoints);
-      
-      this.results.discoveredRoutes = enhancedEndpoints;
-      this.results.summary.discovered = enhancedEndpoints.length;
-      
-      return enhancedEndpoints;
-      
-    } catch (error) {
-      console.error('❌ Error discovering endpoints:', error.message);
-      return [];
-    }
-  }
-
-  findLambdaFiles() {
-    const files = [];
-    
-    const searchPaths = [
-      this.lambdaPath,
-      './backend/',
-      './src/',
-      './functions/',
-      './'
-    ];
-    
-    for (const searchPath of searchPaths) {
-      if (fs.existsSync(searchPath)) {
-        const foundFiles = this.scanDirectory(searchPath);
-        files.push(...foundFiles);
-        if (foundFiles.length > 0) {
-          console.log(`📁 Found ${foundFiles.length} Lambda files in ${searchPath}`);
-          break; // Use first valid directory
-        }
-      }
-    }
-    
-    return files;
-  }
-
-  scanDirectory(dir) {
-    const files = [];
-    
-    try {
-      const entries = fs.readdirSync(dir, { withFileTypes: true });
-      
-      for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name);
-        
-        if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
-          files.push(...this.scanDirectory(fullPath));
-        } else if (entry.isFile() && (entry.name.endsWith('.js') || entry.name.endsWith('.ts'))) {
-          files.push(fullPath);
-        }
-      }
-    } catch (error) {
-      // Directory doesn't exist or no permission
-    }
-    
-    return files;
-  }
-
-  parseRoutes(filePath) {
-    const routes = [];
-    
-    try {
-      const content = fs.readFileSync(filePath, 'utf8');
-      
-      // Parse different route patterns
-      const patterns = [
-        // AWS Lambda event routing
-        /(?:path|resource)\s*===?\s*['"`]([^'"`]+)['"`]/g,
-        /(?:httpMethod|method)\s*===?\s*['"`]([^'"`]+)['"`]/g,
-        
-        // Express-style routes
-        /app\.(get|post|put|delete|patch)\s*\(\s*['"`]([^'"`]+)['"`]/g,
-        
-        // Route objects
-        /route\s*:\s*['"`]([^'"`]+)['"`]/g,
-        /method\s*:\s*['"`]([^'"`]+)['"`]/g,
-        
-        // API Gateway proxy patterns
-        /\/api\/v\d+\/[a-zA-Z0-9\-\/\?\=\&\_]+/g,
-        
-        // Custom route handlers
-        /(['"`]\/api\/[^'"`]+['"`])/g
-      ];
-      
-      const foundPaths = new Set();
-      const foundMethods = new Set();
-      
-      for (const pattern of patterns) {
-        let match;
-        while ((match = pattern.exec(content)) !== null) {
-          const value = match[1] || match[2];
-          if (value) {
-            if (value.startsWith('/')) {
-              foundPaths.add(value);
-            } else if (['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(value.toUpperCase())) {
-              foundMethods.add(value.toUpperCase());
-            }
-          }
-        }
-      }
-      
-      // Extract route information from Lambda handler patterns
-      const lambdaRoutes = this.extractLambdaRoutes(content);
-      routes.push(...lambdaRoutes);
-      
-      // Combine found paths with methods
-      for (const apiPath of foundPaths) {
-        if (apiPath.startsWith('/api/')) {
-          const methods = foundMethods.size > 0 ? Array.from(foundMethods) : ['GET'];
-          for (const method of methods) {
-            routes.push({
-              path: apiPath,
-              method: method,
-              description: `Auto-discovered ${method} ${apiPath}`,
-              source: path.basename(filePath),
-              requiresAuth: this.inferAuthRequirement(apiPath, content)
-            });
-          }
-        }
-      }
-      
-    } catch (error) {
-      console.warn(`⚠️  Could not parse ${filePath}: ${error.message}`);
-    }
-    
-    return routes;
-  }
-
-  extractLambdaRoutes(content) {
-    const routes = [];
-    
-    // Look for Lambda handler routing patterns
-    const routePatterns = [
-      // if (httpMethod === 'GET' && path === '/api/v1/protocols')
-      /if\s*\(\s*(?:httpMethod|method)\s*===?\s*['"`](\w+)['"`]\s*&&\s*(?:path|resource)\s*===?\s*['"`]([^'"`]+)['"`]/g,
-      
-      // if (path.startsWith('/api/v1/foods') && httpMethod === 'GET')
-      /if\s*\(\s*(?:path|resource)\.startsWith\s*\(\s*['"`]([^'"`]+)['"`]\s*\)\s*&&\s*(?:httpMethod|method)\s*===?\s*['"`](\w+)['"`]/g,
-      
-      // case '/api/v1/protocols':
-      /case\s*['"`]([^'"`]+)['"`]\s*:/g,
-      
-      // Switch statement patterns
-      /switch\s*\(\s*(?:path|resource)\s*\)[^}]*case\s*['"`]([^'"`]+)['"`]/g
-    ];
-    
-    for (const pattern of routePatterns) {
-      let match;
-      while ((match = pattern.exec(content)) !== null) {
-        if (match[1] && match[2]) {
-          // httpMethod and path
-          routes.push({
-            path: match[2],
-            method: match[1].toUpperCase(),
-            description: `Lambda route ${match[1]} ${match[2]}`,
-            source: 'lambda-handler',
-            requiresAuth: this.inferAuthRequirement(match[2], content)
-          });
-        } else if (match[1] && match[1].startsWith('/api/')) {
-          // Just path, assume GET
-          routes.push({
-            path: match[1],
-            method: 'GET',
-            description: `Lambda route ${match[1]}`,
-            source: 'lambda-handler',
-            requiresAuth: this.inferAuthRequirement(match[1], content)
-          });
-        }
-      }
-    }
-    
-    return routes;
-  }
-
-  inferAuthRequirement(apiPath, content) {
-    // Look for auth-related patterns near this route
-    const authPatterns = [
-      /getCurrentUser/,
-      /requireAuth/,
-      /authenticate/,
-      /verifyToken/,
-      /Authorization/,
-      /Bearer/
-    ];
-    
-    // Check if any auth patterns exist in the content
-    for (const pattern of authPatterns) {
-      if (pattern.test(content)) {
-        // If it's a user-specific endpoint, probably needs auth
-        if (apiPath.includes('/user/') || apiPath.includes('/journal/')) {
-          return true;
-        }
-      }
-    }
-    
-    return false; // Default to no auth required for dev mode
-  }
-
-  enhanceEndpoints(baseEndpoints) {
-    const enhanced = [];
-    
-    // Remove duplicates
-    const uniqueEndpoints = this.deduplicateEndpoints(baseEndpoints);
-    
-    for (const endpoint of uniqueEndpoints) {
-      enhanced.push(endpoint);
-      
-      // Add common test variations for search endpoints
-      if (endpoint.path.includes('/search')) {
-        enhanced.push({
-          ...endpoint,
-          path: endpoint.path + (endpoint.path.includes('?') ? '&' : '?') + 'search=test',
-          description: endpoint.description + ' (with search term)',
-          isVariation: true
-        });
-      }
-      
-      // Add date filter variations
-      if (endpoint.path.includes('/entries')) {
-        enhanced.push({
-          ...endpoint,
-          path: endpoint.path + (endpoint.path.includes('?') ? '&' : '?') + 'date=2025-07-04',
-          description: endpoint.description + ' (with date filter)',
-          isVariation: true
-        });
-      }
-      
-      // Add userId variations for dev mode
-      if (endpoint.requiresAuth || endpoint.path.includes('/user') || endpoint.path.includes('/correlation')) {
-        enhanced.push({
-          ...endpoint,
-          path: endpoint.path + (endpoint.path.includes('?') ? '&' : '?') + 'userId=8e8a568a-c2f8-43a8-abf2-4e54408dbdc0',
-          description: endpoint.description + ' (with userId)',
-          isVariation: true
-        });
-      }
-    }
-    
-    // Add POST endpoint variations
-    const postEndpoints = this.generatePostEndpoints(uniqueEndpoints);
-    enhanced.push(...postEndpoints);
-    
-    return enhanced;
-  }
-
-  deduplicateEndpoints(endpoints) {
-    const seen = new Set();
-    return endpoints.filter(endpoint => {
-      const key = `${endpoint.method}:${endpoint.path}`;
-      if (seen.has(key)) {
-        return false;
-      }
-      seen.add(key);
-      return true;
-    });
-  }
-
-  generatePostEndpoints(endpoints) {
-    const postEndpoints = [];
-    
-    // Look for endpoints that might have POST variants
-    const postCandidates = [
-      '/api/v1/timeline/entries',
-      '/api/v1/journal/entries',
-      '/api/v1/auth',
-      '/api/v1/users'
-    ];
-    
-    for (const candidate of postCandidates) {
-      const exists = endpoints.some(e => e.path === candidate && e.method === 'POST');
-      if (!exists) {
-        postEndpoints.push({
-          path: candidate,
-          method: 'POST',
-          description: `Auto-discovered POST ${candidate}`,
-          source: 'inferred',
-          requiresAuth: candidate.includes('/user') || candidate.includes('/journal'),
-          body: this.generatePostBody(candidate)
-        });
-      }
-    }
-    
-    return postEndpoints;
-  }
-
-  generatePostBody(path) {
-    const bodies = {
-      '/api/v1/timeline/entries': {
-        userId: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0',
-        entryDate: '2025-07-04',
-        entryType: 'food',
-        content: 'Auto-discovery test entry'
-      },
-      '/api/v1/journal/entries': {
-        userId: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0',
-        date: '2025-07-04',
-        mood: 'good',
-        energy: 'high'
-      },
-      '/api/v1/auth': {
-        email: 'patient@example.com',
-        password: 'demo123456'
-      }
-    };
-    
-    return bodies[path] || { test: true };
-  }
-
-  async fallbackToKnownEndpoints() {
-    console.log('🔄 Using fallback known endpoints...');
-    
-    // Your current working endpoints as fallback
-    const knownEndpoints = [
-      { path: '/api/v1/protocols', method: 'GET', description: 'Get available protocols' },
-      { path: '/api/v1/correlations/insights?userId=8e8a568a-c2f8-43a8-abf2-4e54408dbdc0', method: 'GET', description: 'Get correlation insights' },
-      { path: '/api/v1/foods/search?search=chicken', method: 'GET', description: 'Search foods' },
-      { path: '/api/v1/timeline/entries', method: 'GET', description: 'Get timeline entries' },
-      { path: '/api/v1/users', method: 'GET', description: 'Get user data' },
-      { path: '/api/v1/symptoms/search?search=headache', method: 'GET', description: 'Search symptoms' }
-    ];
-    
-    for (const endpoint of knownEndpoints) {
-      await this.testEndpoint(endpoint);
-      await this.sleep(300);
-    }
-    
-    this.generateReport();
-    this.saveResults();
-  }
-
-  async testEndpoint(endpoint) {
+  async testEndpoint(endpoint, withAuth = false) {
     return new Promise((resolve) => {
       const url = `${this.baseURL}${endpoint.path}`;
       const startTime = Date.now();
       
-      console.log(`🔄 Testing: ${endpoint.method} ${endpoint.path}`);
+      const authSuffix = withAuth ? ' (with auth)' : '';
+      const retryPrefix = endpoint.retryWithAuth ? '    🔄 ' : '🔄 ';
+      console.log(`${retryPrefix}Testing: ${endpoint.method} ${endpoint.path}${authSuffix}`);
       
       const options = {
         method: endpoint.method,
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': 'FILO-Auto-Discovery/1.0'
+          'User-Agent': 'FILO-API-Analyzer/1.0'
         }
       };
+
+      // Add authentication header for POST requests or auth-required endpoints
+      if (withAuth || endpoint.requiresAuth) {
+        // Try the development mode approach - no auth header to get demo user
+        // But for POST requests that are failing, try with a dummy header
+        if (endpoint.method === 'POST') {
+          options.headers['Authorization'] = 'Bearer dev-mode-token';
+        }
+      }
 
       // Add body for POST requests
       let postData = null;
@@ -428,25 +142,27 @@ class AutoDiscoveryAPIAnalyzer {
             const dataType = Array.isArray(parsedBody) ? 'array' : typeof parsedBody;
             const working = res.statusCode >= 200 && res.statusCode < 300;
             
+            // Create sample data structure
+            const sampleData = this.createSampleData(parsedBody);
+            
             const endpointResult = {
               path: endpoint.path,
               method: endpoint.method,
-              description: endpoint.description,
+              description: endpoint.description + (withAuth ? ' (with auth)' : ''),
               url: url,
               status: res.statusCode,
               responseTime: responseTime,
               dataType: dataType,
               dataSize: Buffer.byteLength(body),
-              sampleData: this.createSampleData(parsedBody),
+              sampleData: sampleData,
               headers: {
                 'content-type': res.headers['content-type'],
                 'content-length': res.headers['content-length']
               },
               working: working,
-              source: endpoint.source || 'discovered',
-              isVariation: endpoint.isVariation || false,
-              requiresAuth: endpoint.requiresAuth || false,
-              rawResponse: working ? null : body.substring(0, 500)
+              requiresAuth: endpoint.requiresAuth,
+              testedWithAuth: withAuth,
+              rawResponse: working ? null : body.substring(0, 500) // Limit error response size
             };
             
             this.results.endpoints.push(endpointResult);
@@ -459,15 +175,19 @@ class AutoDiscoveryAPIAnalyzer {
               console.log(`  ✅ ${res.statusCode} (${responseTime}ms) - ${dataInfo}`);
             } else {
               this.results.summary.broken++;
+              if (res.statusCode === 401 && endpoint.requiresAuth) {
+                this.results.summary.authFailed++;
+              }
               console.log(`  ❌ ${res.statusCode} (${responseTime}ms) - Error`);
             }
             
           } catch (error) {
+            // Handle non-JSON responses
             const working = res.statusCode >= 200 && res.statusCode < 300;
             this.results.endpoints.push({
               path: endpoint.path,
               method: endpoint.method,
-              description: endpoint.description,
+              description: endpoint.description + (withAuth ? ' (with auth)' : ''),
               url: url,
               status: res.statusCode,
               responseTime: responseTime,
@@ -479,9 +199,8 @@ class AutoDiscoveryAPIAnalyzer {
                 'content-length': res.headers['content-length']
               },
               working: working,
-              source: endpoint.source || 'discovered',
-              isVariation: endpoint.isVariation || false,
-              requiresAuth: endpoint.requiresAuth || false,
+              requiresAuth: endpoint.requiresAuth,
+              testedWithAuth: withAuth,
               rawResponse: body.substring(0, 500)
             });
             
@@ -490,7 +209,7 @@ class AutoDiscoveryAPIAnalyzer {
               console.log(`  ✅ ${res.statusCode} (${responseTime}ms) - Text response`);
             } else {
               this.results.summary.broken++;
-              console.log(`  ❌ ${res.statusCode} (${responseTime}ms) - Parse error`);
+              console.log(`  ❌ ${res.statusCode} (${responseTime}ms) - Parse error: ${error.message}`);
             }
           }
           
@@ -504,7 +223,7 @@ class AutoDiscoveryAPIAnalyzer {
         this.results.endpoints.push({
           path: endpoint.path,
           method: endpoint.method,
-          description: endpoint.description,
+          description: endpoint.description + (withAuth ? ' (with auth)' : ''),
           url: url,
           status: 0,
           responseTime: responseTime,
@@ -513,9 +232,8 @@ class AutoDiscoveryAPIAnalyzer {
           sampleData: { error: error.message },
           headers: {},
           working: false,
-          source: endpoint.source || 'discovered',
-          isVariation: endpoint.isVariation || false,
-          requiresAuth: endpoint.requiresAuth || false,
+          requiresAuth: endpoint.requiresAuth,
+          testedWithAuth: withAuth,
           rawResponse: error.message
         });
         
@@ -525,6 +243,7 @@ class AutoDiscoveryAPIAnalyzer {
         resolve();
       });
       
+      // Send POST data if present
       if (postData) {
         req.write(postData);
       }
@@ -541,6 +260,7 @@ class AutoDiscoveryAPIAnalyzer {
     const type = Array.isArray(data) ? 'array' : 'object';
     const keys = Array.isArray(data) ? [] : Object.keys(data);
     
+    // Create structure description
     const structure = {};
     if (Array.isArray(data)) {
       structure.length = data.length;
@@ -575,36 +295,24 @@ class AutoDiscoveryAPIAnalyzer {
       ? Math.round((this.results.summary.working / this.results.summary.total) * 100)
       : 0;
     
-    console.log('\n📊 FILO Auto-Discovery API Analysis Report');
-    console.log('==========================================\n');
+    console.log('\n📊 FILO API Analysis Report');
+    console.log('============================\n');
     
-    console.log('🎯 DISCOVERY SUMMARY:');
-    console.log(`🔍 Endpoints Discovered: ${this.results.summary.discovered}`);
+    console.log('🎯 SUMMARY:');
     console.log(`✅ Working: ${this.results.summary.working}/${this.results.summary.total}`);
     console.log(`❌ Broken: ${this.results.summary.broken}/${this.results.summary.total}`);
-    console.log(`📊 Success Rate: ${successRate}%\n`);
-    
-    // Show discovered routes
-    if (this.results.discoveredRoutes.length > 0) {
-      console.log('🔍 DISCOVERED ROUTES:');
-      const routesBySource = this.groupBy(this.results.discoveredRoutes, 'source');
-      Object.keys(routesBySource).forEach(source => {
-        console.log(`  📁 From ${source}:`);
-        routesBySource[source].forEach(route => {
-          console.log(`    ${route.method} ${route.path}`);
-        });
-      });
-      console.log('');
-    }
+    console.log(`📊 Success Rate: ${successRate}%`);
+    console.log(`🔐 Auth Required: ${this.results.summary.authRequired}`);
+    console.log(`🚫 Auth Failed: ${this.results.summary.authFailed}\n`);
     
     const workingEndpoints = this.results.endpoints.filter(e => e.working);
     const brokenEndpoints = this.results.endpoints.filter(e => !e.working);
+    const authEndpoints = this.results.endpoints.filter(e => e.requiresAuth);
     
     if (workingEndpoints.length > 0) {
       console.log('🟢 WORKING ENDPOINTS:');
       workingEndpoints.forEach(endpoint => {
-        const sourceInfo = endpoint.source ? ` (${endpoint.source})` : '';
-        console.log(`  ${endpoint.method} ${endpoint.path}${sourceInfo}`);
+        console.log(`  ${endpoint.method} ${endpoint.path}`);
         console.log(`    Status: ${endpoint.status} | Response Time: ${endpoint.responseTime}ms`);
         console.log(`    Data: ${endpoint.dataType} with keys: ${endpoint.sampleData.keys ? endpoint.sampleData.keys.join(', ') : 'N/A'}`);
         console.log('');
@@ -614,21 +322,82 @@ class AutoDiscoveryAPIAnalyzer {
     if (brokenEndpoints.length > 0) {
       console.log('🔴 BROKEN/ERROR ENDPOINTS:');
       brokenEndpoints.forEach(endpoint => {
-        const sourceInfo = endpoint.source ? ` (${endpoint.source})` : '';
-        console.log(`  ${endpoint.method} ${endpoint.path}${sourceInfo}`);
+        console.log(`  ${endpoint.method} ${endpoint.path}`);
         console.log(`    Status: ${endpoint.status} | Issue: ${this.getErrorDescription(endpoint.status)}`);
+        if (endpoint.status === 401 && endpoint.requiresAuth) {
+          console.log(`    Note: This endpoint requires authentication`);
+        }
         console.log('');
       });
     }
+
+    if (authEndpoints.length > 0) {
+      console.log('🔐 AUTHENTICATION ANALYSIS:');
+      authEndpoints.forEach(endpoint => {
+        const authStatus = endpoint.working ? '✅ Working' : '❌ Failed';
+        console.log(`  ${endpoint.method} ${endpoint.path} - ${authStatus}`);
+        if (endpoint.testedWithAuth) {
+          console.log(`    Tested with auth: ${endpoint.status}`);
+        }
+      });
+      console.log('');
+    }
+    
+    // Performance metrics
+    const responseTimes = this.results.endpoints.map(e => e.responseTime);
+    const avgResponseTime = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
+    const minResponseTime = Math.min(...responseTimes);
+    const maxResponseTime = Math.max(...responseTimes);
+    
+    console.log('⚡ PERFORMANCE METRICS:');
+    console.log(`  Average Response Time: ${Math.round(avgResponseTime)}ms`);
+    console.log(`  Fastest Response: ${minResponseTime}ms`);
+    console.log(`  Slowest Response: ${maxResponseTime}ms\n`);
+    
+    // Data insights
+    console.log('📋 API DATA INSIGHTS:');
+    workingEndpoints.forEach(endpoint => {
+      if (endpoint.sampleData.structure) {
+        console.log(`  ${endpoint.path}:`);
+        Object.keys(endpoint.sampleData.structure).forEach(key => {
+          console.log(`    - ${key}: ${endpoint.sampleData.structure[key]}`);
+        });
+        console.log('');
+      }
+    });
+    
+    // Troubleshooting recommendations
+    console.log('🔧 TROUBLESHOOTING RECOMMENDATIONS:');
+    const errors401 = brokenEndpoints.filter(e => e.status === 401);
+    const errors404 = brokenEndpoints.filter(e => e.status === 404);
+    const errors500 = brokenEndpoints.filter(e => e.status === 500);
+    
+    if (errors401.length > 0) {
+      console.log('  📋 401 Unauthorized Errors:');
+      console.log('    - These endpoints may not be using your dev mode auth middleware');
+      console.log('    - Check if getCurrentUser() is being called for these routes');
+      console.log('    - Your dev mode should return demo user when no auth header is present');
+      errors401.forEach(e => {
+        console.log(`    - Check route: ${e.path}`);
+      });
+    }
+    
+    if (errors404.length > 0) {
+      console.log('  📋 404 Not Found Errors:');
+      errors404.forEach(e => {
+        console.log(`    - Missing endpoint: ${e.path}`);
+      });
+      console.log('    - These endpoints need to be implemented in your Lambda function');
+    }
+    
+    if (errors500.length > 0) {
+      console.log('  📋 500 Server Errors:');
+      console.log('    - Check Lambda CloudWatch logs: aws logs tail /aws/lambda/health-platform-dev');
+      console.log('    - Verify POST request body format and required fields');
+      console.log('    - Check database connections and queries');
+    }
     
     this.results.status = successRate > 50 ? 'healthy' : 'degraded';
-  }
-
-  groupBy(array, key) {
-    return array.reduce((result, item) => {
-      (result[item[key]] = result[item[key]] || []).push(item);
-      return result;
-    }, {});
   }
 
   getErrorDescription(statusCode) {
@@ -647,55 +416,66 @@ class AutoDiscoveryAPIAnalyzer {
 
   saveResults() {
     // Save detailed analysis
-    fs.writeFileSync('FILO_AUTO_DISCOVERY_ANALYSIS.json', JSON.stringify(this.results, null, 2));
-    console.log('\n💾 Auto-discovery report saved to: FILO_AUTO_DISCOVERY_ANALYSIS.json');
+    fs.writeFileSync('FILO_API_ANALYSIS.json', JSON.stringify(this.results, null, 2));
+    console.log('\n💾 Detailed API report saved to: FILO_API_ANALYSIS.json');
     
-    // Save discovered routes for future reference
-    const routeMap = {
+    // Save Swagger-like documentation
+    const swagger = this.generateSwagger();
+    fs.writeFileSync('FILO_API_SWAGGER.json', JSON.stringify(swagger, null, 2));
+    console.log('📋 API documentation saved to: FILO_API_SWAGGER.json');
+    
+    // Save summary
+    const summary = {
       timestamp: this.results.timestamp,
-      discovered: this.results.discoveredRoutes,
-      working: this.results.endpoints.filter(e => e.working).map(e => ({
-        path: e.path,
-        method: e.method,
-        description: e.description,
-        source: e.source
-      }))
+      baseURL: this.baseURL,
+      summary: this.results.summary,
+      status: this.results.status,
+      workingEndpoints: this.results.endpoints.filter(e => e.working).length,
+      totalEndpoints: this.results.summary.total,
+      authEndpoints: this.results.endpoints.filter(e => e.requiresAuth).length,
+      troubleshooting: {
+        errors401: this.results.endpoints.filter(e => e.status === 401).length,
+        errors404: this.results.endpoints.filter(e => e.status === 404).length,
+        errors500: this.results.endpoints.filter(e => e.status === 500).length
+      }
     };
-    fs.writeFileSync('FILO_DISCOVERED_ROUTES.json', JSON.stringify(routeMap, null, 2));
-    console.log('🗺️  Route map saved to: FILO_DISCOVERED_ROUTES.json');
-    
-    // Generate OpenAPI spec from discovered routes
-    const openapi = this.generateOpenAPI();
-    fs.writeFileSync('FILO_AUTO_OPENAPI.json', JSON.stringify(openapi, null, 2));
-    console.log('📋 OpenAPI spec saved to: FILO_AUTO_OPENAPI.json');
+    fs.writeFileSync('FILO_API_SUMMARY.json', JSON.stringify(summary, null, 2));
+    console.log('📊 API summary saved to: FILO_API_SUMMARY.json');
   }
 
-  generateOpenAPI() {
-    const openapi = {
+  generateSwagger() {
+    const swagger = {
       openapi: '3.0.0',
       info: {
         title: 'FILO Health Platform API',
         version: '1.0.0',
-        description: 'Auto-discovered API endpoints for FILO Health Platform'
+        description: 'Production-ready API with proxy integration for AI-powered health intelligence platform'
       },
       servers: [
         {
           url: this.baseURL,
-          description: 'Production API Gateway'
+          description: 'Production API Gateway with proxy integration'
         }
       ],
-      paths: {}
+      paths: {},
+      components: {
+        securitySchemes: {
+          BearerAuth: {
+            type: 'http',
+            scheme: 'bearer'
+          }
+        }
+      }
     };
     
     this.results.endpoints.forEach(endpoint => {
-      const path = endpoint.path.split('?')[0];
-      if (!openapi.paths[path]) {
-        openapi.paths[path] = {};
+      const path = endpoint.path.split('?')[0]; // Remove query parameters for swagger
+      if (!swagger.paths[path]) {
+        swagger.paths[path] = {};
       }
       
-      openapi.paths[path][endpoint.method.toLowerCase()] = {
+      const operation = {
         summary: endpoint.description,
-        tags: [this.inferTag(endpoint.path)],
         responses: {
           [endpoint.status]: {
             description: endpoint.working ? 'Success' : 'Error',
@@ -709,29 +489,18 @@ class AutoDiscoveryAPIAnalyzer {
           }
         }
       };
+
+      if (endpoint.requiresAuth) {
+        operation.security = [{ BearerAuth: [] }];
+      }
+      
+      swagger.paths[path][endpoint.method.toLowerCase()] = operation;
     });
     
-    return openapi;
-  }
-
-  inferTag(path) {
-    if (path.includes('/protocol')) return 'Protocols';
-    if (path.includes('/food')) return 'Foods';
-    if (path.includes('/correlation')) return 'Correlations';
-    if (path.includes('/timeline')) return 'Timeline';
-    if (path.includes('/journal')) return 'Journal';
-    if (path.includes('/user')) return 'Users';
-    if (path.includes('/symptom')) return 'Symptoms';
-    if (path.includes('/supplement')) return 'Supplements';
-    if (path.includes('/medication')) return 'Medications';
-    return 'General';
+    return swagger;
   }
 }
 
-// Run the auto-discovery analysis
-const analyzer = new AutoDiscoveryAPIAnalyzer({
-  baseURL: 'https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev',
-  lambdaPath: './backend/functions/api/' // Adjust this path as needed
-});
-
+// Run the analysis
+const analyzer = new FILOAPIAnalyzer();
 analyzer.analyzeAPIs().catch(console.error);

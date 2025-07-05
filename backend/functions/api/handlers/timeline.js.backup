@@ -3,10 +3,15 @@ const { successResponse, errorResponse } = require('../utils/responses');
 const { handleDatabaseError } = require('../utils/errors');
 const { getCurrentUser, getAccessibleUserIds, requireAuth } = require('../middleware/auth');
 
-const handleGetTimelineEntries = async (queryParams, event, user = null) => {
+const handleGetTimelineEntries = async (queryParams, event) => {
+    // Require authentication (disabled for development)
+    // const authError = await requireAuth(event);
+    // if (authError) {
+    //     return authError;
+    // }
+
     try {
-        // Use provided user or get from event (for backward compatibility)
-        const currentUser = user || await getCurrentUser(event);
+        const user = await getCurrentUser(event);
         const accessibleUserIds = await getAccessibleUserIds(event);
         const client = await pool.connect();
         const { date = null, limit = 50 } = queryParams;
@@ -51,16 +56,15 @@ const handleGetTimelineEntries = async (queryParams, event, user = null) => {
     }
 };
 
-const handleCreateTimelineEntry = async (body, event, user = null) => {
+const handleCreateTimelineEntry = async (body, event) => {
+    // Require authentication (disabled for development)
+    // const authError = await requireAuth(event);
+    // if (authError) {
+    //     return authError;
+    // }
+
     try {
-        // CRITICAL FIX: Use provided user or get from event
-        const currentUser = user || await getCurrentUser(event);
-        
-        // THIS PREVENTS THE NULL ERROR
-        if (!currentUser) {
-            return errorResponse('User not authenticated', 401);
-        }
-        
+        const user = await getCurrentUser(event);
         const client = await pool.connect();
         
         const {
@@ -82,7 +86,7 @@ const handleCreateTimelineEntry = async (body, event, user = null) => {
             WHERE user_id = $1 AND entry_date = $2
         `;
         
-        const checkResult = await client.query(checkQuery, [currentUser.id, entryDate]);
+        const checkResult = await client.query(checkQuery, [user.id, entryDate]);
         
         if (checkResult.rows.length > 0) {
             // Use existing journal entry
@@ -95,59 +99,63 @@ const handleCreateTimelineEntry = async (body, event, user = null) => {
                 RETURNING id
             `;
             
-            const journalResult = await client.query(journalQuery, [currentUser.id, entryDate]);
+            const journalResult = await client.query(journalQuery, [user.id, entryDate]);
             journalEntryId = journalResult.rows[0].id;
         }
         
-        // Create timeline entry
         const timelineQuery = `
             INSERT INTO timeline_entries (
-                journal_entry_id,
-                user_id,
-                entry_time,
-                entry_type,
-                content,
-                severity,
-                created_at,
-                updated_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            RETURNING id
+                journal_entry_id, user_id, entry_time, 
+                entry_type, content, severity, protocol_compliant
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING *
         `;
         
-        const timelineResult = await client.query(timelineQuery, [
-            journalEntryId,
-            currentUser.id,
-            entryTime || '12:00:00',
-            entryType,
-            content,
-            severity
-        ]);
+        const protocolCompliant = entryType === 'food' ? 
+            await checkProtocolCompliance(selectedFoods, user.id, client) : null;
         
-        const timelineEntryId = timelineResult.rows[0].id;
+        const timelineValues = [
+            journalEntryId, user.id, entryTime,
+            entryType, content, severity, protocolCompliant
+        ];
         
-        // Handle selected foods if provided
-        if (selectedFoods && selectedFoods.length > 0) {
-            for (const food of selectedFoods) {
-                const foodQuery = `
-                    INSERT INTO timeline_foods (timeline_entry_id, food_name, created_at)
-                    VALUES ($1, $2, CURRENT_TIMESTAMP)
-                `;
-                await client.query(foodQuery, [timelineEntryId, food]);
-            }
-        }
+        const timelineResult = await client.query(timelineQuery, timelineValues);
         
         await client.query('COMMIT');
         client.release();
         
         return successResponse({
-            id: timelineEntryId,
-            message: 'Timeline entry created successfully'
-        });
+            message: 'Timeline entry created successfully',
+            entry: timelineResult.rows[0]
+        }, 201);
         
     } catch (error) {
-        console.error('Database error during create timeline entry:', error);
         const appError = handleDatabaseError(error, 'create timeline entry');
         return errorResponse(appError.message, appError.statusCode);
+    }
+};
+
+const checkProtocolCompliance = async (selectedFoods, userId, client) => {
+    if (!selectedFoods || selectedFoods.length === 0) return null;
+    
+    try {
+        const query = `
+            SELECT COUNT(*) as avoid_count
+            FROM protocol_food_rules pfr
+            JOIN user_protocols up ON pfr.protocol_id = up.protocol_id
+            JOIN food_properties fp ON pfr.food_id = fp.id
+            WHERE up.user_id = $1 
+            AND up.active = true
+            AND fp.name = ANY($2)
+            AND pfr.status = 'avoid'
+        `;
+        
+        const result = await client.query(query, [userId, selectedFoods]);
+        return parseInt(result.rows[0].avoid_count) === 0;
+        
+    } catch (error) {
+        console.error('Protocol compliance check failed:', error);
+        return null;
     }
 };
 

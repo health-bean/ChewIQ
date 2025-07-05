@@ -10,10 +10,35 @@ const { handleSearchMedications } = require('./handlers/medications');
 const { handleSearchDetoxTypes } = require('./handlers/detox');
 const { handleGetUser, handleUpdateUser, handleGetUserProtocols, handleGetUserPreferences, handleUpdateUserPreferences } = require('./handlers/users');
 
+// Import your auth middleware
+const { getCurrentUser } = require('./middleware/auth');
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With'
+};
+
+// Helper function to get user context for protected routes
+const getUserContext = async (event) => {
+  try {
+    const user = await getCurrentUser(event);
+    if (!user) {
+      return {
+        statusCode: 401,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: 'Unauthorized' })
+      };
+    }
+    return { user };
+  } catch (error) {
+    console.error('Auth error:', error);
+    return {
+      statusCode: 401,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: 'Authentication failed' })
+    };
+  }
 };
 
 exports.handler = async (event, context) => {
@@ -33,7 +58,7 @@ exports.handler = async (event, context) => {
     const queryParams = queryStringParameters || {};
     const body = event.body ? JSON.parse(event.body) : {};
 
-    // Auth routes
+    // Auth routes (public)
     if (route === '/api/v1/auth/login' && httpMethod === 'POST') {
       return await handleLogin(body, event);
     }
@@ -47,57 +72,92 @@ exports.handler = async (event, context) => {
       return await handleVerify(queryParams, event);
     }
 
-    // User routes
+    // User routes (PROTECTED - need auth)
     if (route === '/api/v1/users' && httpMethod === 'GET') {
-      return await handleGetUser(queryParams, event);
+      const authResult = await getUserContext(event);
+      if (authResult.statusCode) return authResult; // Return auth error
+      return await handleGetUser(queryParams, event, authResult.user);
     }
     if (route === '/api/v1/users' && httpMethod === 'PUT') {
-      return await handleUpdateUser(body, event);
+      const authResult = await getUserContext(event);
+      if (authResult.statusCode) return authResult; // Return auth error
+      return await handleUpdateUser(body, event, authResult.user);
     }
     if (route === '/api/v1/user/protocols' && httpMethod === 'GET') {
-      return await handleGetUserProtocols(queryParams, event);
+      const authResult = await getUserContext(event);
+      if (authResult.statusCode) return authResult; // Return auth error
+      return await handleGetUserProtocols(queryParams, event, authResult.user);
     }
     if (route === '/api/v1/user/preferences' && httpMethod === 'GET') {
-      return await handleGetUserPreferences(queryParams, event);
+      const authResult = await getUserContext(event);
+      if (authResult.statusCode) return authResult; // Return auth error
+      return await handleGetUserPreferences(queryParams, event, authResult.user);
     }
     if (route === '/api/v1/user/preferences' && httpMethod === 'PUT') {
-      return await handleUpdateUserPreferences(body, event);
+      const authResult = await getUserContext(event);
+      if (authResult.statusCode) return authResult; // Return auth error
+      return await handleUpdateUserPreferences(body, event, authResult.user);
     }
 
-    // Journal routes
+    // Journal routes (PROTECTED - need auth)
     if (route === '/api/v1/journals' && httpMethod === 'GET') {
-      return await handleGetJournalEntries(queryParams, event);
+      const authResult = await getUserContext(event);
+      if (authResult.statusCode) return authResult; // Return auth error
+      return await handleGetJournalEntries(queryParams, event, authResult.user);
     }
     if (route === '/api/v1/journal/entries' && httpMethod === 'GET') {
-      return await handleGetJournalEntries(queryParams, event);
+      const authResult = await getUserContext(event);
+      if (authResult.statusCode) return authResult; // Return auth error
+      return await handleGetJournalEntries(queryParams, event, authResult.user);
     }
     if (route === '/api/v1/journals' && httpMethod === 'POST') {
-      return await handleCreateJournalEntry(body, event);
+      const authResult = await getUserContext(event);
+      if (authResult.statusCode) return authResult; // Return auth error
+      return await handleCreateJournalEntry(body, event, authResult.user);
     }
     if (route === '/api/v1/journal/entries' && httpMethod === 'POST') {
-      return await handleCreateJournalEntry(body, event);
+      const authResult = await getUserContext(event);
+      if (authResult.statusCode) return authResult; // Return auth error
+      return await handleCreateJournalEntry(body, event, authResult.user);
     }
     if (route.startsWith('/api/v1/journals/') && httpMethod === 'PUT') {
-      return await handleUpdateJournalEntry(body, event);
+      const authResult = await getUserContext(event);
+      if (authResult.statusCode) return authResult; // Return auth error
+      return await handleUpdateJournalEntry(body, event, authResult.user);
     }
     if (route.startsWith('/api/v1/journals/') && httpMethod === 'DELETE') {
-      return await handleDeleteJournalEntry(pathParameters, event);
+      const authResult = await getUserContext(event);
+      if (authResult.statusCode) return authResult; // Return auth error
+      return await handleDeleteJournalEntry(pathParameters, event, authResult.user);
     }
 
-    // Protocol routes
+    // Protocol routes (PUBLIC)
     if (route === '/api/v1/protocols' && httpMethod === 'GET') {
       return await handleGetProtocols(queryParams, event);
     }
 
     // Timeline routes
     if (route === '/api/v1/timeline/entries' && httpMethod === 'GET') {
-      return await handleGetTimelineEntries(queryParams, event);
+      // GET timeline can be public with userId param OR protected without it
+      // Check if userId is provided in query params
+      if (queryParams.userId) {
+        // Public access with explicit userId
+        return await handleGetTimelineEntries(queryParams, event);
+      } else {
+        // Protected access - needs auth to get user's own timeline
+        const authResult = await getUserContext(event);
+        if (authResult.statusCode) return authResult; // Return auth error
+        return await handleGetTimelineEntries(queryParams, event, authResult.user);
+      }
     }
     if (route === '/api/v1/timeline/entries' && httpMethod === 'POST') {
-      return await handleCreateTimelineEntry(body, event);
+      // POST timeline ALWAYS needs auth
+      const authResult = await getUserContext(event);
+      if (authResult.statusCode) return authResult; // Return auth error
+      return await handleCreateTimelineEntry(body, event, authResult.user);
     }
 
-    // Food routes
+    // Food routes (PUBLIC)
     if (route === '/api/v1/foods/search' && httpMethod === 'GET') {
       return await handleSearchFoods(queryParams, event);
     }
@@ -105,7 +165,7 @@ exports.handler = async (event, context) => {
       return await handleGetProtocolFoods(queryParams, event);
     }
 
-    // Search routes
+    // Search routes (PUBLIC)
     if (route === '/api/v1/symptoms/search' && httpMethod === 'GET') {
       return await handleSearchSymptoms(queryParams, event);
     }
@@ -122,7 +182,7 @@ exports.handler = async (event, context) => {
       return await handleSearchDetoxTypes(queryParams, event);
     }
 
-    // Correlation routes
+    // Correlation routes (PUBLIC with userId param)
     if (route === '/api/v1/correlations/insights' && httpMethod === 'GET') {
       return await handleGetCorrelationInsights(queryParams, event);
     }
