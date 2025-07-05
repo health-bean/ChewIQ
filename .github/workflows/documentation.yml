@@ -1,4 +1,4 @@
-name: 📚 Auto-Generate Documentation
+name: 📚 Auto-Discovery Documentation
 
 on:
   push:
@@ -6,7 +6,6 @@ on:
     paths:
       - 'frontend/**'
       - 'backend/**' 
-      - 'docs/**'
       - '*.js'
       - '*.json'
   pull_request:
@@ -14,7 +13,7 @@ on:
   workflow_dispatch: # Allow manual trigger
 
 jobs:
-  analyze-and-document:
+  generate-documentation:
     runs-on: ubuntu-latest
     
     steps:
@@ -26,125 +25,87 @@ jobs:
       with:
         node-version: '18'
         
-    - name: 🔧 Skip Root Dependencies
-      run: |
-        echo "✅ Using component-level package management (no root dependencies needed)"
-        
-    - name: 🔧 Install Shared Component Dependencies
-      working-directory: ./frontend/shared
-      run: npm ci
-      
-    - name: 🔧 Install Web App Dependencies  
-      working-directory: ./frontend/web-app
-      run: npm ci
-      
     - name: 🔧 Install Documentation Dependencies
       working-directory: ./docs
       run: npm ci
       
-    - name: 🔍 Generate Developer Documentation
+    - name: 🔍 Auto-Discover & Generate Complete Documentation
       run: |
-        # Run the new focused documentation generators
-        node dev-api-docs-generator.js || echo "⚠️ API docs generation failed, continuing"
-        node dev-codebase-docs-generator.js || echo "⚠️ Codebase docs generation failed, continuing"
-        echo "✅ Developer documentation generated"
+        node auto-discovery-docs-generator.js
+        echo "✅ Complete documentation auto-generated from implementation"
         
-    - name: 📊 Generate Analysis Reports
+    - name: 📊 Documentation Summary
       run: |
-        # Create summary for GitHub Actions using the new focused data
-        echo "## 📊 Platform Analysis Summary" >> $GITHUB_STEP_SUMMARY
+        echo "## 📊 Auto-Discovery Results" >> $GITHUB_STEP_SUMMARY
         
-        if [ -f "codebase-summary.json" ]; then
-          echo "- **Components Found:** $(jq -r '.components.shared | length' codebase-summary.json)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Custom Hooks:** $(jq -r '.components.hooks | length' codebase-summary.json)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Project Type:** $(jq -r '.overview.type' codebase-summary.json)" >> $GITHUB_STEP_SUMMARY
+        # Count generated documentation files
+        DOC_COUNT=$(find docs/docs -name "*.md" | wc -l)
+        echo "- **Documentation Files:** ${DOC_COUNT}" >> $GITHUB_STEP_SUMMARY
+        
+        # Check for key files
+        if [ -f "docs/docs/intro.md" ]; then
+          echo "- **✅ Platform Overview:** Generated" >> $GITHUB_STEP_SUMMARY
         fi
         
-        if [ -f "api-docs.json" ]; then
-          WORKING_ENDPOINTS=$(jq -r '[.endpoints[] | .[]] | map(select(.working == true)) | length' api-docs.json)
-          TOTAL_ENDPOINTS=$(jq -r '[.endpoints[] | .[]] | length' api-docs.json)
-          echo "- **Working APIs:** ${WORKING_ENDPOINTS}/${TOTAL_ENDPOINTS}" >> $GITHUB_STEP_SUMMARY
+        if [ -f "docs/docs/api/overview.md" ]; then
+          echo "- **✅ API Documentation:** Generated" >> $GITHUB_STEP_SUMMARY
         fi
         
-        echo "- **Documentation Type:** Developer-focused (concise)" >> $GITHUB_STEP_SUMMARY
-        echo "- **Analysis Date:** $(date)" >> $GITHUB_STEP_SUMMARY
-        
-    - name: 📋 Copy Documentation to Docs Site
-      run: |
-        # Copy the generated markdown files to the Docusaurus docs directory
-        if [ -f "README.md" ]; then
-          cp README.md docs/docs/quick-start.md
-          echo "✅ Quick start guide copied"
+        if [ -f "docs/docs/authentication/overview.md" ]; then
+          echo "- **✅ Authentication Docs:** Generated" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "- **ℹ️ Authentication:** Not implemented" >> $GITHUB_STEP_SUMMARY
         fi
         
-        if [ -f "DEVELOPER_SETUP_GUIDE.md" ]; then
-          cp DEVELOPER_SETUP_GUIDE.md docs/docs/development/setup-guide.md
-          echo "✅ Setup guide copied"
+        if [ -f "docs/docs/components/overview.md" ]; then
+          echo "- **✅ Component Library:** Generated" >> $GITHUB_STEP_SUMMARY
         fi
         
-        if [ -f "API_DEVELOPER_GUIDE.md" ]; then
-          cp API_DEVELOPER_GUIDE.md docs/docs/api/developer-guide.md
-          echo "✅ API guide copied"
-        fi
+        echo "- **🔄 Auto-Discovery:** Complete" >> $GITHUB_STEP_SUMMARY
+        echo "- **📅 Generated:** $(date)" >> $GITHUB_STEP_SUMMARY
         
     - name: 🏗️ Build Documentation Site
       working-directory: ./docs
       run: |
         npm run build
-        echo "✅ Documentation site built"
+        echo "✅ Documentation site built successfully"
         
-    - name: 📋 Documentation Health Check
+    - name: 📋 Build Health Check
       working-directory: ./docs
       run: |
-        # Check if key documentation files exist
-        echo "🔍 Checking documentation completeness..."
+        echo "🔍 Verifying documentation build..."
         
-        if [ -f "docs/quick-start.md" ]; then
-          echo "✅ Quick start documentation generated"
-        else
-          echo "❌ Quick start documentation missing"
-        fi
-        
-        if [ -f "docs/development/setup-guide.md" ]; then
-          echo "✅ Development setup documentation generated"  
-        else
-          echo "❌ Development setup documentation missing"
-        fi
-        
-        if [ -f "docs/api/developer-guide.md" ]; then
-          echo "✅ API documentation generated"
-        else
-          echo "❌ API documentation missing"
-        fi
-        
-        # Check build output
         if [ -d "build" ]; then
-          echo "✅ Documentation site built successfully"
+          BUILD_SIZE=$(du -sh build | cut -f1)
+          echo "✅ Build successful (${BUILD_SIZE})"
+          
+          # Check for essential pages
+          if [ -f "build/index.html" ]; then
+            echo "✅ Home page generated"
+          fi
+          
+          if [ -f "build/intro/index.html" ]; then
+            echo "✅ Platform overview page generated"
+          fi
+          
+          if [ -f "build/api/overview/index.html" ]; then
+            echo "✅ API documentation page generated"
+          fi
+          
         else
-          echo "❌ Documentation site build failed"
+          echo "❌ Build failed - no build directory created"
+          exit 1
         fi
-        
-    - name: 📈 Upload Documentation Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: developer-documentation
-        path: |
-          README.md
-          DEVELOPER_SETUP_GUIDE.md
-          API_DEVELOPER_GUIDE.md
-          api-docs.json
-          codebase-summary.json
-        retention-days: 30
         
     - name: 📄 Upload Documentation Build
       uses: actions/upload-artifact@v4
       with:
-        name: documentation-site
+        name: auto-generated-documentation
         path: docs/build/
         retention-days: 7
 
   deploy-documentation:
-    needs: analyze-and-document
+    needs: generate-documentation
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     
@@ -152,15 +113,10 @@ jobs:
     - name: 📥 Checkout Repository
       uses: actions/checkout@v4
       
-    - name: 📦 Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        
     - name: 📥 Download Documentation Build
       uses: actions/download-artifact@v4
       with:
-        name: documentation-site
+        name: auto-generated-documentation
         path: docs/build/
         
     - name: 🔍 Detect Custom Domain
@@ -174,7 +130,7 @@ jobs:
           echo "Custom domain detected: $(cat CNAME)"
         else
           echo "custom_domain=" >> $GITHUB_OUTPUT
-          echo "No custom domain detected"
+          echo "No custom domain detected - using GitHub Pages default"
         fi
     
     - name: 🚀 Deploy to GitHub Pages
@@ -186,37 +142,44 @@ jobs:
         
     - name: 📊 Deployment Summary
       run: |
-        echo "## 🚀 Documentation Deployment Summary" >> $GITHUB_STEP_SUMMARY
-        echo "- **Status:** Successfully deployed to GitHub Pages" >> $GITHUB_STEP_SUMMARY
-        echo "- **Documentation Type:** Developer-focused (clean & concise)" >> $GITHUB_STEP_SUMMARY
+        echo "## 🚀 Documentation Deployed Successfully" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
         
         # Dynamic URL based on repository and custom domain
         if [ -n "${{ steps.domain.outputs.custom_domain }}" ]; then
-          echo "- **URL:** https://${{ steps.domain.outputs.custom_domain }}/" >> $GITHUB_STEP_SUMMARY
+          DOCS_URL="https://${{ steps.domain.outputs.custom_domain }}/"
         else
-          echo "- **URL:** https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
+          DOCS_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
         fi
         
-        echo "- **Repository:** https://github.com/${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+        echo "### 📖 Documentation Links:" >> $GITHUB_STEP_SUMMARY
+        echo "- **🏠 Documentation Home:** ${DOCS_URL}" >> $GITHUB_STEP_SUMMARY
+        echo "- **🚀 Quick Start:** ${DOCS_URL}quick-start" >> $GITHUB_STEP_SUMMARY
+        echo "- **🌐 API Reference:** ${DOCS_URL}api/overview" >> $GITHUB_STEP_SUMMARY
+        echo "- **⚛️ Components:** ${DOCS_URL}components/overview" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "### 📊 Deployment Info:" >> $GITHUB_STEP_SUMMARY
+        echo "- **Status:** ✅ Live and updated" >> $GITHUB_STEP_SUMMARY
+        echo "- **Source:** Auto-generated from live implementation" >> $GITHUB_STEP_SUMMARY
         echo "- **Build Time:** $(date)" >> $GITHUB_STEP_SUMMARY
-        echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
 
   notify-completion:
-    needs: [analyze-and-document, deploy-documentation]
+    needs: [generate-documentation, deploy-documentation]
     runs-on: ubuntu-latest
     if: always()
     
     steps:
-    - name: 📋 Workflow Summary
+    - name: 📋 Final Workflow Summary
       run: |
-        echo "## 🎯 FILO Documentation Workflow Complete" >> $GITHUB_STEP_SUMMARY
+        echo "## 🎯 Auto-Discovery Documentation Complete" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### Results:" >> $GITHUB_STEP_SUMMARY
         
-        if [ "${{ needs.analyze-and-document.result }}" == "success" ]; then
-          echo "- ✅ **Developer Documentation Generation:** Success" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ needs.generate-documentation.result }}" == "success" ]; then
+          echo "- ✅ **Documentation Generation:** Success" >> $GITHUB_STEP_SUMMARY
         else
-          echo "- ❌ **Developer Documentation Generation:** Failed" >> $GITHUB_STEP_SUMMARY
+          echo "- ❌ **Documentation Generation:** Failed" >> $GITHUB_STEP_SUMMARY
         fi
         
         if [ "${{ needs.deploy-documentation.result }}" == "success" ]; then
@@ -228,22 +191,19 @@ jobs:
         fi
         
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### Documentation Features:" >> $GITHUB_STEP_SUMMARY
-        echo "- 🎯 **Developer-focused:** Clean, actionable guides" >> $GITHUB_STEP_SUMMARY
-        echo "- 🚀 **Quick onboarding:** New developers can start immediately" >> $GITHUB_STEP_SUMMARY
-        echo "- 📊 **Live API testing:** Automatically tests working endpoints" >> $GITHUB_STEP_SUMMARY
-        echo "- 🔧 **Setup guides:** Complete development workflow documentation" >> $GITHUB_STEP_SUMMARY
+        echo "### 🔍 Auto-Discovery Features:" >> $GITHUB_STEP_SUMMARY
+        echo "- **🌐 Live API Testing:** Automatically tests all endpoints" >> $GITHUB_STEP_SUMMARY
+        echo "- **🔐 Auth Detection:** Discovers authentication implementation" >> $GITHUB_STEP_SUMMARY
+        echo "- **⚛️ Component Analysis:** Catalogs all React components" >> $GITHUB_STEP_SUMMARY
+        echo "- **🏗️ Architecture Mapping:** Documents system architecture" >> $GITHUB_STEP_SUMMARY
+        echo "- **📚 Zero-Maintenance:** Updates automatically with code changes" >> $GITHUB_STEP_SUMMARY
         
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+        echo "### 👥 For New Developers:" >> $GITHUB_STEP_SUMMARY
+        echo "1. 📖 Start with the documentation homepage" >> $GITHUB_STEP_SUMMARY
+        echo "2. 🚀 Follow the Quick Start guide" >> $GITHUB_STEP_SUMMARY
+        echo "3. 🌐 Explore the API Reference" >> $GITHUB_STEP_SUMMARY
+        echo "4. ⚛️ Browse available components" >> $GITHUB_STEP_SUMMARY
         
-        # Dynamic documentation URL
-        if [ -f "docs/static/CNAME" ] || [ -f "CNAME" ]; then
-          DOMAIN=$(cat docs/static/CNAME 2>/dev/null || cat CNAME 2>/dev/null)
-          echo "1. 📖 Review documentation at: https://${DOMAIN}/" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "1. 📖 Review documentation at: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
-        fi
-        
-        echo "2. 📊 Check developer guides in workflow artifacts" >> $GITHUB_STEP_SUMMARY
-        echo "3. 🔧 Share setup guide with new team members" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "*All documentation auto-generated from actual implementation - always current!*" >> $GITHUB_STEP_SUMMARY

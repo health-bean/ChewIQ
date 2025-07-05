@@ -1,148 +1,77 @@
-# System Architecture
+---
+title: Architecture Overview
+sidebar_position: 6
+---
 
-## Overview
+# Architecture Overview
 
-The Web App follows a modern monorepo architecture with clear separation of concerns and scalable design patterns.
+Technical architecture of the FILO Health Platform.
+
+## System Architecture
+
+**Type:** AWS Amplify Fullstack
+
+### Frontend
+
+- **Framework:** React
+- **Bundler:** Vite
+- **Styling:** Tailwind CSS
+- **Components:** 3 shared components
+
+
+### Backend
+
+- **Runtime:** Node.js
+- **Database:** PostgreSQL
+- **Authentication:** JWT
+- **Deployment:** AWS Lambda
+
 
 ## Project Structure
 
 ```
-Web App/
+health-platform/
 ├── frontend/
-│   ├── web-app/          # Main React application
-│   ├── mobile-app/       # Future mobile app (not planned)
-│   ├── practitioner-dashboard/  # Future practitioner interface
-│   └── shared/           # Shared components and utilities
+│   ├── shared/           # Component library
+│   └── web-app/          # Main React application
 ├── backend/
-│   ├── functions/        # AWS Lambda functions
-│   ├── database/         # Database schemas and migrations
-│   └── shared/           # Shared backend utilities
-├── docs/                 # Documentation (Docusaurus)
-├── infrastructure/       # Infrastructure as Code
-└── scripts/              # Build and deployment scripts
+│   └── functions/api/    # API backend
+└── docs/                 # Documentation (this site)
 ```
 
-## Technology Stack
+## Package Management
 
-### Frontend Architecture
-- **Framework:** React 19.1.0
-- **Build Tool:** Vite
-- **Styling:** Tailwind CSS
-- **Icons:** Lucide React
-- **State Management:** React hooks and context
+### shared (`frontend/shared/package.json`)
 
-### Component Architecture
+**Type:** Component Library
+**Dependencies:** 1
+**Scripts:** test
 
-#### Shared Component Library
-- **Alert:** Displays notification and alert messages with customizable variants and dismissal options
-- **Button:** Interactive button component with loading states, variants, and icon support
-- **Card:** Container component with optional title, subtitle, icon, and content sections
-- **Input:** Form input component with focus colors, validation, and styling options
-- **Select:** Dropdown selection component with customizable styling and focus colors
-- **Textarea:** Multi-line text input with configurable rows and styling options
+### web-app (`frontend/web-app/package.json`)
 
-#### Application Components  
-- **Total Components:** 19
-- **Shared Components:** 6
-- **App-Specific Components:** 13
+**Type:** React Application
+**Dependencies:** 5
+**Scripts:** dev, build, lint, preview
+
+### health-platform-test-db (`backend/functions/api/package.json`)
+
+**Type:** Backend API
+**Dependencies:** 3
+**Scripts:** 
 
 
-### Data Management
-
-#### Custom Hooks
-- **useDetoxTypes:** Custom React hook: useDetoxTypes
-- **useExposureTypes:** Custom React hook: useExposureTypes
-- **useProtocols:** Custom React hook: useProtocols
-- **useUserPreferences:** Custom React hook: useUserPreferences
-- **useSetupWizard:** Custom React hook: useSetupWizard
-- **useReflectionData:** Custom React hook: useReflectionData
+## Database
 
 
-## Backend Architecture
-
-### AWS Infrastructure
-
-- **API Gateway:** REST API endpoints
-- **Base URL:** `https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev`
-- **Lambda Functions:** Serverless compute
-- **Working Endpoints:** 3
-- **Protected Endpoints:** 0
+**Type:** PostgreSQL
+**Configuration Files:** .git/objects/00/697ce39be94e3f16dbe9af97d26f57e327a222, .git/objects/00/b523012e860db69bd544f06145302cc23d6ba0, .git/objects/01/0d80bc09c81d694de7541d4e85edbc803dd7ca, .git/objects/01/1d94d7e4356d2c6ae76ca05074fddbac2c29fe, .git/objects/01/cc687afe569bd175125f0da54cbdbb9683c2dd
 
 
-### Database Design
-- **Primary Database:** PostgreSQL (RDS)
-- **Caching:** Redis (planned for production)
-- **File Storage:** AWS S3 (planned)
+## Deployment
 
-## Data Flow Architecture
-
-### Request Flow
-1. **Frontend** makes API calls via custom hooks
-2. **API Gateway** routes requests to appropriate Lambda functions  
-3. **Lambda Functions** process business logic and database operations
-4. **PostgreSQL** stores all application data
-5. **Response** returns through the same chain
-
-### State Management
-- **Local State:** React useState/useReducer for component state
-- **Global State:** Context providers for shared data
-- **Server State:** Custom hooks for API data fetching and caching
-- **Form State:** Controlled components with validation
-
-## Deployment Architecture
-
-### Current Deployment
-- **Frontend Hosting:** AWS Amplify
-- **Backend API:** AWS Lambda + API Gateway  
-- **Database:** AWS RDS PostgreSQL
-- **Documentation:** GitHub Pages
-
-### CI/CD Pipeline
-1. **Code Push** → GitHub repository
-2. **GitHub Actions** → Automated testing and building
-3. **AWS Amplify** → Frontend deployment
-4. **Documentation** → Auto-generated and deployed
-
-## Security Architecture
-
-### Current Implementation
-- **HTTPS:** All traffic encrypted in transit
-- **CORS:** Configured for secure cross-origin requests
-
-
-### Production Security Plan
-- **Authentication:** JWT tokens with refresh mechanism
-- **Authorization:** Role-based access control (Patient/Practitioner)  
-- **Data Encryption:** Encryption at rest for sensitive data
-- **API Security:** Rate limiting, input validation, API keys
-
-## Scalability Considerations
-
-### Horizontal Scaling
-- **Lambda Functions:** Auto-scaling based on demand
-- **Database:** Read replicas for query scaling
-- **CDN:** Global CloudFront distribution for static assets
-
-### Performance Optimization
-- **Bundle Splitting:** Dynamic imports for code splitting
-- **API Caching:** Response caching with appropriate TTL
-- **Database Optimization:** Indexed queries and connection pooling
-- **Image Optimization:** WebP format and responsive images
-
-## Development Workflow
-
-### Monorepo Benefits
-- **Shared Components:** Reusable across all applications
-- **Consistent Tooling:** Same build tools and configurations
-- **Atomic Changes:** Update multiple apps in single commit
-- **Code Sharing:** Utilities and types shared across projects
-
-### Quality Assurance
-- **Automated Analysis:** Codebase analysis on every commit
-- **Documentation:** Auto-generated and always up-to-date
-- **Type Safety:** TypeScript integration (planned)
-- **Testing:** Unit and integration testing (planned)
+**Strategy:** AWS Amplify
+**Configuration:** `amplify.yml`
 
 ---
 
-*This architecture documentation is automatically generated from codebase analysis.*
+*Architecture documentation auto-generated on 7/5/2025*
