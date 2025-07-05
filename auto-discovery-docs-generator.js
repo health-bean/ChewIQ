@@ -1050,7 +1050,7 @@ Configure your environment variables before deployment.`;
 
     // Export as proper Docusaurus sidebar configuration (object approach - recommended)
     const sidebarConfig = {
-      docs: sidebarItems
+      tutorialSidebar: sidebarItems
     };
 
     this.writeDocFile('../sidebars.js', `module.exports = ${JSON.stringify(sidebarConfig, null, 2)};`);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const API_BASE_URL = 'https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const useCorrelations = (userId, confidenceThreshold = 0.6, timeframeDays = 180) => {
   const [correlations, setCorrelations] = useState([]);
