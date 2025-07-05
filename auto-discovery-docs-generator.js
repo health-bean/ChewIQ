@@ -27,7 +27,6 @@ class AutoDiscoveryDocsGenerator {
     const docsDir = path.join(this.rootPath, 'docs', 'docs');
     
     if (fs.existsSync(docsDir)) {
-      // Remove all .md files and subdirectories
       const items = fs.readdirSync(docsDir);
       
       items.forEach(item => {
@@ -35,16 +34,13 @@ class AutoDiscoveryDocsGenerator {
         const stat = fs.statSync(itemPath);
         
         if (stat.isDirectory()) {
-          // Remove directory and all contents
           fs.rmSync(itemPath, { recursive: true, force: true });
         } else if (item.endsWith('.md')) {
-          // Remove markdown files
           fs.unlinkSync(itemPath);
         }
       });
     }
     
-    // Also clean the sidebars.js file
     const sidebarPath = path.join(this.rootPath, 'docs', 'sidebars.js');
     if (fs.existsSync(sidebarPath)) {
       fs.unlinkSync(sidebarPath);
@@ -56,19 +52,17 @@ class AutoDiscoveryDocsGenerator {
   async generateComplete() {
     console.log('🔍 Auto-Discovering FILO Health Platform Implementation...\n');
     
-    // Clean old documentation first
     this.cleanDocsDirectory();
     
-    // Auto-discover everything that's actually implemented
     await this.discoverAPIs();
     await this.discoverAuthentication();
     await this.discoverComponents();
     await this.discoverArchitecture();
     await this.discoverDeployment();
     
-    // Generate clean documentation directly in Docusaurus structure
     this.generateIntroduction();
     this.generateQuickStart();
+    this.generateDevelopmentSetup();
     this.generateAPIDocumentation();
     this.generateAuthenticationDocs();
     this.generateComponentDocs();
@@ -188,7 +182,7 @@ class AutoDiscoveryDocsGenerator {
     if (!obj || typeof obj !== 'object') return { type: typeof obj };
     
     const structure = {};
-    Object.keys(obj).slice(0, 10).forEach(key => { // Limit to first 10 keys
+    Object.keys(obj).slice(0, 10).forEach(key => {
       const value = obj[key];
       if (Array.isArray(value)) {
         structure[key] = `array[${value.length}]`;
@@ -234,7 +228,6 @@ class AutoDiscoveryDocsGenerator {
   async discoverAuthentication() {
     console.log('🔐 Auto-discovering authentication implementation...');
     
-    // Check for auth-related files
     const authFiles = this.findAuthImplementation();
     const authEndpoints = this.discovered.apis.filter(api => api.category === 'Authentication');
     
@@ -505,7 +498,6 @@ class AutoDiscoveryDocsGenerator {
   }
 
   detectDatabase() {
-    // Check for database configuration files
     const dbFiles = this.findFilesRecursive(this.rootPath, /database|db|sql|mongo/i);
     const packageJsons = this.findAllPackageJsons();
     
@@ -541,7 +533,6 @@ class AutoDiscoveryDocsGenerator {
     console.log(`   ✅ Deployment: ${this.discovered.deployment.type}`);
   }
 
-  // Documentation generation methods
   generateIntroduction() {
     const workingAPIs = this.discovered.apis.filter(api => api.working).length;
     const authStatus = this.discovered.auth.implemented ? 'Implemented' : 'Not implemented';
@@ -566,7 +557,7 @@ AI-powered health intelligence platform for tracking food sensitivities and heal
 
 ## Quick Start
 
-1. **[Setup Development Environment](./development/setup)**
+1. **[Development Setup](./development/setup)**
 2. **[API Documentation](./api/overview)**
 3. **[Component Library](./components/overview)**
 
@@ -661,6 +652,77 @@ Expected response: List of health protocols
 `;
 
     this.writeDocFile('quick-start.md', quickStart);
+  }
+
+  generateDevelopmentSetup() {
+    const setupDoc = `---
+title: Development Setup
+sidebar_position: 3
+---
+
+# Development Setup
+
+Complete setup guide for the FILO Health Platform development environment.
+
+## Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- Git
+${this.discovered.deployment.type === 'AWS Amplify' ? '- AWS CLI and Amplify CLI' : ''}
+
+## Clone Repository
+
+\`\`\`bash
+git clone <repository-url>
+cd health-platform
+\`\`\`
+
+## Install Dependencies
+
+${this.generateInstallationSteps()}
+
+## Environment Configuration
+
+${this.generateEnvironmentDocs()}
+
+## Start Development
+
+${this.generateDevelopmentSteps()}
+
+## Verify Setup
+
+1. **Test API connectivity:**
+   \`\`\`bash
+   curl ${this.baseURL}/api/v1/protocols
+   \`\`\`
+
+2. **Access frontend:**
+   Open http://localhost:5173 in your browser
+
+3. **View documentation:**
+   Access this documentation site
+
+## Troubleshooting
+
+### Common Issues
+
+- **Port already in use:** Change port in package.json or kill existing process
+- **API connection failed:** Check if backend is running and API URL is correct
+- **Build errors:** Clear node_modules and reinstall dependencies
+
+### Getting Help
+
+- Check the [API Documentation](../api/overview) for endpoint details
+- Review [Architecture Overview](../architecture/overview) for system understanding
+- Examine [Component Library](../components/overview) for UI components
+
+---
+
+*Development setup guide auto-generated on ${new Date().toLocaleDateString()}*
+`;
+
+    this.writeDocFile('development/setup.md', setupDoc);
   }
 
   generateInstallationSteps() {
@@ -1011,10 +1073,14 @@ Configure your environment variables before deployment.`;
   }
 
   generateSidebar() {
-    // Create the sidebar items array
     const sidebarItems = [
       'intro',
       'quick-start',
+      {
+        type: 'category',
+        label: 'Development',
+        items: ['development/setup']
+      },
       {
         type: 'category',
         label: 'API Reference',
@@ -1032,7 +1098,6 @@ Configure your environment variables before deployment.`;
       }
     ];
 
-    // Add authentication section if implemented
     if (this.discovered.auth.implemented) {
       sidebarItems.splice(3, 0, {
         type: 'category',
@@ -1041,14 +1106,12 @@ Configure your environment variables before deployment.`;
       });
     }
 
-    // Add deployment section
     sidebarItems.push({
       type: 'category',
       label: 'Deployment',
       items: ['deployment/overview']
     });
 
-    // Export as proper Docusaurus sidebar configuration (object approach - recommended)
     const sidebarConfig = {
       tutorialSidebar: sidebarItems
     };
@@ -1060,7 +1123,6 @@ Configure your environment variables before deployment.`;
     const filePath = path.join(this.docsPath, filename);
     const dir = path.dirname(filePath);
     
-    // Ensure directory exists
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
@@ -1070,7 +1132,6 @@ Configure your environment variables before deployment.`;
   }
 }
 
-// CLI execution
 if (require.main === module) {
   const generator = new AutoDiscoveryDocsGenerator();
   generator.generateComplete().catch(console.error);
