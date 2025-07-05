@@ -1,7 +1,10 @@
 // frontend/shared/contexts/AuthProvider.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+// Add these lines right after the imports, before the AuthContext creation
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+console.log('🔍 AuthProvider API_BASE_URL:', API_BASE_URL);
+console.log('🔍 Environment:', import.meta.env);
 
 const AuthContext = createContext({});
 
