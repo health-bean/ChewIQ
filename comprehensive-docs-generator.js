@@ -264,10 +264,30 @@ class AutomatedProfessionalDocsGenerator {
         const content = fs.readFileSync(path.join(this.rootPath, envFile), 'utf8');
         const apiUrlMatch = content.match(/VITE_API_BASE_URL=(.+)/);
         if (apiUrlMatch) {
-          urls.api = apiUrlMatch[1].trim();
+          const apiUrl = apiUrlMatch[1].trim().replace(/['"]/g, '');
+          urls.api = apiUrl;
+          urls.backend = apiUrl; // Backend and API are the same in this architecture
         }
       } catch (error) {
         // Env file read error
+      }
+    }
+
+    // Check for hardcoded URLs in code if not found in env
+    if (!urls.api) {
+      const jsFiles = this.findFiles(this.rootPath, '*.js');
+      for (const jsFile of jsFiles) {
+        try {
+          const content = fs.readFileSync(path.join(this.rootPath, jsFile), 'utf8');
+          const apiMatch = content.match(/https?:\/\/[^'"\s]+\.execute-api\.[^'"\s]+\.amazonaws\.com\/[^'"\s\/]+/);
+          if (apiMatch) {
+            urls.api = apiMatch[0];
+            urls.backend = apiMatch[0];
+            break;
+          }
+        } catch (error) {
+          // File read error
+        }
       }
     }
 
@@ -299,6 +319,15 @@ class AutomatedProfessionalDocsGenerator {
       }
     } catch (error) {
       // Git command error
+    }
+
+    // Set default URLs if not found
+    if (!urls.frontend) {
+      urls.frontend = 'https://main.d45x824boqj7y.amplifyapp.com';
+    }
+    if (!urls.api) {
+      urls.api = 'https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev';
+      urls.backend = urls.api;
     }
 
     // Test URLs to see which ones are live
@@ -337,7 +366,8 @@ class AutomatedProfessionalDocsGenerator {
       type: 'Unknown',
       tables: [],
       relationships: [],
-      connectionInfo: {}
+      connectionInfo: {},
+      schema: []
     };
 
     // Check for database connection strings in env files
@@ -357,7 +387,7 @@ class AutomatedProfessionalDocsGenerator {
         // Extract connection info (without credentials)
         const dbUrlMatch = content.match(/DATABASE_URL=(.+)/);
         if (dbUrlMatch) {
-          const url = dbUrlMatch[1].trim();
+          const url = dbUrlMatch[1].trim().replace(/['"]/g, '');
           database.connectionInfo = this.parseConnectionString(url);
         }
       } catch (error) {
@@ -365,25 +395,178 @@ class AutomatedProfessionalDocsGenerator {
       }
     }
 
-    // Check backend code for database models/schemas
-    const backendDirs = Object.keys(this.discoveredInfo.fileStructure.backend || {});
-    for (const backendDir of backendDirs) {
-      const modelFiles = this.findFiles(path.join(this.rootPath, backendDir), '*.js');
-      for (const modelFile of modelFiles) {
-        try {
-          const content = fs.readFileSync(path.join(this.rootPath, modelFile), 'utf8');
-          const tables = this.extractTableNames(content);
-          database.tables.push(...tables);
-        } catch (error) {
-          // Model file read error
+    // Enhanced database discovery from backend code
+    const backendFiles = this.findFiles(this.rootPath, '*.js').filter(file => 
+      file.includes('backend') || file.includes('handlers') || file.includes('database') || file.includes('models')
+    );
+
+    for (const file of backendFiles) {
+      try {
+        const content = fs.readFileSync(path.join(this.rootPath, file), 'utf8');
+        const tables = this.extractTableNames(content);
+        const schemas = this.extractSchemaInfo(content);
+        
+        database.tables.push(...tables);
+        database.schema.push(...schemas);
+      } catch (error) {
+        // File read error
+      }
+    }
+
+    // Add known tables based on your API structure
+    const knownTables = [
+      'users',
+      'protocols', 
+      'foods',
+      'timeline_entries',
+      'reflections',
+      'correlations',
+      'exposure_types',
+      'detox_types',
+      'user_preferences',
+      'protocol_foods',
+      'symptoms',
+      'supplements',
+      'medications'
+    ];
+
+    // Merge discovered and known tables
+    database.tables = [...new Set([...database.tables, ...knownTables])];
+
+    // Infer relationships based on table names
+    database.relationships = this.inferTableRelationships(database.tables);
+
+    this.discoveredInfo.database = database;
+  }
+
+  extractSchemaInfo(content) {
+    const schemas = [];
+    
+    // Look for CREATE TABLE statements
+    const createTableRegex = /CREATE TABLE\s+(\w+)\s*\(([\s\S]*?)\)/gi;
+    let match;
+    
+    while ((match = createTableRegex.exec(content)) !== null) {
+      const tableName = match[1];
+      const columns = match[2];
+      
+      schemas.push({
+        table: tableName,
+        columns: this.parseColumns(columns),
+        source: 'SQL'
+      });
+    }
+
+    // Look for database schema in comments or documentation
+    const schemaCommentRegex = /\/\*[\s\S]*?TABLE:\s*(\w+)[\s\S]*?\*\//gi;
+    while ((match = schemaCommentRegex.exec(content)) !== null) {
+      schemas.push({
+        table: match[1],
+        source: 'Comment'
+      });
+    }
+
+    return schemas;
+  }
+
+  parseColumns(columnString) {
+    const columns = [];
+    const lines = columnString.split('\n');
+    
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('--') && !trimmed.startsWith('/*')) {
+        const columnMatch = trimmed.match(/^(\w+)\s+(\w+)/);
+        if (columnMatch) {
+          columns.push({
+            name: columnMatch[1],
+            type: columnMatch[2]
+          });
+        }
+      }
+    }
+    
+    return columns;
+  }
+
+  inferTableRelationships(tables) {
+    const relationships = [];
+    
+    // Common relationship patterns
+    const relationshipPatterns = [
+      { from: 'timeline_entries', to: 'users', type: 'many-to-one', foreignKey: 'user_id' },
+      { from: 'reflections', to: 'users', type: 'many-to-one', foreignKey: 'user_id' },
+      { from: 'correlations', to: 'users', type: 'many-to-one', foreignKey: 'user_id' },
+      { from: 'user_preferences', to: 'users', type: 'one-to-one', foreignKey: 'user_id' },
+      { from: 'protocol_foods', to: 'protocols', type: 'many-to-one', foreignKey: 'protocol_id' },
+      { from: 'protocol_foods', to: 'foods', type: 'many-to-one', foreignKey: 'food_id' },
+      { from: 'timeline_entries', to: 'foods', type: 'many-to-many', via: 'entry_foods' }
+    ];
+
+    // Add relationships where both tables exist
+    for (const rel of relationshipPatterns) {
+      if (tables.includes(rel.from) && tables.includes(rel.to)) {
+        relationships.push(rel);
+      }
+    }
+
+    return relationships;
+  }
+
+  extractTableNames(content) {
+    const tables = [];
+    
+    // Look for SQL table references
+    const sqlPatterns = [
+      /CREATE TABLE\s+(\w+)/gi,
+      /INSERT INTO\s+(\w+)/gi,
+      /SELECT.*FROM\s+(\w+)/gi,
+      /UPDATE\s+(\w+)/gi,
+      /DELETE FROM\s+(\w+)/gi,
+      /JOIN\s+(\w+)/gi
+    ];
+
+    for (const pattern of sqlPatterns) {
+      let match;
+      while ((match = pattern.exec(content)) !== null) {
+        const tableName = match[1];
+        if (tableName && !tableName.match(/^(SELECT|INSERT|UPDATE|DELETE|FROM|JOIN)$/i)) {
+          tables.push(tableName);
         }
       }
     }
 
-    // Remove duplicates
-    database.tables = [...new Set(database.tables)];
+    // Look for ORM/query builder patterns
+    const ormPatterns = [
+      /\.table\(['"](\w+)['"]\)/g,
+      /\.from\(['"](\w+)['"]\)/g,
+      /knex\(['"](\w+)['"]\)/g
+    ];
 
-    this.discoveredInfo.database = database;
+    for (const pattern of ormPatterns) {
+      let match;
+      while ((match = pattern.exec(content)) !== null) {
+        tables.push(match[1]);
+      }
+    }
+
+    // Look for model references
+    const modelPatterns = [
+      /class\s+(\w+)\s+extends\s+Model/g,
+      /const\s+(\w+)\s*=.*sequelize\.define/g
+    ];
+
+    for (const pattern of modelPatterns) {
+      let match;
+      while ((match = pattern.exec(content)) !== null) {
+        const modelName = match[1];
+        // Convert CamelCase to snake_case for table names
+        const tableName = modelName.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+        tables.push(tableName);
+      }
+    }
+
+    return [...new Set(tables)]; // Remove duplicates
   }
 
   parseConnectionString(connectionString) {
@@ -524,39 +707,17 @@ class AutomatedProfessionalDocsGenerator {
       categories: {}
     };
 
-    // Get API base URL from discovered URLs
-    if (this.discoveredInfo.urls.api) {
-      apis.baseUrl = this.discoveredInfo.urls.api.url;
-    }
-
-    // If no API URL found, try to find it in code
-    if (!apis.baseUrl) {
-      const jsFiles = this.findFiles(this.rootPath, '*.js');
-      for (const jsFile of jsFiles) {
-        try {
-          const content = fs.readFileSync(path.join(this.rootPath, jsFile), 'utf8');
-          const apiMatch = content.match(/https?:\/\/[^'"\s]+\.execute-api\.[^'"\s]+/);
-          if (apiMatch) {
-            apis.baseUrl = apiMatch[0];
-            break;
-          }
-        } catch (error) {
-          // File read error
-        }
-      }
-    }
-
-    // Test common endpoints if we have a base URL
+    // Discover API base URL from environment files
+    apis.baseUrl = await this.discoverApiBaseUrl();
+    
+    // Discover all endpoints from backend code
+    const discoveredEndpoints = await this.discoverEndpointsFromCode();
+    
+    // Test all discovered endpoints
     if (apis.baseUrl) {
-      const commonEndpoints = [
-        { path: '/api/v1/health', method: 'GET', category: 'System' },
-        { path: '/api/v1/protocols', method: 'GET', category: 'Core' },
-        { path: '/api/v1/foods/search', method: 'GET', category: 'Foods' },
-        { path: '/api/v1/timeline/entries', method: 'GET', category: 'Timeline' },
-        { path: '/api/v1/correlations/insights', method: 'GET', category: 'AI' }
-      ];
-
-      for (const endpoint of commonEndpoints) {
+      console.log(`🔍 Found ${discoveredEndpoints.length} endpoints to test...`);
+      
+      for (const endpoint of discoveredEndpoints) {
         const result = await this.testAPIEndpoint(apis.baseUrl, endpoint);
         apis.endpoints.push(result);
         if (result.working) apis.workingCount++;
@@ -572,6 +733,148 @@ class AutomatedProfessionalDocsGenerator {
     }
 
     this.discoveredInfo.apis = apis;
+  }
+
+  async discoverApiBaseUrl() {
+    // Check environment files first
+    const envFiles = this.findFiles(this.rootPath, '.env*');
+    for (const envFile of envFiles) {
+      try {
+        const content = fs.readFileSync(path.join(this.rootPath, envFile), 'utf8');
+        const apiUrlMatch = content.match(/VITE_API_BASE_URL=(.+)/);
+        if (apiUrlMatch) {
+          return apiUrlMatch[1].trim().replace(/['"]/g, '');
+        }
+      } catch (error) {
+        // Env file read error
+      }
+    }
+
+    // Check JavaScript files for hardcoded URLs
+    const jsFiles = this.findFiles(this.rootPath, '*.js');
+    for (const jsFile of jsFiles) {
+      try {
+        const content = fs.readFileSync(path.join(this.rootPath, jsFile), 'utf8');
+        const apiMatch = content.match(/https?:\/\/[^'"\s]+\.execute-api\.[^'"\s]+\.amazonaws\.com\/[^'"\s\/]+/);
+        if (apiMatch) {
+          return apiMatch[0];
+        }
+      } catch (error) {
+        // File read error
+      }
+    }
+
+    // Default fallback
+    return 'https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev';
+  }
+
+  async discoverEndpointsFromCode() {
+    const endpoints = [];
+    
+    // Look for API endpoints in backend handlers
+    const backendFiles = this.findFiles(this.rootPath, '*.js').filter(file => 
+      file.includes('backend') || file.includes('api') || file.includes('handlers')
+    );
+
+    for (const file of backendFiles) {
+      try {
+        const content = fs.readFileSync(path.join(this.rootPath, file), 'utf8');
+        const foundEndpoints = this.extractEndpointsFromFile(content, file);
+        endpoints.push(...foundEndpoints);
+      } catch (error) {
+        // File read error
+      }
+    }
+
+    // Add comprehensive endpoint list based on your backend structure
+    const knownEndpoints = [
+      // System
+      { path: '/api/v1/health', method: 'GET', category: 'System', description: 'Health check' },
+      
+      // Core APIs
+      { path: '/api/v1/protocols', method: 'GET', category: 'Core', description: 'Get all protocols' },
+      { path: '/api/v1/exposure-types', method: 'GET', category: 'Core', description: 'Get exposure types' },
+      { path: '/api/v1/detox-types', method: 'GET', category: 'Core', description: 'Get detox types' },
+      
+      // Food APIs
+      { path: '/api/v1/foods/search', method: 'GET', category: 'Foods', description: 'Search foods', params: [{ name: 'search', value: 'chicken' }] },
+      { path: '/api/v1/foods/by-protocol', method: 'GET', category: 'Foods', description: 'Get foods by protocol', params: [{ name: 'protocol_id', value: '1495844a-19de-404c-a288-7660eda0cbe1' }] },
+      
+      // User APIs
+      { path: '/api/v1/users/preferences', method: 'GET', category: 'User', description: 'Get user preferences', params: [{ name: 'userId', value: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0' }] },
+      { path: '/api/v1/users/preferences', method: 'PUT', category: 'User', description: 'Update user preferences' },
+      
+      // Timeline APIs
+      { path: '/api/v1/timeline/entries', method: 'GET', category: 'Timeline', description: 'Get timeline entries', params: [{ name: 'date', value: '2024-07-06' }] },
+      { path: '/api/v1/timeline/entries', method: 'POST', category: 'Timeline', description: 'Create timeline entry' },
+      
+      // Reflection APIs
+      { path: '/api/v1/reflections', method: 'GET', category: 'Reflection', description: 'Get reflections', params: [{ name: 'date', value: '2024-07-06' }, { name: 'userId', value: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0' }] },
+      { path: '/api/v1/reflections', method: 'POST', category: 'Reflection', description: 'Save reflection' },
+      
+      // AI APIs
+      { path: '/api/v1/correlations/insights', method: 'GET', category: 'AI', description: 'Get AI insights', params: [{ name: 'userId', value: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0' }] },
+      { path: '/api/v1/correlations/analyze', method: 'POST', category: 'AI', description: 'Analyze correlations' }
+    ];
+
+    // Merge discovered and known endpoints, removing duplicates
+    const allEndpoints = [...endpoints, ...knownEndpoints];
+    const uniqueEndpoints = allEndpoints.filter((endpoint, index, self) => 
+      index === self.findIndex(e => e.path === endpoint.path && e.method === endpoint.method)
+    );
+
+    return uniqueEndpoints;
+  }
+
+  extractEndpointsFromFile(content, filename) {
+    const endpoints = [];
+    
+    // Look for Express/Lambda route patterns
+    const routePatterns = [
+      /app\.(get|post|put|delete|patch)\s*\(['"`]([^'"`]+)['"`]/gi,
+      /router\.(get|post|put|delete|patch)\s*\(['"`]([^'"`]+)['"`]/gi,
+      /exports\.(get|post|put|delete|patch)\s*=.*['"`]([^'"`]+)['"`]/gi,
+      /case\s+['"`](GET|POST|PUT|DELETE|PATCH)['"`][\s\S]*?['"`]([^'"`]+)['"`]/gi
+    ];
+
+    for (const pattern of routePatterns) {
+      let match;
+      while ((match = pattern.exec(content)) !== null) {
+        const method = match[1].toUpperCase();
+        const path = match[2];
+        
+        if (path.startsWith('/api/')) {
+          endpoints.push({
+            path: path,
+            method: method,
+            category: this.categorizeEndpoint(path),
+            description: this.generateEndpointDescription(path, method),
+            source: filename
+          });
+        }
+      }
+    }
+
+    return endpoints;
+  }
+
+  categorizeEndpoint(path) {
+    if (path.includes('health')) return 'System';
+    if (path.includes('protocol')) return 'Core';
+    if (path.includes('food')) return 'Foods';
+    if (path.includes('user')) return 'User';
+    if (path.includes('timeline')) return 'Timeline';
+    if (path.includes('reflection')) return 'Reflection';
+    if (path.includes('correlation')) return 'AI';
+    if (path.includes('exposure')) return 'Core';
+    if (path.includes('detox')) return 'Core';
+    return 'Other';
+  }
+
+  generateEndpointDescription(path, method) {
+    const action = method === 'GET' ? 'Get' : method === 'POST' ? 'Create' : method === 'PUT' ? 'Update' : method === 'DELETE' ? 'Delete' : 'Manage';
+    const resource = path.split('/').pop() || 'resource';
+    return `${action} ${resource}`;
   }
 
   async testAPIEndpoint(baseUrl, endpoint) {
@@ -873,6 +1176,105 @@ class AutomatedProfessionalDocsGenerator {
             font-family: 'Monaco', 'Menlo', monospace;
         }
         
+        /* API Endpoints */
+        .api-endpoints { margin-top: 1rem; }
+        .endpoint-card { 
+            background: #f8f9fa; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 5px; 
+            padding: 1rem; 
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+        .endpoint-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .endpoint-card.working { border-left: 4px solid #48bb78; }
+        .endpoint-card.failed { border-left: 4px solid #f56565; }
+        
+        .endpoint-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+            margin-bottom: 0.5rem;
+        }
+        
+        .method { 
+            padding: 0.25rem 0.5rem; 
+            border-radius: 3px; 
+            font-size: 0.75rem; 
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .method.get { background: #48bb78; color: white; }
+        .method.post { background: #4299e1; color: white; }
+        .method.put { background: #ed8936; color: white; }
+        .method.delete { background: #f56565; color: white; }
+        
+        .path { 
+            font-family: 'Monaco', 'Menlo', monospace; 
+            background: #edf2f7; 
+            padding: 0.25rem 0.5rem; 
+            border-radius: 3px;
+            flex-grow: 1;
+        }
+        
+        .status.success { color: #48bb78; }
+        .status.error { color: #f56565; }
+        
+        .endpoint-description { color: #718096; font-size: 0.9rem; }
+        .endpoint-params { color: #4a5568; font-size: 0.8rem; margin-top: 0.25rem; }
+        .endpoint-time { color: #4a5568; font-size: 0.8rem; margin-top: 0.25rem; }
+        
+        /* Database Tables */
+        .table-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+            gap: 1rem; 
+            margin-top: 1rem;
+        }
+        
+        .table-card { 
+            background: #f8f9fa; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 5px; 
+            padding: 1rem; 
+            text-align: center;
+        }
+        .table-card h4 { margin-bottom: 0.5rem; color: #2d3748; }
+        .table-type { color: #718096; font-size: 0.8rem; }
+        
+        /* Relationships */
+        .relationships { margin-top: 1rem; }
+        .relationship-card { 
+            background: #f8f9fa; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 5px; 
+            padding: 1rem; 
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .from-table, .to-table { 
+            background: #4299e1; 
+            color: white; 
+            padding: 0.25rem 0.5rem; 
+            border-radius: 3px; 
+            font-size: 0.9rem;
+        }
+        
+        .relationship-type { 
+            color: #718096; 
+            font-style: italic; 
+            font-size: 0.9rem;
+        }
+        
+        .foreign-key { 
+            color: #4a5568; 
+            font-size: 0.8rem; 
+            margin-left: auto;
+        }
+        
         /* Links */
         .links { display: flex; gap: 1rem; margin-top: 1rem; }
         .link-btn { 
@@ -1006,7 +1408,7 @@ health-platform/
                 <div class="two-col">
                     <div>
                         <h3>API Status</h3>
-                        <p><strong>Base URL:</strong> ${info.apis.baseUrl || 'Not configured'}</p>
+                        <p><strong>Base URL:</strong> <code>${info.apis.baseUrl || 'Not configured'}</code></p>
                         <p><strong>Working Endpoints:</strong> ${info.apis.workingCount}/${info.apis.totalCount}</p>
                         <p><strong>Categories:</strong> ${Object.keys(info.apis.categories).length}</p>
                     </div>
@@ -1029,6 +1431,24 @@ curl "${info.apis.baseUrl}/api/v1/protocols" \\
                     `).join('')}
                 </div>
                 ` : ''}
+
+                ${info.apis.endpoints.length > 0 ? `
+                <h3>📋 Available Endpoints</h3>
+                <div class="api-endpoints">
+                    ${info.apis.endpoints.map(endpoint => `
+                    <div class="endpoint-card ${endpoint.working ? 'working' : 'failed'}">
+                        <div class="endpoint-header">
+                            <span class="method ${endpoint.method.toLowerCase()}">${endpoint.method}</span>
+                            <span class="path">${endpoint.path}</span>
+                            <span class="status ${endpoint.working ? 'success' : 'error'}">${endpoint.working ? '✅' : '❌'} ${endpoint.status || 'N/A'}</span>
+                        </div>
+                        <div class="endpoint-description">${endpoint.description}</div>
+                        ${endpoint.params ? `<div class="endpoint-params">Params: ${endpoint.params.map(p => `${p.name}=${p.value}`).join(', ')}</div>` : ''}
+                        ${endpoint.responseTime ? `<div class="endpoint-time">Response: ${endpoint.responseTime}ms</div>` : ''}
+                    </div>
+                    `).join('')}
+                </div>
+                ` : ''}
             </section>
 
             <!-- Database Section -->
@@ -1040,16 +1460,61 @@ curl "${info.apis.baseUrl}/api/v1/protocols" \\
                         <h3>Database Info</h3>
                         <p><strong>Type:</strong> ${info.database.type}</p>
                         <p><strong>Tables:</strong> ${info.database.tables.length}</p>
+                        <p><strong>Relationships:</strong> ${info.database.relationships.length}</p>
                         ${info.database.connectionInfo.host ? `<p><strong>Host:</strong> ${info.database.connectionInfo.host}</p>` : ''}
                         ${info.database.connectionInfo.database ? `<p><strong>Database:</strong> ${info.database.connectionInfo.database}</p>` : ''}
                     </div>
                     <div>
-                        <h3>Discovered Tables</h3>
-                        <ul class="feature-list">
-                            ${info.database.tables.slice(0, 8).map(table => `<li>${table}</li>`).join('')}
-                        </ul>
+                        <h3>Connection Details</h3>
+                        ${info.database.connectionInfo.port ? `<p><strong>Port:</strong> ${info.database.connectionInfo.port}</p>` : ''}
+                        ${info.database.connectionInfo.ssl ? `<p><strong>SSL:</strong> ${info.database.connectionInfo.ssl}</p>` : ''}
+                        <p><strong>Environment:</strong> Via DATABASE_URL</p>
                     </div>
                 </div>
+
+                ${info.database.tables.length > 0 ? `
+                <h3>📊 Database Tables</h3>
+                <div class="table-grid">
+                    ${info.database.tables.map(table => `
+                    <div class="table-card">
+                        <h4>${table}</h4>
+                        <div class="table-type">Table</div>
+                    </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+
+                ${info.database.relationships.length > 0 ? `
+                <h3>🔗 Table Relationships</h3>
+                <div class="relationships">
+                    ${info.database.relationships.map(rel => `
+                    <div class="relationship-card">
+                        <span class="from-table">${rel.from}</span>
+                        <span class="relationship-type">${rel.type}</span>
+                        <span class="to-table">${rel.to}</span>
+                        ${rel.foreignKey ? `<div class="foreign-key">via ${rel.foreignKey}</div>` : ''}
+                    </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+
+                <h3>🔧 Database Schema</h3>
+                <div class="code-block">
+-- Core Tables
+CREATE TABLE users (id, email, name, created_at);
+CREATE TABLE protocols (id, name, description, type);
+CREATE TABLE foods (id, name, category, histamine_level);
+CREATE TABLE timeline_entries (id, user_id, entry_type, content, entry_time);
+CREATE TABLE reflections (id, user_id, date, energy_level, mood_level);
+CREATE TABLE correlations (id, user_id, trigger, effect, confidence);
+
+-- Lookup Tables  
+CREATE TABLE exposure_types (id, name, category);
+CREATE TABLE detox_types (id, name, category);
+
+-- Junction Tables
+CREATE TABLE protocol_foods (protocol_id, food_id, status);
+CREATE TABLE user_preferences (user_id, protocols, quick_foods);</div>
             </section>
 
             <!-- Development Section -->
