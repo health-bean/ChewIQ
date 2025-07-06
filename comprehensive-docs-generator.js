@@ -439,6 +439,21 @@ class AutomatedProfessionalDocsGenerator {
     this.discoveredInfo.database = database;
   }
 
+  parseConnectionString(connectionString) {
+    // Parse connection string without exposing credentials
+    try {
+      const url = new URL(connectionString);
+      return {
+        host: url.hostname,
+        port: url.port,
+        database: url.pathname.slice(1),
+        ssl: url.searchParams.get('ssl') || url.searchParams.get('sslmode')
+      };
+    } catch (error) {
+      return { raw: 'Connection string format not recognized' };
+    }
+  }
+
   extractSchemaInfo(content) {
     const schemas = [];
     
@@ -569,49 +584,6 @@ class AutomatedProfessionalDocsGenerator {
     return [...new Set(tables)]; // Remove duplicates
   }
 
-  parseConnectionString(connectionString) {
-    // Parse connection string without exposing credentials
-    try {
-      const url = new URL(connectionString);
-      return {
-        host: url.hostname,
-        port: url.port,
-        database: url.pathname.slice(1),
-        ssl: url.searchParams.get('ssl') || url.searchParams.get('sslmode')
-      };
-    } catch (error) {
-      return { raw: 'Connection string format not recognized' };
-    }
-  }
-
-  extractTableNames(content) {
-    const tables = [];
-    
-    // Look for SQL table references
-    const sqlMatches = content.match(/CREATE TABLE\s+(\w+)|INSERT INTO\s+(\w+)|SELECT.*FROM\s+(\w+)|UPDATE\s+(\w+)/gi);
-    if (sqlMatches) {
-      sqlMatches.forEach(match => {
-        const tableMatch = match.match(/(?:CREATE TABLE|INSERT INTO|FROM|UPDATE)\s+(\w+)/i);
-        if (tableMatch) {
-          tables.push(tableMatch[1]);
-        }
-      });
-    }
-
-    // Look for ORM model references
-    const ormMatches = content.match(/\.table\(['"](\w+)['"]\)/g);
-    if (ormMatches) {
-      ormMatches.forEach(match => {
-        const tableMatch = match.match(/\.table\(['"](\w+)['"]\)/);
-        if (tableMatch) {
-          tables.push(tableMatch[1]);
-        }
-      });
-    }
-
-    return tables;
-  }
-
   async discoverGitInfo() {
     console.log('📝 Discovering Git repository information...');
     
@@ -709,18 +681,30 @@ class AutomatedProfessionalDocsGenerator {
 
     // Discover API base URL from environment files
     apis.baseUrl = await this.discoverApiBaseUrl();
+    console.log(`📡 Using API base URL: ${apis.baseUrl}`);
     
     // Discover all endpoints from backend code
     const discoveredEndpoints = await this.discoverEndpointsFromCode();
+    console.log(`🔍 Found ${discoveredEndpoints.length} endpoints to test`);
     
     // Test all discovered endpoints
     if (apis.baseUrl) {
-      console.log(`🔍 Found ${discoveredEndpoints.length} endpoints to test...`);
+      let successCount = 0;
+      let errorCount = 0;
       
       for (const endpoint of discoveredEndpoints) {
+        console.log(`\n🧪 Testing: ${endpoint.method} ${endpoint.path}`);
         const result = await this.testAPIEndpoint(apis.baseUrl, endpoint);
         apis.endpoints.push(result);
-        if (result.working) apis.workingCount++;
+        
+        if (result.working) {
+          apis.workingCount++;
+          successCount++;
+          console.log(`   ✅ SUCCESS: ${result.status} (${result.responseTime}ms)`);
+        } else {
+          errorCount++;
+          console.log(`   ❌ FAILED: ${result.status} - ${result.error || 'Unknown error'}`);
+        }
         
         if (!apis.categories[endpoint.category]) {
           apis.categories[endpoint.category] = { working: 0, total: 0 };
@@ -730,6 +714,10 @@ class AutomatedProfessionalDocsGenerator {
       }
       
       apis.totalCount = apis.endpoints.length;
+      console.log(`\n📊 API Testing Summary:`);
+      console.log(`   ✅ Working: ${successCount}`);
+      console.log(`   ❌ Failed: ${errorCount}`);
+      console.log(`   📈 Success Rate: ${Math.round((successCount / apis.totalCount) * 100)}%`);
     }
 
     this.discoveredInfo.apis = apis;
@@ -804,87 +792,155 @@ class AutomatedProfessionalDocsGenerator {
   }
 
   async discoverEndpointsFromCode() {
+    console.log('🔍 Discovering endpoints from backend code...');
     const endpoints = [];
     
-    // Look for API endpoints in backend handlers
+    // Look for API endpoints in backend handlers and main files
     const backendFiles = this.findFiles(this.rootPath, '*.js').filter(file => 
-      file.includes('backend') || file.includes('api') || file.includes('handlers')
+      file.includes('backend') || file.includes('handlers') || file.includes('index.js')
     );
+
+    console.log(`   Found ${backendFiles.length} backend files to scan`);
 
     for (const file of backendFiles) {
       try {
         const content = fs.readFileSync(path.join(this.rootPath, file), 'utf8');
         const foundEndpoints = this.extractEndpointsFromFile(content, file);
-        endpoints.push(...foundEndpoints);
+        
+        if (foundEndpoints.length > 0) {
+          console.log(`   📄 ${file}: Found ${foundEndpoints.length} endpoints`);
+          endpoints.push(...foundEndpoints);
+        }
       } catch (error) {
-        // File read error
+        console.log(`   ⚠️ Error reading ${file}: ${error.message}`);
       }
     }
 
-    // Add comprehensive endpoint list based on your backend structure
-    const knownEndpoints = [
-      // System
-      { path: '/api/v1/health', method: 'GET', category: 'System', description: 'Health check' },
-      
-      // Core APIs
-      { path: '/api/v1/protocols', method: 'GET', category: 'Core', description: 'Get all protocols' },
-      { path: '/api/v1/exposure-types', method: 'GET', category: 'Core', description: 'Get exposure types' },
-      { path: '/api/v1/detox-types', method: 'GET', category: 'Core', description: 'Get detox types' },
-      
-      // Food APIs
-      { path: '/api/v1/foods/search', method: 'GET', category: 'Foods', description: 'Search foods', params: [{ name: 'search', value: 'chicken' }] },
-      { path: '/api/v1/foods/by-protocol', method: 'GET', category: 'Foods', description: 'Get foods by protocol', params: [{ name: 'protocol_id', value: '1495844a-19de-404c-a288-7660eda0cbe1' }] },
-      
-      // User APIs
-      { path: '/api/v1/users/preferences', method: 'GET', category: 'User', description: 'Get user preferences', params: [{ name: 'userId', value: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0' }] },
-      { path: '/api/v1/users/preferences', method: 'PUT', category: 'User', description: 'Update user preferences' },
-      
-      // Timeline APIs
-      { path: '/api/v1/timeline/entries', method: 'GET', category: 'Timeline', description: 'Get timeline entries', params: [{ name: 'date', value: '2024-07-06' }] },
-      { path: '/api/v1/timeline/entries', method: 'POST', category: 'Timeline', description: 'Create timeline entry' },
-      
-      // Reflection APIs
-      { path: '/api/v1/reflections', method: 'GET', category: 'Reflection', description: 'Get reflections', params: [{ name: 'date', value: '2024-07-06' }, { name: 'userId', value: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0' }] },
-      { path: '/api/v1/reflections', method: 'POST', category: 'Reflection', description: 'Save reflection' },
-      
-      // AI APIs
-      { path: '/api/v1/correlations/insights', method: 'GET', category: 'AI', description: 'Get AI insights', params: [{ name: 'userId', value: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0' }] },
-      { path: '/api/v1/correlations/analyze', method: 'POST', category: 'AI', description: 'Analyze correlations' }
-    ];
+    console.log(`   📊 Total discovered endpoints: ${endpoints.length}`);
+    
+    // If no endpoints found, use minimal fallback (not hardcoded list)
+    if (endpoints.length === 0) {
+      console.log('   🔄 No endpoints discovered, using basic health check');
+      return [
+        { path: '/api/v1/health', method: 'GET', category: 'System', description: 'Health check endpoint' }
+      ];
+    }
 
-    // Merge discovered and known endpoints, removing duplicates
-    const allEndpoints = [...endpoints, ...knownEndpoints];
-    const uniqueEndpoints = allEndpoints.filter((endpoint, index, self) => 
+    // Remove duplicates
+    const uniqueEndpoints = endpoints.filter((endpoint, index, self) => 
       index === self.findIndex(e => e.path === endpoint.path && e.method === endpoint.method)
     );
 
+    console.log(`   ✅ Unique endpoints after deduplication: ${uniqueEndpoints.length}`);
     return uniqueEndpoints;
   }
 
   extractEndpointsFromFile(content, filename) {
     const endpoints = [];
     
-    // Look for Express/Lambda route patterns
-    const routePatterns = [
-      /app\.(get|post|put|delete|patch)\s*\(['"`]([^'"`]+)['"`]/gi,
-      /router\.(get|post|put|delete|patch)\s*\(['"`]([^'"`]+)['"`]/gi,
-      /exports\.(get|post|put|delete|patch)\s*=.*['"`]([^'"`]+)['"`]/gi,
-      /case\s+['"`](GET|POST|PUT|DELETE|PATCH)['"`][\s\S]*?['"`]([^'"`]+)['"`]/gi
+    // Enhanced patterns to find API routes in your backend code
+    const patterns = [
+      // Lambda handler patterns like: case 'GET': if (path === '/api/v1/protocols')
+      /case\s+['"`](GET|POST|PUT|DELETE|PATCH)['"`]\s*:[\s\S]*?(?:path\s*===?\s*['"`]([^'"`]+)['"`]|resource\s*===?\s*['"`]([^'"`]+)['"`])/gi,
+      
+      // Express/Router patterns
+      /(?:app|router)\.(get|post|put|delete|patch)\s*\(['"`]([^'"`]+)['"`]/gi,
+      
+      // Function export patterns like: exports.getProtocols = async (event) => { ... }
+      /exports\.(\w+)\s*=\s*async\s*\(/g,
+      
+      // Switch case patterns for HTTP methods
+      /switch\s*\(\s*(?:event\.)?httpMethod\s*\)[\s\S]*?case\s*['"`](GET|POST|PUT|DELETE|PATCH)['"`]/gi,
+      
+      // API Gateway event patterns
+      /if\s*\(\s*(?:event\.)?httpMethod\s*===?\s*['"`](GET|POST|PUT|DELETE|PATCH)['"`][\s\S]*?(?:event\.)?(?:path|resource)\s*===?\s*['"`]([^'"`]+)['"`]/gi,
+      
+      // Route handler patterns
+      /['"`]([^'"`]*\/api\/v1\/[^'"`]+)['"`]/g
     ];
 
-    for (const pattern of routePatterns) {
+    // Extract from different patterns
+    for (const pattern of patterns) {
       let match;
       while ((match = pattern.exec(content)) !== null) {
-        const method = match[1].toUpperCase();
-        const path = match[2];
+        let method = null;
+        let path = null;
         
-        if (path.startsWith('/api/')) {
+        // Handle different match patterns
+        if (match[1] && match[2]) {
+          // Standard method + path pattern
+          method = match[1].toUpperCase();
+          path = match[2] || match[3];
+        } else if (match[1] && match[1].startsWith('/api/')) {
+          // Path-only pattern, infer method from context
+          path = match[1];
+          method = this.inferMethodFromContext(content, match.index);
+        } else if (match[1] && !match[1].startsWith('/')) {
+          // Function name pattern, convert to endpoint
+          const funcName = match[1];
+          const endpoint = this.functionNameToEndpoint(funcName);
+          if (endpoint) {
+            method = endpoint.method;
+            path = endpoint.path;
+          }
+        }
+        
+        if (method && path && path.startsWith('/api/')) {
           endpoints.push({
             path: path,
             method: method,
             category: this.categorizeEndpoint(path),
             description: this.generateEndpointDescription(path, method),
-            source: filename
+            source: filename,
+            params: this.extractParamsFromPath(path)
+          });
+        }
+      }
+    }
+
+    // Look for specific handler patterns in your code
+    const handlerPatterns = this.extractHandlerSpecificPatterns(content, filename);
+    endpoints.push(...handlerPatterns);
+
+    return endpoints;
+  }
+
+  extractHandlerSpecificPatterns(content, filename) {
+    const endpoints = [];
+    
+    // If this is a handler file, look for specific patterns
+    if (filename.includes('handlers') || filename.includes('index.js')) {
+      
+      // Look for your specific handler patterns
+      const handlerMethods = [
+        { pattern: /getProtocols|protocols.*get/i, path: '/api/v1/protocols', method: 'GET' },
+        { pattern: /searchFood|food.*search/i, path: '/api/v1/foods/search', method: 'GET' },
+        { pattern: /getFoodsByProtocol|foods.*protocol/i, path: '/api/v1/foods/by-protocol', method: 'GET' },
+        { pattern: /getUserPreferences|user.*preferences.*get/i, path: '/api/v1/users/preferences', method: 'GET' },
+        { pattern: /updateUserPreferences|user.*preferences.*update/i, path: '/api/v1/users/preferences', method: 'PUT' },
+        { pattern: /getTimelineEntries|timeline.*entries.*get/i, path: '/api/v1/timeline/entries', method: 'GET' },
+        { pattern: /createTimelineEntry|timeline.*entries.*create/i, path: '/api/v1/timeline/entries', method: 'POST' },
+        { pattern: /getReflections|reflections.*get/i, path: '/api/v1/reflections', method: 'GET' },
+        { pattern: /saveReflection|reflections.*save/i, path: '/api/v1/reflections', method: 'POST' },
+        { pattern: /getCorrelationInsights|correlations.*insights/i, path: '/api/v1/correlations/insights', method: 'GET' },
+        { pattern: /analyzeCorrelations|correlations.*analyze/i, path: '/api/v1/correlations/analyze', method: 'POST' },
+        { pattern: /getExposureTypes|exposure.*types/i, path: '/api/v1/exposure-types', method: 'GET' },
+        { pattern: /getDetoxTypes|detox.*types/i, path: '/api/v1/detox-types', method: 'GET' },
+        { pattern: /getSymptoms|symptoms.*get/i, path: '/api/v1/symptoms', method: 'GET' },
+        { pattern: /getSupplements|supplements.*get/i, path: '/api/v1/supplements', method: 'GET' },
+        { pattern: /getMedications|medications.*get/i, path: '/api/v1/medications', method: 'GET' },
+        { pattern: /healthCheck|health.*check/i, path: '/api/v1/health', method: 'GET' }
+      ];
+
+      for (const handler of handlerMethods) {
+        if (handler.pattern.test(content)) {
+          endpoints.push({
+            path: handler.path,
+            method: handler.method,
+            category: this.categorizeEndpoint(handler.path),
+            description: this.generateEndpointDescription(handler.path, handler.method),
+            source: filename,
+            params: this.extractParamsFromPath(handler.path)
           });
         }
       }
@@ -893,16 +949,73 @@ class AutomatedProfessionalDocsGenerator {
     return endpoints;
   }
 
+  inferMethodFromContext(content, matchIndex) {
+    // Look at surrounding context to infer HTTP method
+    const contextStart = Math.max(0, matchIndex - 200);
+    const contextEnd = Math.min(content.length, matchIndex + 200);
+    const context = content.substring(contextStart, contextEnd);
+    
+    if (/GET|get/i.test(context)) return 'GET';
+    if (/POST|post|create/i.test(context)) return 'POST';
+    if (/PUT|put|update/i.test(context)) return 'PUT';
+    if (/DELETE|delete/i.test(context)) return 'DELETE';
+    
+    return 'GET'; // Default to GET
+  }
+
+  functionNameToEndpoint(funcName) {
+    // Convert function names to endpoints
+    const mappings = {
+      'getProtocols': { method: 'GET', path: '/api/v1/protocols' },
+      'searchFood': { method: 'GET', path: '/api/v1/foods/search' },
+      'getFoodsByProtocol': { method: 'GET', path: '/api/v1/foods/by-protocol' },
+      'getUserPreferences': { method: 'GET', path: '/api/v1/users/preferences' },
+      'updateUserPreferences': { method: 'PUT', path: '/api/v1/users/preferences' },
+      'getTimelineEntries': { method: 'GET', path: '/api/v1/timeline/entries' },
+      'createTimelineEntry': { method: 'POST', path: '/api/v1/timeline/entries' },
+      'getReflections': { method: 'GET', path: '/api/v1/reflections' },
+      'saveReflection': { method: 'POST', path: '/api/v1/reflections' },
+      'getCorrelationInsights': { method: 'GET', path: '/api/v1/correlations/insights' },
+      'analyzeCorrelations': { method: 'POST', path: '/api/v1/correlations/analyze' },
+      'getExposureTypes': { method: 'GET', path: '/api/v1/exposure-types' },
+      'getDetoxTypes': { method: 'GET', path: '/api/v1/detox-types' },
+      'healthCheck': { method: 'GET', path: '/api/v1/health' }
+    };
+    
+    return mappings[funcName] || null;
+  }
+
+  extractParamsFromPath(path) {
+    const params = [];
+    
+    // Add common parameters based on endpoint
+    if (path.includes('search')) {
+      params.push({ name: 'search', value: 'chicken' });
+    }
+    if (path.includes('protocol')) {
+      params.push({ name: 'protocol_id', value: '1495844a-19de-404c-a288-7660eda0cbe1' });
+    }
+    if (path.includes('preferences') || path.includes('reflections') || path.includes('correlations')) {
+      params.push({ name: 'userId', value: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0' });
+    }
+    if (path.includes('timeline') || path.includes('reflections')) {
+      params.push({ name: 'date', value: '2024-07-06' });
+    }
+    
+    return params;
+  }
+
   categorizeEndpoint(path) {
     if (path.includes('health')) return 'System';
-    if (path.includes('protocol')) return 'Core';
+    if (path.includes('protocol')) return 'Protocols';
     if (path.includes('food')) return 'Foods';
-    if (path.includes('user')) return 'User';
+    if (path.includes('user')) return 'Users';
     if (path.includes('timeline')) return 'Timeline';
-    if (path.includes('reflection')) return 'Reflection';
+    if (path.includes('reflection')) return 'Reflections';
     if (path.includes('correlation')) return 'AI';
-    if (path.includes('exposure')) return 'Core';
-    if (path.includes('detox')) return 'Core';
+    if (path.includes('exposure')) return 'Lookup Data';
+    if (path.includes('detox')) return 'Lookup Data';
+    if (path.includes('symptoms') || path.includes('supplements') || path.includes('medications')) return 'Health Data';
     return 'Other';
   }
 
@@ -1514,18 +1627,6 @@ class AutomatedProfessionalDocsGenerator {
                         </ul>
                     </div>
                 </div>
-
-                <h3>📁 Project Structure</h3>
-                <div class="code-block">
-health-platform/
-├── frontend/
-│   ├── web-app/           # React application
-│   └── shared/            # Reusable components & hooks
-├── backend/
-│   └── functions/api/     # AWS Lambda functions
-├── docs-site/             # Generated documentation
-└── README.md</div>
-            </section>
 
             <!-- API Documentation -->
             <section id="api" class="section">
