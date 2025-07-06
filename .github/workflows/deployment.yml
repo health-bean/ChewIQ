@@ -1,5 +1,5 @@
-# .github/workflows/deploymentyml
-name: 📚Platform Deployment - Documentation & Backend Deployment
+# .github/workflows/deployment.yml
+name: 🚀 Platform Deployment - Backend + Documentation
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
       - 'frontend/**'
       - 'backend/**' 
       - 'docs/**'
+      - '.github/workflows/**'  # Include workflow changes
       - '*.js'
       - '*.json'
   pull_request:
