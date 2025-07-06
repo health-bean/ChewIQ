@@ -2,7 +2,7 @@
   "platform": {
     "name": "FILO Health Platform",
     "version": "1.0.0",
-    "lastUpdated": "2025-07-06T17:58:45.236Z",
+    "lastUpdated": "2025-07-06T18:11:23.175Z",
     "architecture": "Full-Stack React + AWS Lambda",
     "status": "Active Development"
   },
@@ -32,7 +32,7 @@
     "platform": {
       "name": "FILO Health Platform",
       "version": "1.0.0",
-      "lastUpdated": "2025-07-06T17:58:45.236Z",
+      "lastUpdated": "2025-07-06T18:11:23.175Z",
       "architecture": "Full-Stack React + AWS Lambda",
       "status": "Active Development"
     },
@@ -45,7 +45,7 @@
           "description": "Get health protocols",
           "status": 200,
           "working": true,
-          "responseTime": 740,
+          "responseTime": 784,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -163,7 +163,7 @@
           "description": "Get exposure types",
           "status": 404,
           "working": false,
-          "responseTime": 88,
+          "responseTime": 85,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -226,7 +226,7 @@
           "description": "Get detox types",
           "status": 404,
           "working": false,
-          "responseTime": 81,
+          "responseTime": 58,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -295,7 +295,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 112,
+          "responseTime": 126,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -349,7 +349,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 157,
+          "responseTime": 97,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -4486,7 +4486,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 51,
+          "responseTime": 60,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -4549,7 +4549,7 @@
           "description": "Update user preferences",
           "status": 404,
           "working": false,
-          "responseTime": 57,
+          "responseTime": 51,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -4618,7 +4618,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 58,
+          "responseTime": 74,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -4645,7 +4645,7 @@
           "description": "Create timeline entry",
           "status": 500,
           "working": false,
-          "responseTime": 57,
+          "responseTime": 88,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -4675,7 +4675,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 89,
+          "responseTime": 52,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -4738,7 +4738,7 @@
           "description": "Save daily reflection",
           "status": 404,
           "working": false,
-          "responseTime": 53,
+          "responseTime": 75,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -4807,7 +4807,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 6101,
+          "responseTime": 5980,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -6357,7 +6357,7 @@
           "description": "Analyze correlations",
           "status": 404,
           "working": false,
-          "responseTime": 52,
+          "responseTime": 90,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -6420,7 +6420,7 @@
           "description": "Health check",
           "status": 404,
           "working": false,
-          "responseTime": 53,
+          "responseTime": 94,
           "responseSchema": {
             "type": "object",
             "properties": {
@@ -6743,7 +6743,7 @@
             "useUserPreferences"
           ],
           "purpose": "API Integration",
-          "size": "2.4KB"
+          "size": "4.6KB"
         }
       ],
       "utilities": [
