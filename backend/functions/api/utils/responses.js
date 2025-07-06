@@ -43,11 +43,38 @@ const options = () => ({
   body: ''
 });
 
+// 🔧 FIX: Add missing exports that index.js expects
+const handleCors = (event) => {
+  // Handle OPTIONS requests for CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: CORS_HEADERS,
+      body: ''
+    };
+  }
+  // Return null for non-OPTIONS requests (let the route handler continue)
+  return null;
+};
+
+// 🔧 FIX: Export corsHeaders (alias for CORS_HEADERS)
+const corsHeaders = CORS_HEADERS;
+
+// 🔧 FIX: Export errorResponse (alias for error function)
+const errorResponse = error;
+
 module.exports = {
+  // Original exports (keep all existing functionality)
   success,
   error,
   unauthorized,
   notFound,
   badRequest,
-  options
+  options,
+  CORS_HEADERS,
+  
+  // 🔧 FIX: Add missing exports for index.js compatibility
+  handleCors,
+  corsHeaders,
+  errorResponse
 };
