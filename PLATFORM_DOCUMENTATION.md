@@ -26,7 +26,7 @@
 #### GET /api/v1/protocols
 **Status:** ✅ Working (200)  
 **Description:** Get health protocols  
-**Response Time:** 689ms
+**Response Time:** 373ms
 
 
 
@@ -141,7 +141,7 @@ curl "https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/api/v1/protocol
 #### GET /api/v1/foods/search
 **Status:** ✅ Working (200)  
 **Description:** Search food database  
-**Response Time:** 42ms
+**Response Time:** 236ms
 
 **Parameters:**
 - `search`: chicken
@@ -179,7 +179,7 @@ curl "https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/api/v1/foods/se
 #### GET /api/v1/foods/by-protocol
 **Status:** ✅ Working (200)  
 **Description:** Get protocol foods  
-**Response Time:** 144ms
+**Response Time:** 263ms
 
 **Parameters:**
 - `protocol_id`: 1495844a-19de-404c-a288-7660eda0cbe1
@@ -4081,7 +4081,7 @@ curl "https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/api/v1/foods/by
 #### GET /api/v1/timeline/entries
 **Status:** ✅ Working (200)  
 **Description:** Get timeline entries  
-**Response Time:** 52ms
+**Response Time:** 102ms
 
 **Parameters:**
 - `date`: 2025-07-04
@@ -4106,7 +4106,7 @@ curl "https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/api/v1/timeline
 #### GET /api/v1/correlations/insights
 **Status:** ✅ Working (200)  
 **Description:** Get AI insights  
-**Response Time:** 5914ms
+**Response Time:** 5945ms
 
 **Parameters:**
 - `userId`: 8e8a568a-c2f8-43a8-abf2-4e54408dbdc0
@@ -5696,7 +5696,7 @@ curl "https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev/api/v1/correlat
   - Dependencies: useState, useEffect, useReflectionData
 - **useUserPreferences** - API Integration
   - Path: `frontend/shared/hooks/useUserPreferences.js`
-  - Size: 4.6KB
+  - Size: 5.4KB
   - Dependencies: useState, useEffect, useUserPreferences
 
 ### Utility Functions (2)
