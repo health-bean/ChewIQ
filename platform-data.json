@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2025-07-07T11:30:14.784Z",
+    "generated": "2025-07-07T14:30:23.743Z",
     "version": "1.0.0",
     "generator": "AutomatedProfessionalDocsGenerator"
   },
@@ -17,7 +17,7 @@
     "workingAPIs": 0,
     "totalAPIs": 28,
     "totalTables": 21,
-    "totalCommits": 24,
+    "totalCommits": 25,
     "contributors": 1
   },
   "discoveredInfo": {
@@ -129,7 +129,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 6569,
+          "responseTime": 6277,
           "responseData": {
             "error": "Failed to analyze correlations"
           },
@@ -149,7 +149,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 103,
+          "responseTime": 55,
           "responseData": {
             "message": "Internal server error"
           },
@@ -164,7 +164,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 160,
+          "responseTime": 99,
           "responseData": {
             "message": "Internal server error"
           },
@@ -184,7 +184,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 240,
+          "responseTime": 83,
           "responseData": {
             "error": "Failed to complete search foods"
           },
@@ -204,7 +204,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 100,
+          "responseTime": 74,
           "responseData": {
             "error": "Failed to complete fetch protocols"
           },
@@ -224,7 +224,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 106,
+          "responseTime": 55,
           "responseData": {
             "error": "Failed to complete fetch timeline entries"
           },
@@ -244,7 +244,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 118,
+          "responseTime": 137,
           "responseData": {
             "error": "Failed to complete create timeline entry"
           },
@@ -264,7 +264,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 101,
+          "responseTime": 94,
           "responseData": {
             "message": "Internal server error"
           },
@@ -284,7 +284,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 99,
+          "responseTime": 54,
           "responseData": {
             "message": "Internal server error"
           },
@@ -299,7 +299,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 132,
+          "responseTime": 62,
           "responseData": {
             "error": "Email and password required"
           },
@@ -314,7 +314,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 228,
+          "responseTime": 48,
           "responseData": {
             "message": "Internal server error"
           },
@@ -329,7 +329,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 105,
+          "responseTime": 76,
           "responseData": {
             "error": "No authorization header"
           },
@@ -344,7 +344,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 97,
+          "responseTime": 54,
           "responseData": {
             "message": "Internal server error"
           },
@@ -359,7 +359,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 102,
+          "responseTime": 57,
           "responseData": {
             "error": "Missing required fields"
           },
@@ -374,7 +374,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 98,
+          "responseTime": 48,
           "responseData": {
             "error": "Email and password required"
           },
@@ -389,7 +389,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 124,
+          "responseTime": 43,
           "responseData": {
             "error": "Failed to complete fetch user"
           },
@@ -409,7 +409,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 266,
+          "responseTime": 116,
           "responseData": {
             "error": "Failed to complete fetch user protocols"
           },
@@ -429,7 +429,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 237,
+          "responseTime": 53,
           "responseData": {
             "error": "Failed to complete fetch user preferences"
           },
@@ -449,7 +449,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 105,
+          "responseTime": 68,
           "responseData": {
             "error": "Failed to complete fetch protocol foods"
           },
@@ -469,7 +469,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 97,
+          "responseTime": 49,
           "responseData": {
             "error": "Failed to complete search symptoms"
           },
@@ -489,7 +489,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 230,
+          "responseTime": 119,
           "responseData": {
             "error": "Failed to complete search supplements"
           },
@@ -509,7 +509,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 234,
+          "responseTime": 69,
           "responseData": {
             "error": "Failed to complete search medications"
           },
@@ -529,7 +529,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 101,
+          "responseTime": 49,
           "responseData": {
             "error": "Failed to complete search detox types"
           },
@@ -544,7 +544,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 96,
+          "responseTime": 54,
           "responseData": {
             "error": "Internal server error: handleGetJournalEntries is not a function"
           },
@@ -559,7 +559,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 102,
+          "responseTime": 91,
           "responseData": {
             "error": "Internal server error: handleGetJournalEntry is not a function"
           },
@@ -574,7 +574,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 106,
+          "responseTime": 55,
           "responseData": {
             "message": "Internal server error"
           },
@@ -589,7 +589,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 146,
+          "responseTime": 43,
           "responseData": {
             "message": "Internal server error"
           },
@@ -604,7 +604,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 100,
+          "responseTime": 51,
           "responseData": {
             "message": "Internal server error"
           },
@@ -746,7 +746,7 @@
             {
               "name": "App",
               "path": "frontend/web-app/src/App.jsx",
-              "size": 12239,
+              "size": 8656,
               "hooks": [
                 "useEffect",
                 "useAuth",
@@ -805,7 +805,7 @@
             {
               "name": "LoginPage",
               "path": "frontend/web-app/src/components/pages/LoginPage.jsx",
-              "size": 6674,
+              "size": 6728,
               "hooks": [
                 "useState",
                 "useAuth"
@@ -939,7 +939,7 @@
             }
           ],
           "utilities": [],
-          "size": "321.07 KB"
+          "size": "317.63 KB"
         },
         "frontend/shared": {
           "totalFiles": 24,
@@ -1036,19 +1036,18 @@
             {
               "name": "useUserPreferences",
               "path": "frontend/shared/hooks/useUserPreferences.js",
-              "size": 9640
+              "size": 5747
             }
           ],
           "utilities": [],
-          "size": "47.79 KB"
+          "size": "43.99 KB"
         }
       },
       "backend": {
         "backend/functions/api": {
-          "totalFiles": 20,
+          "totalFiles": 19,
           "fileTypes": {
             ".js": 17,
-            "": 1,
             ".json": 2
           },
           "components": [],
@@ -1060,13 +1059,12 @@
             }
           ],
           "utilities": [],
-          "size": "91.55 KB"
+          "size": "91.29 KB"
         },
         "backend/functions": {
-          "totalFiles": 20,
+          "totalFiles": 19,
           "fileTypes": {
             ".js": 17,
-            "": 1,
             ".json": 2
           },
           "components": [],
@@ -1078,13 +1076,12 @@
             }
           ],
           "utilities": [],
-          "size": "91.55 KB"
+          "size": "91.29 KB"
         },
         "backend": {
-          "totalFiles": 20,
+          "totalFiles": 19,
           "fileTypes": {
             ".js": 17,
-            "": 1,
             ".json": 2
           },
           "components": [],
@@ -1096,7 +1093,7 @@
             }
           ],
           "utilities": [],
-          "size": "91.55 KB"
+          "size": "91.29 KB"
         }
       },
       "shared": {},
@@ -1180,18 +1177,18 @@
       "repository": "https://github.com/deebyrne26/health-platform",
       "branch": "main",
       "lastCommit": {
-        "hash": "0c892a2",
-        "message": "Update auth.js",
+        "hash": "c908a5d",
+        "message": "Reverting a few files.",
         "author": "deebyrne26",
-        "date": "Mon Jul 7 07:29:33 2025 -0400"
+        "date": "Mon Jul 7 10:29:39 2025 -0400"
       },
       "contributors": [
         {
           "name": "deebyrne26",
-          "commits": 24
+          "commits": 25
         }
       ],
-      "totalCommits": 24
+      "totalCommits": 25
     }
   }
 }
