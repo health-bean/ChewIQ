@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCorrelations } from '../../../../shared/hooks/useCorrelations';
-import { AlertTriangle, TrendingUp, Clock, Target, Zap, Activity, Pill, Moon, Dumbbell, Brain, Heart } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Clock, Target, Zap, Activity, Pill, Moon, Dumbbell, Brain, Heart, CheckCircle, AlertCircle } from 'lucide-react';
 
 const DEMO_USER_ID = '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0'; // Sarah's ID for demo
 
@@ -11,54 +11,130 @@ const CorrelationInsights = () => {
   const { 
     correlations,  
     sortedCorrelations,
-    highConfidenceTriggers, // Now includes ALL correlation types
     summary, 
     loading, 
     error,
     correlationStats
   } = useCorrelations(DEMO_USER_ID, confidenceFilter, timeframeFilter);
 
-  // DEBUG: Log correlation data to understand what we're getting
-  console.log('🔍 Correlation Debug:', {
-    totalCorrelations: correlations?.length || 0,
-    correlationTypes: correlations?.map(c => c.type) || [],
-    confidenceRange: correlations?.map(c => c.confidence) || [],
-    highConfidenceCount: highConfidenceTriggers?.length || 0,
-    highConfidenceTypes: highConfidenceTriggers?.map(c => c.type) || [],
-    confidenceFilter,
-    correlationStats
-  });
+  // ENHANCED: Filter for very high confidence patterns (90%+)
+  const veryHighConfidencePatterns = correlations.filter(c => c.confidence >= 0.9);
 
-  const getConfidenceColor = (confidence) => {
-    if (confidence >= 0.8) return 'text-red-600 bg-red-50 border-red-200';
-    if (confidence >= 0.7) return 'text-orange-600 bg-orange-50 border-orange-200';
-    if (confidence >= 0.6) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-    return 'text-blue-600 bg-blue-50 border-blue-200';
+  // ENHANCED: Consolidate duplicates by trigger
+  const consolidateByTrigger = (patterns) => {
+    const grouped = {};
+    
+    patterns.forEach(pattern => {
+      const key = pattern.trigger.toLowerCase();
+      if (!grouped[key]) {
+        grouped[key] = {
+          trigger: pattern.trigger,
+          type: pattern.type,
+          confidence: pattern.confidence,
+          effects: [],
+          icon: getCorrelationIcon(pattern),
+          typeLabel: getCorrelationTypeLabel(pattern.type),
+          typeColor: getCorrelationTypeColor(pattern.type),
+          isPositive: isPositiveCorrelation(pattern)
+        };
+      }
+      
+      grouped[key].effects.push({
+        effect: pattern.effect,
+        description: pattern.description,
+        recommendation: pattern.recommendation,
+        timeWindowDescription: pattern.timeWindowDescription,
+        frequency: pattern.frequency,
+        confidence: pattern.confidence
+      });
+      
+      // Keep the highest confidence for the group
+      if (pattern.confidence > grouped[key].confidence) {
+        grouped[key].confidence = pattern.confidence;
+      }
+    });
+    
+    return Object.values(grouped).sort((a, b) => b.confidence - a.confidence);
   };
 
-  const getConfidenceLabel = (confidence) => {
-    if (confidence >= 0.8) return 'High Risk';
-    if (confidence >= 0.7) return 'Strong Pattern';
-    if (confidence >= 0.6) return 'Moderate Pattern';
-    return 'Possible Pattern';
+  const consolidatedHighConfidence = consolidateByTrigger(veryHighConfidencePatterns);
+
+  // ENHANCED: Determine if correlation is positive or negative
+  const isPositiveCorrelation = (correlation) => {
+    const positiveKeywords = ['reduce', 'improve', 'help', 'boost', 'increase energy', 'better', 'benefit'];
+    const negativeKeywords = ['cause', 'trigger', 'worsen', 'amplify', 'side effect'];
+    
+    const text = (correlation.description || correlation.effect || '').toLowerCase();
+    
+    const hasPositive = positiveKeywords.some(keyword => text.includes(keyword));
+    const hasNegative = negativeKeywords.some(keyword => text.includes(keyword));
+    
+    // Supplement improvements and sleep quality improvements are typically positive
+    if (correlation.type === 'supplement-improvement' || 
+        (correlation.type === 'sleep-quality' && text.includes('improve'))) {
+      return true;
+    }
+    
+    // Exercise energy boosts are positive
+    if (correlation.type === 'exercise-energy' && text.includes('boost')) {
+      return true;
+    }
+    
+    // Medication effects and stress amplification are typically negative
+    if (correlation.type === 'medication-effect' || correlation.type === 'stress-symptom') {
+      return false;
+    }
+    
+    // Food triggers are typically negative
+    if (correlation.type === 'food-symptom') {
+      return false;
+    }
+    
+    return hasPositive && !hasNegative;
+  };
+
+  // ENHANCED: Get confidence color based on positive/negative and strength
+  const getPatternStrengthColor = (correlation) => {
+    const isPositive = isPositiveCorrelation(correlation);
+    const confidence = correlation.confidence;
+    
+    if (confidence >= 0.9) {
+      return isPositive ? 'text-green-700 bg-green-50 border-green-200' : 'text-red-700 bg-red-50 border-red-200';
+    }
+    if (confidence >= 0.7) {
+      return isPositive ? 'text-green-600 bg-green-50 border-green-100' : 'text-red-600 bg-red-50 border-red-100';
+    }
+    if (confidence >= 0.5) {
+      return isPositive ? 'text-green-500 bg-green-50 border-green-100' : 'text-orange-600 bg-orange-50 border-orange-100';
+    }
+    return 'text-blue-600 bg-blue-50 border-blue-100';
+  };
+
+  const getPatternStrengthLabel = (confidence) => {
+    if (confidence >= 0.9) return 'Very Strong';
+    if (confidence >= 0.7) return 'Strong';
+    if (confidence >= 0.5) return 'Moderate';
+    return 'Emerging';
   };
 
   // ENHANCED: Get appropriate icon based on correlation type
   const getCorrelationIcon = (correlation) => {
+    const isPositive = isPositiveCorrelation(correlation);
+    
     switch (correlation.type) {
       case 'medication-effect':
         return <Pill className="w-5 h-5 text-red-500" />;
       case 'sleep-quality':
-        return <Moon className="w-5 h-5 text-indigo-500" />;
+        return <Moon className={`w-5 h-5 ${isPositive ? 'text-green-500' : 'text-blue-500'}`} />;
       case 'exercise-energy':
-        return <Dumbbell className="w-5 h-5 text-green-500" />;
+        return <Dumbbell className={`w-5 h-5 ${isPositive ? 'text-green-500' : 'text-orange-500'}`} />;
       case 'stress-symptom':
-        return <Brain className="w-5 h-5 text-purple-500" />;
+        return <Brain className="w-5 h-5 text-red-500" />;
       case 'supplement-improvement':
-        return <Heart className="w-5 h-5 text-pink-500" />;
+        return <Heart className="w-5 h-5 text-green-500" />;
       case 'food-symptom':
       default:
-        return <span className="text-xl">🍽️</span>;
+        return <AlertTriangle className="w-5 h-5 text-red-500" />;
     }
   };
 
@@ -66,61 +142,41 @@ const CorrelationInsights = () => {
   const getCorrelationTypeLabel = (type) => {
     switch (type) {
       case 'medication-effect':
-        return 'Medication Side Effect';
+        return 'Medication Effect';
       case 'sleep-quality':
-        return 'Sleep Quality';
+        return 'Sleep Factor';
       case 'exercise-energy':
-        return 'Exercise Energy';
+        return 'Exercise Impact';
       case 'stress-symptom':
-        return 'Stress Amplification';
+        return 'Stress Factor';
       case 'supplement-improvement':
         return 'Supplement Benefit';
       case 'food-symptom':
       default:
-        return 'Food Trigger';
+        return 'Food Response';
     }
   };
 
-  // ENHANCED: Get correlation type color
-  const getCorrelationTypeColor = (type) => {
+  // ENHANCED: Get correlation type color based on positive/negative
+  const getCorrelationTypeColor = (type, isPositive = null) => {
+    if (isPositive === true) {
+      return 'bg-green-100 text-green-800';
+    } else if (isPositive === false) {
+      return 'bg-red-100 text-red-800';
+    }
+    
     switch (type) {
       case 'medication-effect':
-        return 'bg-red-100 text-red-800';
-      case 'sleep-quality':
-        return 'bg-indigo-100 text-indigo-800';
-      case 'exercise-energy':
-        return 'bg-green-100 text-green-800';
       case 'stress-symptom':
-        return 'bg-purple-100 text-purple-800';
-      case 'supplement-improvement':
-        return 'bg-pink-100 text-pink-800';
       case 'food-symptom':
+        return 'bg-red-100 text-red-800';
+      case 'supplement-improvement':
+        return 'bg-green-100 text-green-800';
+      case 'sleep-quality':
+      case 'exercise-energy':
       default:
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-blue-100 text-blue-800';
     }
-  };
-
-  const getTriggerIcon = (trigger) => {
-    if (trigger.includes('nightshade')) return '🍅';
-    if (trigger.includes('oxalate')) return '🥬';
-    if (trigger.includes('histamine')) return '🧀';
-    if (trigger.includes('lectin')) return '🌾';
-    return '🍽️';
-  };
-
-  const getSymptomIcon = (symptom) => {
-    if (symptom.includes('joint pain')) return '🦴';
-    if (symptom.includes('digestive')) return '🤢';
-    if (symptom.includes('bloating')) return '😖';
-    if (symptom.includes('swelling')) return '🤕';
-    if (symptom.includes('skin')) return '🔴';
-    if (symptom.includes('headache')) return '🤯';
-    if (symptom.includes('fatigue')) return '😴';
-    if (symptom.includes('brain fog')) return '🌫️';
-    if (symptom.includes('sleep')) return '😴';
-    if (symptom.includes('energy')) return '⚡';
-    if (symptom.includes('drowsiness')) return '😴';
-    return '⚠️';
   };
 
   if (loading) {
@@ -156,15 +212,15 @@ const CorrelationInsights = () => {
           <div>
             <h2 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
               <Target className="w-7 h-7 text-blue-600" />
-              <span>AI Health Insights</span>
+              <span>Health Pattern Analysis</span>
             </h2>
             <p className="text-gray-600 mt-1">
-              Personalized patterns discovered from your comprehensive health data
+              Patterns observed from your comprehensive health tracking data
             </p>
           </div>
           <div className="text-right">
             <div className="text-3xl font-bold text-blue-600">{correlationStats?.total || 0}</div>
-            <div className="text-sm text-gray-500">Patterns Found</div>
+            <div className="text-sm text-gray-500">Patterns Observed</div>
           </div>
         </div>
       </div>
@@ -173,22 +229,21 @@ const CorrelationInsights = () => {
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:space-x-6">
           <div className="flex items-center space-x-2">
-            <label className="text-xs font-medium text-gray-700 min-w-0 flex-shrink-0">Confidence:</label>
+            <label className="text-xs font-medium text-gray-700 min-w-0 flex-shrink-0">Pattern Strength:</label>
             <select 
               value={confidenceFilter} 
               onChange={(e) => setConfidenceFilter(parseFloat(e.target.value))}
-              className="border border-gray-300 rounded px-2 py-1 text-xs flex-1 sm:flex-none sm:w-32"
+              className="border border-gray-300 rounded px-2 py-1 text-xs flex-1 sm:flex-none sm:w-40"
             >
               <option value={0.1}>All (10%+)</option>
-              <option value={0.3}>Low (30%+)</option>
+              <option value={0.3}>Emerging (30%+)</option>
               <option value={0.5}>Moderate (50%+)</option>
-              <option value={0.6}>Good (60%+)</option>
               <option value={0.7}>Strong (70%+)</option>
-              <option value={0.8}>Very Strong (80%+)</option>
+              <option value={0.9}>Very Strong (90%+)</option>
             </select>
           </div>
           <div className="flex items-center space-x-2">
-            <label className="text-xs font-medium text-gray-700 min-w-0 flex-shrink-0">Time:</label>
+            <label className="text-xs font-medium text-gray-700 min-w-0 flex-shrink-0">Time Period:</label>
             <select 
               value={timeframeFilter} 
               onChange={(e) => setTimeframeFilter(parseInt(e.target.value))}
@@ -203,45 +258,69 @@ const CorrelationInsights = () => {
         </div>
       </div>
 
-      {/* High Priority Alerts - ENHANCED */}
-      {highConfidenceTriggers.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h3 className="text-lg font-semibold text-red-800 flex items-center space-x-2 mb-3">
-            <AlertTriangle className="w-5 h-5" />
-            <span>High-Confidence Patterns (70%+ Confidence)</span>
-            <span className="text-sm font-normal text-red-600">({highConfidenceTriggers.length} found)</span>
-          </h3>
-          <div className="space-y-2">
-            {highConfidenceTriggers.slice(0, 5).map((correlation, index) => (
-              <div key={index} className="bg-white rounded border border-red-200 p-3">
-                <div className="flex items-center justify-between">
+      {/* Very Strong Patterns (90%+) - ENHANCED */}
+      {consolidatedHighConfidence.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-lg">
+          <div className="p-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+              <CheckCircle className="w-5 h-5 text-green-500" />
+              <span>Very Strong Patterns (90%+ Observed)</span>
+              <span className="text-sm font-normal text-gray-500">({consolidatedHighConfidence.length} found)</span>
+            </h3>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {consolidatedHighConfidence.map((group, index) => (
+              <div key={index} className="p-4">
+                <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-3">
-                    {getCorrelationIcon(correlation)}
+                    {group.icon}
                     <div>
                       <div className="flex items-center space-x-2 mb-1">
-                        <span className={`px-2 py-1 text-xs rounded-full ${getCorrelationTypeColor(correlation.type)}`}>
-                          {getCorrelationTypeLabel(correlation.type)}
+                        <span className={`px-2 py-1 text-xs rounded-full ${getCorrelationTypeColor(group.type, group.isPositive)}`}>
+                          {group.typeLabel}
                         </span>
                       </div>
-                      <div className="font-medium text-gray-900">
-                        {correlation.trigger} → {correlation.effect}
+                      <div className="font-semibold text-gray-900 text-lg">
+                        {group.trigger}
                       </div>
-                      <div className="text-sm text-gray-600">
-                        {correlation.timeWindowDescription} • {correlation.frequency}
-                      </div>
-                      {correlation.description && (
-                        <div className="text-sm text-blue-600 mt-1">
-                          💡 {correlation.description}
-                        </div>
-                      )}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-bold text-red-600">
-                      {Math.round(correlation.confidence * 100)}%
+                    <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getPatternStrengthColor(group)}`}>
+                      {Math.round(group.confidence * 100)}%
                     </div>
-                    <div className="text-xs text-red-500">confidence</div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {getPatternStrengthLabel(group.confidence)} Pattern
+                    </div>
                   </div>
+                </div>
+                
+                <div className="ml-8 space-y-2">
+                  {group.effects.map((effect, effectIndex) => (
+                    <div key={effectIndex} className="border-l-2 border-gray-200 pl-4">
+                      <div className="flex items-center space-x-2">
+                        {group.isPositive ? (
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <AlertCircle className="w-4 h-4 text-red-500" />
+                        )}
+                        <span className="font-medium text-gray-900">{effect.effect}</span>
+                      </div>
+                      <div className="text-sm text-gray-600 mt-1">
+                        {effect.timeWindowDescription} • {effect.frequency}
+                      </div>
+                      {effect.description && (
+                        <div className="text-sm text-blue-600 mt-1">
+                          💡 {effect.description}
+                        </div>
+                      )}
+                      {effect.recommendation && (
+                        <div className="text-sm text-green-600 mt-1">
+                          🎯 {effect.recommendation}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
@@ -249,12 +328,12 @@ const CorrelationInsights = () => {
         </div>
       )}
 
-      {/* All Correlations - ENHANCED */}
+      {/* All Patterns - ENHANCED */}
       <div className="bg-white rounded-lg border border-gray-200">
         <div className="p-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
             <TrendingUp className="w-5 h-5 text-blue-500" />
-            <span>All Discovered Patterns (Sorted by Confidence)</span>
+            <span>All Observed Patterns (Sorted by Strength)</span>
           </h3>
         </div>
         
@@ -262,7 +341,7 @@ const CorrelationInsights = () => {
           <div className="p-8 text-center">
             <Activity className="w-12 h-12 text-gray-400 mx-auto mb-3" />
             <p className="text-gray-500">No patterns found with current filters.</p>
-            <p className="text-sm text-gray-400 mt-1">Try lowering the confidence threshold.</p>
+            <p className="text-sm text-gray-400 mt-1">Try lowering the pattern strength threshold.</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
@@ -274,7 +353,7 @@ const CorrelationInsights = () => {
                       {getCorrelationIcon(correlation)}
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-1">
-                          <span className={`px-2 py-1 text-xs rounded-full ${getCorrelationTypeColor(correlation.type)}`}>
+                          <span className={`px-2 py-1 text-xs rounded-full ${getCorrelationTypeColor(correlation.type, isPositiveCorrelation(correlation))}`}>
                             {getCorrelationTypeLabel(correlation.type)}
                           </span>
                         </div>
@@ -317,11 +396,11 @@ const CorrelationInsights = () => {
                   </div>
                   
                   <div className="text-right ml-4">
-                    <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getConfidenceColor(correlation.confidence)}`}>
+                    <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getPatternStrengthColor(correlation)}`}>
                       {Math.round(correlation.confidence * 100)}%
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
-                      {getConfidenceLabel(correlation.confidence)}
+                      {getPatternStrengthLabel(correlation.confidence)} Pattern
                     </div>
                   </div>
                 </div>
@@ -343,12 +422,12 @@ const CorrelationInsights = () => {
           </div>
         </div>
         
-        <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center space-x-3">
-            <Moon className="w-8 h-8 text-indigo-600" />
+            <Moon className="w-8 h-8 text-blue-600" />
             <div>
-              <div className="text-2xl font-bold text-indigo-600">{correlationStats?.byType?.sleepQuality || 0}</div>
-              <div className="text-sm text-indigo-700">Sleep Factors</div>
+              <div className="text-2xl font-bold text-blue-600">{correlationStats?.byType?.sleepFactors || 0}</div>
+              <div className="text-sm text-blue-700">Sleep Factors</div>
             </div>
           </div>
         </div>
@@ -357,7 +436,7 @@ const CorrelationInsights = () => {
           <div className="flex items-center space-x-3">
             <Dumbbell className="w-8 h-8 text-green-600" />
             <div>
-              <div className="text-2xl font-bold text-green-600">{correlationStats?.byType?.exerciseEnergy || 0}</div>
+              <div className="text-2xl font-bold text-green-600">{correlationStats?.byType?.exerciseImpacts || 0}</div>
               <div className="text-sm text-green-700">Exercise Impacts</div>
             </div>
           </div>
@@ -367,7 +446,7 @@ const CorrelationInsights = () => {
           <div className="flex items-center space-x-3">
             <Brain className="w-8 h-8 text-purple-600" />
             <div>
-              <div className="text-2xl font-bold text-purple-600">{correlationStats?.byType?.stressAmplification || 0}</div>
+              <div className="text-2xl font-bold text-purple-600">{correlationStats?.byType?.stressAmplifiers || 0}</div>
               <div className="text-sm text-purple-700">Stress Amplifiers</div>
             </div>
           </div>
