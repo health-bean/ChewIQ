@@ -5,19 +5,29 @@ import { AlertTriangle, TrendingUp, Clock, Target, Zap, Activity, Pill, Moon, Du
 const DEMO_USER_ID = '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0'; // Sarah's ID for demo
 
 const CorrelationInsights = () => {
-  const [confidenceFilter, setConfidenceFilter] = useState(0.6);
-  const [timeframeFilter, setTimeframeFilter] = useState(30);
+  const [confidenceFilter, setConfidenceFilter] = useState(0.3); // Lower default to show more correlations
+  const [timeframeFilter, setTimeframeFilter] = useState(180); // Longer timeframe for more data
   
   const { 
     correlations,  
+    sortedCorrelations,
+    highConfidenceTriggers, // Now includes ALL correlation types
     summary, 
     loading, 
-    error 
+    error,
+    correlationStats
   } = useCorrelations(DEMO_USER_ID, confidenceFilter, timeframeFilter);
 
-  // ENHANCED: Sort all correlations by confidence and filter high confidence ones
-  const sortedCorrelations = correlations ? [...correlations].sort((a, b) => b.confidence - a.confidence) : [];
-  const highConfidenceTriggers = sortedCorrelations.filter(c => c.confidence >= 0.7);
+  // DEBUG: Log correlation data to understand what we're getting
+  console.log('🔍 Correlation Debug:', {
+    totalCorrelations: correlations?.length || 0,
+    correlationTypes: correlations?.map(c => c.type) || [],
+    confidenceRange: correlations?.map(c => c.confidence) || [],
+    highConfidenceCount: highConfidenceTriggers?.length || 0,
+    highConfidenceTypes: highConfidenceTriggers?.map(c => c.type) || [],
+    confidenceFilter,
+    correlationStats
+  });
 
   const getConfidenceColor = (confidence) => {
     if (confidence >= 0.8) return 'text-red-600 bg-red-50 border-red-200';
@@ -153,7 +163,7 @@ const CorrelationInsights = () => {
             </p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-blue-600">{summary?.totalCorrelations || 0}</div>
+            <div className="text-3xl font-bold text-blue-600">{correlationStats?.total || 0}</div>
             <div className="text-sm text-gray-500">Patterns Found</div>
           </div>
         </div>
@@ -174,6 +184,7 @@ const CorrelationInsights = () => {
               <option value={0.5}>Moderate (50%+)</option>
               <option value={0.6}>Good (60%+)</option>
               <option value={0.7}>Strong (70%+)</option>
+              <option value={0.8}>Very Strong (80%+)</option>
             </select>
           </div>
           <div className="flex items-center space-x-2">
@@ -186,6 +197,7 @@ const CorrelationInsights = () => {
               <option value={30}>30 days</option>
               <option value={90}>3 months</option>
               <option value={180}>6 months</option>
+              <option value={365}>1 year</option>
             </select>
           </div>
         </div>
@@ -196,7 +208,8 @@ const CorrelationInsights = () => {
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <h3 className="text-lg font-semibold text-red-800 flex items-center space-x-2 mb-3">
             <AlertTriangle className="w-5 h-5" />
-            <span>High-Confidence Patterns (Action Recommended)</span>
+            <span>High-Confidence Patterns (70%+ Confidence)</span>
+            <span className="text-sm font-normal text-red-600">({highConfidenceTriggers.length} found)</span>
           </h3>
           <div className="space-y-2">
             {highConfidenceTriggers.slice(0, 5).map((correlation, index) => (
@@ -324,7 +337,7 @@ const CorrelationInsights = () => {
           <div className="flex items-center space-x-3">
             <Pill className="w-8 h-8 text-red-600" />
             <div>
-              <div className="text-2xl font-bold text-red-600">{summary?.medicationEffects || 0}</div>
+              <div className="text-2xl font-bold text-red-600">{correlationStats?.byType?.medicationEffects || 0}</div>
               <div className="text-sm text-red-700">Medication Effects</div>
             </div>
           </div>
@@ -334,7 +347,7 @@ const CorrelationInsights = () => {
           <div className="flex items-center space-x-3">
             <Moon className="w-8 h-8 text-indigo-600" />
             <div>
-              <div className="text-2xl font-bold text-indigo-600">{summary?.sleepFactors || 0}</div>
+              <div className="text-2xl font-bold text-indigo-600">{correlationStats?.byType?.sleepQuality || 0}</div>
               <div className="text-sm text-indigo-700">Sleep Factors</div>
             </div>
           </div>
@@ -344,7 +357,7 @@ const CorrelationInsights = () => {
           <div className="flex items-center space-x-3">
             <Dumbbell className="w-8 h-8 text-green-600" />
             <div>
-              <div className="text-2xl font-bold text-green-600">{summary?.exerciseImpacts || 0}</div>
+              <div className="text-2xl font-bold text-green-600">{correlationStats?.byType?.exerciseEnergy || 0}</div>
               <div className="text-sm text-green-700">Exercise Impacts</div>
             </div>
           </div>
@@ -354,7 +367,7 @@ const CorrelationInsights = () => {
           <div className="flex items-center space-x-3">
             <Brain className="w-8 h-8 text-purple-600" />
             <div>
-              <div className="text-2xl font-bold text-purple-600">{summary?.stressAmplifiers || 0}</div>
+              <div className="text-2xl font-bold text-purple-600">{correlationStats?.byType?.stressAmplification || 0}</div>
               <div className="text-sm text-purple-700">Stress Amplifiers</div>
             </div>
           </div>
