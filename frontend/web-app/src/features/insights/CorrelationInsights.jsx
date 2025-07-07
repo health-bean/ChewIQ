@@ -17,48 +17,6 @@ const CorrelationInsights = () => {
     correlationStats
   } = useCorrelations(DEMO_USER_ID, confidenceFilter, timeframeFilter);
 
-  // ENHANCED: Filter for very high confidence patterns (90%+)
-  const veryHighConfidencePatterns = correlations.filter(c => c.confidence >= 0.9);
-
-  // ENHANCED: Consolidate duplicates by trigger
-  const consolidateByTrigger = (patterns) => {
-    const grouped = {};
-    
-    patterns.forEach(pattern => {
-      const key = pattern.trigger.toLowerCase();
-      if (!grouped[key]) {
-        grouped[key] = {
-          trigger: pattern.trigger,
-          type: pattern.type,
-          confidence: pattern.confidence,
-          effects: [],
-          icon: getCorrelationIcon(pattern),
-          typeLabel: getCorrelationTypeLabel(pattern.type),
-          typeColor: getCorrelationTypeColor(pattern.type),
-          isPositive: isPositiveCorrelation(pattern)
-        };
-      }
-      
-      grouped[key].effects.push({
-        effect: pattern.effect,
-        description: pattern.description,
-        recommendation: pattern.recommendation,
-        timeWindowDescription: pattern.timeWindowDescription,
-        frequency: pattern.frequency,
-        confidence: pattern.confidence
-      });
-      
-      // Keep the highest confidence for the group
-      if (pattern.confidence > grouped[key].confidence) {
-        grouped[key].confidence = pattern.confidence;
-      }
-    });
-    
-    return Object.values(grouped).sort((a, b) => b.confidence - a.confidence);
-  };
-
-  const consolidatedHighConfidence = consolidateByTrigger(veryHighConfidencePatterns);
-
   // ENHANCED: Determine if correlation is positive or negative
   const isPositiveCorrelation = (correlation) => {
     const positiveKeywords = ['reduce', 'improve', 'help', 'boost', 'increase energy', 'better', 'benefit'];
@@ -91,30 +49,6 @@ const CorrelationInsights = () => {
     }
     
     return hasPositive && !hasNegative;
-  };
-
-  // ENHANCED: Get confidence color based on positive/negative and strength
-  const getPatternStrengthColor = (correlation) => {
-    const isPositive = isPositiveCorrelation(correlation);
-    const confidence = correlation.confidence;
-    
-    if (confidence >= 0.9) {
-      return isPositive ? 'text-green-700 bg-green-50 border-green-200' : 'text-red-700 bg-red-50 border-red-200';
-    }
-    if (confidence >= 0.7) {
-      return isPositive ? 'text-green-600 bg-green-50 border-green-100' : 'text-red-600 bg-red-50 border-red-100';
-    }
-    if (confidence >= 0.5) {
-      return isPositive ? 'text-green-500 bg-green-50 border-green-100' : 'text-orange-600 bg-orange-50 border-orange-100';
-    }
-    return 'text-blue-600 bg-blue-50 border-blue-100';
-  };
-
-  const getPatternStrengthLabel = (confidence) => {
-    if (confidence >= 0.9) return 'Very Strong';
-    if (confidence >= 0.7) return 'Strong';
-    if (confidence >= 0.5) return 'Moderate';
-    return 'Emerging';
   };
 
   // ENHANCED: Get appropriate icon based on correlation type
@@ -178,6 +112,71 @@ const CorrelationInsights = () => {
         return 'bg-blue-100 text-blue-800';
     }
   };
+
+  // ENHANCED: Get confidence color based on positive/negative and strength
+  const getPatternStrengthColor = (correlation) => {
+    const isPositive = isPositiveCorrelation(correlation);
+    const confidence = correlation.confidence;
+    
+    if (confidence >= 0.9) {
+      return isPositive ? 'text-green-700 bg-green-50 border-green-200' : 'text-red-700 bg-red-50 border-red-200';
+    }
+    if (confidence >= 0.7) {
+      return isPositive ? 'text-green-600 bg-green-50 border-green-100' : 'text-red-600 bg-red-50 border-red-100';
+    }
+    if (confidence >= 0.5) {
+      return isPositive ? 'text-green-500 bg-green-50 border-green-100' : 'text-orange-600 bg-orange-50 border-orange-100';
+    }
+    return 'text-blue-600 bg-blue-50 border-blue-100';
+  };
+
+  const getPatternStrengthLabel = (confidence) => {
+    if (confidence >= 0.9) return 'Very Strong';
+    if (confidence >= 0.7) return 'Strong';
+    if (confidence >= 0.5) return 'Moderate';
+    return 'Emerging';
+  };
+
+  // ENHANCED: Consolidate duplicates by trigger
+  const consolidateByTrigger = (patterns) => {
+    const grouped = {};
+    
+    patterns.forEach(pattern => {
+      const key = pattern.trigger.toLowerCase();
+      if (!grouped[key]) {
+        grouped[key] = {
+          trigger: pattern.trigger,
+          type: pattern.type,
+          confidence: pattern.confidence,
+          effects: [],
+          icon: getCorrelationIcon(pattern),
+          typeLabel: getCorrelationTypeLabel(pattern.type),
+          typeColor: getCorrelationTypeColor(pattern.type),
+          isPositive: isPositiveCorrelation(pattern)
+        };
+      }
+      
+      grouped[key].effects.push({
+        effect: pattern.effect,
+        description: pattern.description,
+        recommendation: pattern.recommendation,
+        timeWindowDescription: pattern.timeWindowDescription,
+        frequency: pattern.frequency,
+        confidence: pattern.confidence
+      });
+      
+      // Keep the highest confidence for the group
+      if (pattern.confidence > grouped[key].confidence) {
+        grouped[key].confidence = pattern.confidence;
+      }
+    });
+    
+    return Object.values(grouped).sort((a, b) => b.confidence - a.confidence);
+  };
+
+  // ENHANCED: Filter for very high confidence patterns (90%+)
+  const veryHighConfidencePatterns = correlations.filter(c => c.confidence >= 0.9);
+  const consolidatedHighConfidence = consolidateByTrigger(veryHighConfidencePatterns);
 
   if (loading) {
     return (

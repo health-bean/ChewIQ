@@ -16,35 +16,30 @@ const LoginPage = () => {
     {
       email: 'sarah.aip@test.com',
       name: 'Sarah Johnson',
-      protocol: 'Autoimmune Protocol (AIP)',
       avatar: '👩‍💼',
       entries: '1,052 entries'
     },
     {
       email: 'mike.fodmap@test.com',
       name: 'Mike Chen',
-      protocol: 'Low FODMAP Diet',
       avatar: '👨‍💻',
       entries: '1,215 entries'
     },
     {
       email: 'lisa.histamine@test.com',
       name: 'Lisa Rodriguez',
-      protocol: 'Low Histamine Diet',
       avatar: '👩‍🔬',
       entries: '933 entries'
     },
     {
       email: 'john.paleo@test.com',
       name: 'John Williams',
-      protocol: 'Paleo Protocol',
       avatar: '👨‍🍳',
       entries: '970 entries'
     },
     {
       email: 'emma.multi@test.com',
       name: 'Emma Davis',
-      protocol: 'Multi-Protocol',
       avatar: '👩‍⚕️',
       entries: '1,071 entries'
     }
@@ -196,9 +191,6 @@ const LoginPage = () => {
           </div>
 
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 text-center">
-              🔐 <strong>Password:</strong> demo123
-            </p>
             <p className="text-xs text-gray-500 text-center mt-1">
               All demo accounts use the same password for easy access
             </p>
