@@ -197,7 +197,6 @@ const LoginPage = () => {
 
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600 text-center">
-              🔐 <strong>Password:</strong> demo123
             </p>
             <p className="text-xs text-gray-500 text-center mt-1">
               All demo accounts use the same password for easy access
