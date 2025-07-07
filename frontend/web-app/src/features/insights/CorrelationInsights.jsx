@@ -110,6 +110,68 @@ const CorrelationInsights = () => {
     }
   };
 
+  // Get appropriate icon based on correlation type
+  const getCorrelationIcon = (correlation) => {
+    const isPositive = isPositiveCorrelation(correlation);
+    
+    switch (correlation.type) {
+      case 'medication-effect':
+        return <Pill className="w-5 h-5 text-red-500" />;
+      case 'sleep-quality':
+        return <Moon className={`w-5 h-5 ${isPositive ? 'text-green-500' : 'text-blue-500'}`} />;
+      case 'exercise-energy':
+        return <Dumbbell className={`w-5 h-5 ${isPositive ? 'text-green-500' : 'text-orange-500'}`} />;
+      case 'stress-symptom':
+        return <Brain className="w-5 h-5 text-red-500" />;
+      case 'supplement-improvement':
+        return <Heart className="w-5 h-5 text-green-500" />;
+      case 'food-symptom':
+      default:
+        return <AlertTriangle className="w-5 h-5 text-red-500" />;
+    }
+  };
+
+  // Get correlation type display name
+  const getCorrelationTypeLabel = (type) => {
+    switch (type) {
+      case 'medication-effect':
+        return 'Medication Effect';
+      case 'sleep-quality':
+        return 'Sleep Factor';
+      case 'exercise-energy':
+        return 'Exercise Impact';
+      case 'stress-symptom':
+        return 'Stress Factor';
+      case 'supplement-improvement':
+        return 'Supplement Benefit';
+      case 'food-symptom':
+      default:
+        return 'Food Response';
+    }
+  };
+
+  // Get correlation type color
+  const getCorrelationTypeColor = (type, isPositive = null) => {
+    if (isPositive === true) {
+      return 'bg-green-100 text-green-800';
+    } else if (isPositive === false) {
+      return 'bg-red-100 text-red-800';
+    }
+    
+    switch (type) {
+      case 'medication-effect':
+      case 'stress-symptom':
+      case 'food-symptom':
+        return 'bg-red-100 text-red-800';
+      case 'supplement-improvement':
+        return 'bg-green-100 text-green-800';
+      case 'sleep-quality':
+      case 'exercise-energy':
+      default:
+        return 'bg-blue-100 text-blue-800';
+    }
+  };
+
   // Filter correlations based on chip selection
   const getFilteredCorrelations = () => {
     const baseCorrelations = correlations.filter(c => c.confidence >= 0.5);
