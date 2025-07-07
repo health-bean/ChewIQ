@@ -1,4 +1,4 @@
-// File: frontend/web-app/src/App.jsx (CLEAN VERSION)
+// File: frontend/web-app/src/App.jsx (UPDATED WITH AUTH)
 
 import React, { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
@@ -38,7 +38,7 @@ import { getProtocolDisplayText } from '../../shared/utils/entryHelpers';
 
 // Main App Component (Inside AuthProvider)
 const MainApp = () => {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
   
   // App state
   const { 
@@ -55,16 +55,10 @@ const MainApp = () => {
 
   // Add preferences view state
   const [showPreferences, setShowPreferences] = React.useState(false);
-  
-  // TEMPORARY WORKAROUND: Track login session to force setup once per session
-  // This works around the backend auth issue where all users share demo preferences
-  // TODO: Remove this once backend auth.js is fixed to handle real user tokens
-  const [loginSessionId, setLoginSessionId] = React.useState(null);
-  const [hasTriggeredSetupThisSession, setHasTriggeredSetupThisSession] = React.useState(false);
 
   // Data hooks (only run when authenticated)
   const { protocols, loading: protocolsLoading, error: protocolsError } = useProtocols();
-  const { preferences, updatePreferences, refreshPreferences, loading: preferencesLoading, error: preferencesError, isReady, user: prefsUser } = useUserPreferences();
+  const { preferences, updatePreferences, refreshPreferences, loading: preferencesLoading, error: preferencesError, isReady } = useUserPreferences();
   const { exposureTypes } = useExposureTypes();
   const { detoxTypes } = useDetoxTypes();
   const { reflectionData, updateReflectionData, saveReflectionData, loading: reflectionLoading, hasUnsavedChanges } = useReflectionData(selectedDate);
@@ -73,38 +67,14 @@ const MainApp = () => {
   const { entries, loading: entriesLoading, addEntry, hasCriticalInsights } = useTimelineEntries(selectedDate);
   const { formData, updateFormData, toggleSelectedFood, handleQuickSelect, resetForm, buildEntryData } = useEntryForm();
 
-  // Show setup if authenticated and not completed (WITH SESSION WORKAROUND)
+  // Show setup if authenticated and not completed OR manually triggered
   useEffect(() => {
-    console.log('🔧 Setup check:', {
-      isAuthenticated,
-      isReady,
-      setup_complete: preferences?.setup_complete,
-      showSetup,
-      user: prefsUser?.email,
-      userId: prefsUser?.id,
-      loginSessionId: loginSessionId,
-      hasTriggeredSetupThisSession: hasTriggeredSetupThisSession
-    });
-    
-    // Create session ID from login (email + timestamp gives us unique session)
-    const currentSessionId = prefsUser?.email;
-    
-    // If this is a new login session, reset setup trigger
-    if (currentSessionId && currentSessionId !== loginSessionId) {
-      console.log('🔧 NEW LOGIN SESSION detected:', currentSessionId);
-      setLoginSessionId(currentSessionId);
-      setHasTriggeredSetupThisSession(false);
+    if (isAuthenticated && isReady && preferences) {
+      if (!preferences.setup_complete) {
+        handleSetupToggle();
+      }
     }
-    
-    if (isAuthenticated && isReady && preferences && !showSetup && !hasTriggeredSetupThisSession && currentSessionId) {
-      // TEMPORARY WORKAROUND: Force setup once per login session 
-      // This is needed because backend auth falls back to shared demo user
-      // TODO: Remove this once auth.js properly handles JWT tokens
-      console.log('🔧 FORCING setup for new session (WORKAROUND):', currentSessionId);
-      setHasTriggeredSetupThisSession(true);
-      handleSetupToggle();
-    }
-  }, [isAuthenticated, preferences?.setup_complete, isReady, showSetup, handleSetupToggle, prefsUser?.email, loginSessionId, hasTriggeredSetupThisSession]);
+  }, [isAuthenticated, preferences, isReady]);
 
   // Handle auth loading
   if (authLoading) {
@@ -169,20 +139,6 @@ const MainApp = () => {
     handleAddEntryToggle();
   };
 
-  // Setup completion handler
-  const handleSetupCompleteWithRefresh = async () => {
-    try {
-      console.log('🔧 Setup completed for session:', loginSessionId);
-      setHasTriggeredSetupThisSession(true); // Prevent re-triggering in this session
-      
-      await handleSetupComplete(refreshPreferences);
-      // Force a preferences refresh after setup
-      await refreshPreferences();
-    } catch (error) {
-      console.error('Setup completion error:', error);
-    }
-  };
-
   // Loading states
   if (preferencesLoading || !isReady) {
     return (
@@ -216,39 +172,9 @@ const MainApp = () => {
   // Setup wizard
   if (showSetup) {
     return (
-      <div>
-        <SetupWizard 
-          onComplete={handleSetupCompleteWithRefresh} 
-        />
-        {/* Debug panel with session info */}
-        <div className="fixed bottom-4 left-4 text-xs text-gray-500 bg-white p-2 rounded shadow">
-          <div>User: {prefsUser?.email}</div>
-          <div>Session: {loginSessionId}</div>
-          <div>Setup Complete: {preferences?.setup_complete ? 'Yes' : 'No'}</div>
-          <div>Setup Triggered: {hasTriggeredSetupThisSession ? 'Yes' : 'No'}</div>
-          <div className="flex gap-1 mt-1">
-            <button 
-              onClick={() => {
-                console.log('🔧 Current user:', prefsUser);
-                console.log('🔧 Current preferences:', preferences);
-                console.log('🔧 Session info:', { loginSessionId, hasTriggeredSetupThisSession });
-              }}
-              className="text-blue-500 underline text-xs"
-            >
-              Debug
-            </button>
-            <button 
-              onClick={() => {
-                setHasTriggeredSetupThisSession(false);
-                console.log('🔧 Reset session setup trigger');
-              }}
-              className="text-orange-500 underline text-xs"
-            >
-              Reset
-            </button>
-          </div>
-        </div>
-      </div>
+      <SetupWizard 
+        onComplete={() => handleSetupComplete(refreshPreferences)} 
+      />
     );
   }
 
@@ -270,10 +196,7 @@ const MainApp = () => {
         onViewChange={handleViewChange}
         hasUnsavedChanges={hasUnsavedChanges}
         hasCriticalInsights={hasCriticalInsights()}
-        onSetupClick={() => {
-          setHasTriggeredSetupThisSession(false);
-          handleSetupToggle();
-        }}
+        onSetupClick={handleSetupToggle}
         getProtocolDisplayText={() => getProtocolDisplayText(safePreferences.protocols, protocols)}
         selectedProtocols={safePreferences.protocols}
       />
@@ -324,13 +247,7 @@ const MainApp = () => {
           <Alert variant="info" dismissible onDismiss={() => {}}>
             <div className="flex items-center justify-between">
               <span>Welcome! Tap the ⚙️ icon to set up your health journey</span>
-              <Button 
-                size="sm" 
-                onClick={() => {
-                  setHasTriggeredSetupThisSession(false);
-                  handleSetupToggle();
-                }}
-              >
+              <Button size="sm" onClick={handleSetupToggle}>
                 Start
               </Button>
             </div>

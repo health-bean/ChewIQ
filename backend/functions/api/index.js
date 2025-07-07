@@ -1,7 +1,7 @@
-// backend/functions/api/index.js (COMMONJS)
+// backend/functions/api/index.js (UPDATED)
 const { handleGetCorrelationInsights } = require('./handlers/correlations');
-const { handleCors, successResponse, errorResponse } = require('./utils/responses');
-// Import specific auth handlers
+const { handleCors } = require('./utils/responses');
+// Import specific auth handlers instead of generic handleAuth
 const { handleLogin, handleLogout, handleVerify, handleRefresh, handleRegister } = require('./handlers/auth');
 const { handleGetUser, handleUpdateUser, handleGetUserProtocols, handleGetUserPreferences, handleUpdateUserPreferences } = require('./handlers/users');
 const { handleGetJournalEntries, handleCreateJournalEntry, handleGetJournalEntry, handleUpdateJournalEntry } = require('./handlers/journal');
@@ -12,11 +12,11 @@ const { handleSearchSymptoms } = require('./handlers/symptoms');
 const { handleSearchSupplements } = require('./handlers/supplements');
 const { handleSearchMedications } = require('./handlers/medications');
 const { handleSearchDetoxTypes } = require('./handlers/detox');
+const { successResponse, errorResponse } = require('./utils/responses');
 
 exports.handler = async (event) => {
     console.log('Event:', JSON.stringify(event, null, 2));
     
-    // Handle CORS preflight request
     const corsResponse = handleCors(event);
     if (corsResponse) return corsResponse;
     
@@ -31,7 +31,7 @@ exports.handler = async (event) => {
         
         let response;
         
-        // Auth routes
+        // Auth routes - specific endpoints
         if (path === '/api/v1/auth/login' && method === 'POST') {
             response = await handleLogin(body, event);
         }
@@ -47,8 +47,9 @@ exports.handler = async (event) => {
         else if (path === '/api/v1/auth/register' && method === 'POST') {
             response = await handleRegister(body, event);
         }
+        // Keep the generic auth route for backward compatibility
         else if (path === '/api/v1/auth' && method === 'POST') {
-            response = await handleLogin(body, event); // Legacy route defaulting to login
+            response = await handleLogin(body, event); // Default to login
         }
         // User routes
         else if (path === '/api/v1/users' && method === 'GET') {
@@ -131,8 +132,8 @@ exports.handler = async (event) => {
 
 const handleNotFound = (path, method) => {
     return errorResponse('Endpoint not found', 404, {
-        path,
-        method,
+        path: path,
+        method: method,
         availableEndpoints: [
             // Auth endpoints
             'POST /api/v1/auth/login',
