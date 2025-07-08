@@ -235,42 +235,49 @@ const CorrelationInsights = () => {
 
   return (
     <div className="space-y-6">
-      {/* Navigation Tabs with Time Period */}
-      <div className="flex items-center justify-between space-x-2">
-        <div className="flex space-x-2">
-          <Button
-            variant={activeTab === 'review' ? 'danger' : 'ghost'}
-            onClick={() => setActiveTab('review')}
-            size="sm"
+      {/* Compact Header */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3 border border-blue-200">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-gray-900 flex items-center space-x-2">
+            <Target className="w-5 h-5 text-blue-600" />
+            <span>FILO Insights</span>
+          </h2>
+          <Select
+            value={timeframeFilter}
+            onChange={(e) => setTimeframeFilter(parseInt(e.target.value))}
+            className="text-sm w-24"
           >
-            Review ({reviewCount})
-          </Button>
-          <Button
-            variant={activeTab === 'observe' ? 'warning' : 'ghost'}
-            onClick={() => setActiveTab('observe')}
-            size="sm"
-          >
-            Observe ({observeCount})
-          </Button>
-          <Button
-            variant={activeTab === 'positive' ? 'success' : 'ghost'}
-            onClick={() => setActiveTab('positive')}
-            size="sm"
-          >
-            Keep it Up ({positiveCount})
-          </Button>
+            <option value={30}>30d</option>
+            <option value={90}>3m</option>
+            <option value={180}>6m</option>
+            <option value={365}>1y</option>
+          </Select>
         </div>
-        
-        <Select
-          value={timeframeFilter}
-          onChange={(e) => setTimeframeFilter(parseInt(e.target.value))}
-          className="text-sm w-20"
+      </div>
+
+      {/* Navigation Tabs */}
+      <div className="flex space-x-2">
+        <Button
+          variant={activeTab === 'review' ? 'danger' : 'ghost'}
+          onClick={() => setActiveTab('review')}
+          size="sm"
         >
-          <option value={30}>30d</option>
-          <option value={90}>3m</option>
-          <option value={180}>6m</option>
-          <option value={365}>1y</option>
-        </Select>
+          Review ({reviewCount})
+        </Button>
+        <Button
+          variant={activeTab === 'observe' ? 'warning' : 'ghost'}
+          onClick={() => setActiveTab('observe')}
+          size="sm"
+        >
+          Observe ({observeCount})
+        </Button>
+        <Button
+          variant={activeTab === 'positive' ? 'success' : 'ghost'}
+          onClick={() => setActiveTab('positive')}
+          size="sm"
+        >
+          Keep it Up ({positiveCount})
+        </Button>
       </div>
 
 
