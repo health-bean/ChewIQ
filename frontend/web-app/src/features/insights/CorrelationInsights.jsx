@@ -7,17 +7,17 @@ import { Button, Select } from '../../../../shared/components/ui';
 const CorrelationInsights = () => {
   const [timeframeFilter, setTimeframeFilter] = useState(180);
   const [activeTab, setActiveTab] = useState('review');
-
   const [showMore, setShowMore] = useState(false);
   
   // Get current user from auth context
   const { user, loading: authLoading } = useAuth();
   
+  // FIXED: Lower confidence threshold to get more data
   const { 
     correlations,  
     loading: correlationsLoading, 
     error
-  } = useCorrelations(user?.id, 0.3, timeframeFilter);
+  } = useCorrelations(user?.id, 0.1, timeframeFilter); // Changed to 0.1 to capture more data
 
   // Helper function to determine if correlation is positive/beneficial
   const isPositiveCorrelation = (correlation) => {
@@ -25,10 +25,15 @@ const CorrelationInsights = () => {
       return correlation.is_beneficial;
     }
     
-    const positiveTypes = ['supplement-improvement'];
+    const positiveTypes = ['supplement-improvement', 'sleep-quality', 'exercise-energy'];
     const negativeTypes = ['food-symptom', 'medication-effect', 'stress-symptom', 'food-property-pattern'];
     
-    if (positiveTypes.includes(correlation.type)) return true;
+    if (positiveTypes.includes(correlation.type)) {
+      // For positive types, check if effect is actually positive
+      const effect = (correlation.effect || '').toLowerCase();
+      return effect.includes('improved') || effect.includes('increased') || effect.includes('better') || effect.includes('reduced');
+    }
+    
     if (negativeTypes.includes(correlation.type)) return false;
     
     const text = (correlation.description || correlation.effect || '').toLowerCase();
@@ -41,9 +46,106 @@ const CorrelationInsights = () => {
     return hasPositive && !hasNegative;
   };
 
-  // Check if correlation is critical (high confidence + negative impact)
+  // FIXED: More lenient critical correlation check
   const isCriticalCorrelation = (correlation) => {
-    return correlation.confidence >= 0.7 && !isPositiveCorrelation(correlation);
+    return correlation.confidence >= 0.5 && !isPositiveCorrelation(correlation); // Changed from 0.7 to 0.5
+  };
+
+  // FIXED: Get emoji for correlation display
+  const getCorrelationEmoji = (correlation) => {
+    if (correlation.type === 'food-property-pattern') {
+      return '📈'; // Pattern emoji
+    }
+    
+    // Individual food/trigger emojis
+    const trigger = correlation.trigger.toLowerCase();
+    
+    // Common food emojis
+    if (trigger.includes('egg')) return '🥚';
+    if (trigger.includes('milk') || trigger.includes('dairy')) return '🥛';
+    if (trigger.includes('bread') || trigger.includes('wheat')) return '🍞';
+    if (trigger.includes('cheese')) return '🧀';
+    if (trigger.includes('apple')) return '🍎';
+    if (trigger.includes('banana')) return '🍌';
+    if (trigger.includes('tomato')) return '🍅';
+    if (trigger.includes('coffee')) return '☕';
+    if (trigger.includes('chocolate')) return '🍫';
+    if (trigger.includes('nuts') || trigger.includes('almond')) return '🥜';
+    if (trigger.includes('fish')) return '🐟';
+    if (trigger.includes('chicken')) return '🐔';
+    if (trigger.includes('beef')) return '🥩';
+    if (trigger.includes('rice')) return '🍚';
+    if (trigger.includes('pasta')) return '🍝';
+    if (trigger.includes('sugar')) return '🍬';
+    if (trigger.includes('wine') || trigger.includes('alcohol')) return '🍷';
+    if (trigger.includes('pepper')) return '🌶️';
+    if (trigger.includes('garlic')) return '🧄';
+    if (trigger.includes('onion')) return '🧅';
+    if (trigger.includes('carrot')) return '🥕';
+    if (trigger.includes('spinach')) return '🥬';
+    if (trigger.includes('orange')) return '🍊';
+    if (trigger.includes('strawberry')) return '🍓';
+    if (trigger.includes('avocado')) return '🥑';
+    if (trigger.includes('potato')) return '🥔';
+    if (trigger.includes('broccoli')) return '🥦';
+    if (trigger.includes('cucumber')) return '🥒';
+    if (trigger.includes('corn')) return '🌽';
+    if (trigger.includes('mushroom')) return '🍄';
+    if (trigger.includes('lemon')) return '🍋';
+    if (trigger.includes('grape')) return '🍇';
+    if (trigger.includes('peach')) return '🍑';
+    if (trigger.includes('pear')) return '🍐';
+    if (trigger.includes('cherry')) return '🍒';
+    if (trigger.includes('pineapple')) return '🍍';
+    if (trigger.includes('kiwi')) return '🥝';
+    if (trigger.includes('mango')) return '🥭';
+    if (trigger.includes('coconut')) return '🥥';
+    if (trigger.includes('watermelon')) return '🍉';
+    if (trigger.includes('melon')) return '🍈';
+    if (trigger.includes('blueberry')) return '🫐';
+    if (trigger.includes('olive')) return '🫒';
+    if (trigger.includes('bacon')) return '🥓';
+    if (trigger.includes('steak')) return '🥩';
+    if (trigger.includes('turkey')) return '🦃';
+    if (trigger.includes('shrimp')) return '🦐';
+    if (trigger.includes('lobster')) return '🦞';
+    if (trigger.includes('crab')) return '🦀';
+    if (trigger.includes('salmon')) return '🐟';
+    if (trigger.includes('tuna')) return '🐟';
+    if (trigger.includes('yogurt')) return '🥛';
+    if (trigger.includes('butter')) return '🧈';
+    if (trigger.includes('honey')) return '🍯';
+    if (trigger.includes('jam')) return '🍯';
+    if (trigger.includes('cookie')) return '🍪';
+    if (trigger.includes('cake')) return '🍰';
+    if (trigger.includes('pie')) return '🥧';
+    if (trigger.includes('donut')) return '🍩';
+    if (trigger.includes('pizza')) return '🍕';
+    if (trigger.includes('burger')) return '🍔';
+    if (trigger.includes('sandwich')) return '🥪';
+    if (trigger.includes('hotdog')) return '🌭';
+    if (trigger.includes('taco')) return '🌮';
+    if (trigger.includes('burrito')) return '🌯';
+    if (trigger.includes('sushi')) return '🍣';
+    if (trigger.includes('soup')) return '🍲';
+    if (trigger.includes('salad')) return '🥗';
+    if (trigger.includes('ice cream')) return '🍦';
+    if (trigger.includes('tea')) return '🍵';
+    if (trigger.includes('beer')) return '🍺';
+    if (trigger.includes('soda')) return '🥤';
+    if (trigger.includes('water')) return '💧';
+    if (trigger.includes('juice')) return '🧃';
+    
+    // Medication/supplement emojis
+    if (correlation.type === 'medication-effect') return '💊';
+    if (correlation.type === 'supplement-improvement') return '💊';
+    if (correlation.type === 'sleep-quality') return '😴';
+    if (correlation.type === 'exercise-energy') return '💪';
+    if (correlation.type === 'stress-symptom') return '😤';
+    
+    // Default based on correlation type
+    if (isPositiveCorrelation(correlation)) return '✅';
+    return '⚠️';
   };
 
   // Get appropriate icon based on correlation type
@@ -68,8 +170,6 @@ const CorrelationInsights = () => {
         return <AlertTriangle className="w-5 h-5 text-red-500" />;
     }
   };
-
-
 
   // Format percentage display
   const getPercentageDisplay = (correlation) => {
@@ -110,33 +210,13 @@ const CorrelationInsights = () => {
     return Math.min(baseScore, 1.0);
   };
 
-  // Generate user-friendly description
-  const getCorrelationDescription = (correlation) => {
-    const isPositive = isPositiveCorrelation(correlation);
-    
-    // Handle pattern correlations specially
-    if (correlation.type === 'food-property-pattern') {
-      return correlation.description || `🔍 Your data suggests ${correlation.trigger} may trigger ${correlation.effect}`;
-    }
-    
-    const trigger = correlation.trigger;
-    const effect = correlation.effect;
-    
-    if (isPositive) {
-      return `💡 Your data suggests ${trigger} may help with ${effect}`;
-    } else {
-      return `🔍 Your data suggests ${trigger} may trigger ${effect}`;
-    }
-  };
-
   // Safe correlations array
   const safeCorrelations = correlations || [];
 
-
-  
-  // Filter correlations based on tab selection
+  // FIXED: More lenient filtering to show more data
   const getFilteredCorrelations = () => {
-    const baseCorrelations = safeCorrelations.filter(c => c.confidence >= 0.5);
+    // FIXED: Changed from 0.5 to 0.3 to show more data
+    const baseCorrelations = safeCorrelations.filter(c => c.confidence >= 0.3);
     
     // Apply tab filter
     switch (activeTab) {
@@ -183,10 +263,10 @@ const CorrelationInsights = () => {
   const groupedCorrelations = getGroupedCorrelations();
   const displayedGroups = showMore ? groupedCorrelations : groupedCorrelations.slice(0, 5);
 
-  // Calculate counts for different categories
-  const reviewCount = safeCorrelations.filter(c => c.confidence >= 0.5 && isCriticalCorrelation(c)).length;
-  const observeCount = safeCorrelations.filter(c => c.confidence >= 0.5 && !isPositiveCorrelation(c) && !isCriticalCorrelation(c)).length;
-  const positiveCount = safeCorrelations.filter(c => c.confidence >= 0.5 && isPositiveCorrelation(c)).length;
+  // FIXED: More lenient counts calculation
+  const reviewCount = safeCorrelations.filter(c => c.confidence >= 0.3 && isCriticalCorrelation(c)).length;
+  const observeCount = safeCorrelations.filter(c => c.confidence >= 0.3 && !isPositiveCorrelation(c) && !isCriticalCorrelation(c)).length;
+  const positiveCount = safeCorrelations.filter(c => c.confidence >= 0.3 && isPositiveCorrelation(c)).length;
   
   // Combined loading state
   const loading = authLoading || correlationsLoading;
@@ -262,6 +342,13 @@ const CorrelationInsights = () => {
         </Select>
       </div>
 
+      {/* FIXED: Debug info to see what's happening - Remove this after testing */}
+      <div className="bg-gray-100 p-3 rounded text-sm">
+        <strong>Debug Info:</strong> Total correlations: {safeCorrelations.length}, 
+        Filtered: {getFilteredCorrelations().length}, 
+        Grouped: {groupedCorrelations.length}
+      </div>
+
       {/* Navigation Tabs */}
       <div className="flex space-x-2">
         <Button
@@ -286,8 +373,6 @@ const CorrelationInsights = () => {
           Keep it Up ({positiveCount})
         </Button>
       </div>
-
-
 
       {/* Patterns Display */}
       <div className="bg-white rounded-lg border border-gray-200">
@@ -324,11 +409,9 @@ const CorrelationInsights = () => {
                     <div className="flex items-center space-x-3 flex-1">
                       {getCorrelationIcon(group.correlations[0])}
                       <div className="flex-1">
+                        {/* FIXED: Enhanced display format with emojis */}
                         <h4 className="font-semibold text-gray-900 text-lg">
-                          {group.isPattern ? 
-                            `${group.trigger} emerging in your data` : 
-                            `${group.trigger} trend emerging in your data`
-                          }
+                          {getCorrelationEmoji(group.correlations[0])} {group.trigger} {group.isPattern ? 'emerging in your data' : 'trend emerging in your data'}
                         </h4>
                         {group.isPattern && group.correlations[0].contributingFoods ? (
                           <div className="text-sm text-gray-600 mt-1">
@@ -353,7 +436,7 @@ const CorrelationInsights = () => {
                     )}
                   </div>
                   
-                  {/* Only show detailed breakdown for patterns when clicked through */}
+                  {/* Show detailed breakdown for patterns */}
                   {group.isPattern && (
                     <div className="space-y-2 pt-2 border-t border-gray-200">
                       {group.correlations.map((correlation, corrIndex) => {
@@ -415,8 +498,6 @@ const CorrelationInsights = () => {
           </div>
         )}
       </div>
-
-
     </div>
   );
 };

@@ -164,7 +164,7 @@ async function detectFoodSymptomCorrelations(timelineData, confidenceThreshold) 
 }
 
 /**
- * Get individual food-symptom correlations
+ * FIXED: Get individual food correlations - More lenient threshold
  */
 async function getIndividualFoodCorrelations(foodEntries, symptomEntries, timeWindows, confidenceThreshold) {
   const correlations = [];
@@ -181,7 +181,8 @@ async function getIndividualFoodCorrelations(foodEntries, symptomEntries, timeWi
 
   // Analyze each food
   for (const [foodName, foodInstances] of Object.entries(foodCounts)) {
-    if (foodInstances.length < 3) continue;
+    // FIXED: Changed from 3 to 2 minimum instances for more data
+    if (foodInstances.length < 2) continue;
 
     for (const window of timeWindows) {
       for (const symptomType of getUniqueSymptoms(symptomEntries)) {
@@ -202,7 +203,7 @@ async function getIndividualFoodCorrelations(foodEntries, symptomEntries, timeWi
 }
 
 /**
- * NEW: Detect food property patterns from individual correlations
+ * FIXED: Detect food property patterns - Changed from 3+ to 2+ foods threshold
  */
 async function detectFoodPropertyPatterns(individualCorrelations, foodProperties, confidenceThreshold) {
   const patternCorrelations = [];
@@ -220,7 +221,8 @@ async function detectFoodPropertyPatterns(individualCorrelations, foodProperties
 
   // Analyze each symptom group for food property patterns
   for (const [key, correlations] of Object.entries(symptomGroups)) {
-    if (correlations.length < 3) continue; // Need at least 3 correlations to find patterns
+    // FIXED: Changed from 3 to 2 correlations minimum
+    if (correlations.length < 2) continue;
 
     const patterns = await findFoodPropertyPatterns(correlations, foodProperties);
     
@@ -235,7 +237,7 @@ async function detectFoodPropertyPatterns(individualCorrelations, foodProperties
 }
 
 /**
- * Find patterns based on food properties
+ * FIXED: Find patterns based on food properties - Changed from 3+ to 2+ foods threshold
  */
 async function findFoodPropertyPatterns(correlations, foodProperties) {
   const patterns = [];
@@ -260,8 +262,8 @@ async function findFoodPropertyPatterns(correlations, foodProperties) {
       return category.values.includes(propertyValue);
     });
 
-    // If 3+ foods with same property trigger the same symptom, create pattern
-    if (matchingCorrelations.length >= 3) {
+    // FIXED: Changed from 3+ to 2+ foods minimum for pattern
+    if (matchingCorrelations.length >= 2) {
       const pattern = createPropertyPattern(category, matchingCorrelations);
       patterns.push(pattern);
     }
@@ -451,7 +453,7 @@ async function getFoodProperties() {
 }
 
 /**
- * Detect medication → side effect correlations
+ * FIXED: Detect medication → side effect correlations - More lenient threshold
  */
 async function detectMedicationEffects(timelineData, confidenceThreshold) {
   const correlations = [];
@@ -475,7 +477,8 @@ async function detectMedicationEffects(timelineData, confidenceThreshold) {
 
   // Analyze each medication for side effects
   for (const [medicationName, medicationInstances] of Object.entries(medicationGroups)) {
-    if (medicationInstances.length < 3) continue;
+    // FIXED: Changed from 3 to 2 minimum instances
+    if (medicationInstances.length < 2) continue;
 
     for (const effectType of getUniqueSymptoms(sideEffectEntries)) {
       const correlation = analyzeMedicationSideEffectCorrelation(
@@ -676,7 +679,7 @@ function analyzeExerciseEnergyCorrelation(exerciseInstances, energyEntries, exer
 }
 
 /**
- * Detect sleep quality correlations
+ * FIXED: Detect sleep quality correlations - More lenient threshold
  */
 async function detectSleepQualityCorrelations(timelineData, confidenceThreshold) {
   const correlations = [];
@@ -705,7 +708,8 @@ async function detectSleepQualityCorrelations(timelineData, confidenceThreshold)
 
   // Analyze each supplement
   for (const [supplementName, supplementInstances] of Object.entries(supplementGroups)) {
-    if (supplementInstances.length < 3) continue;
+    // FIXED: Changed from 3 to 2 minimum instances
+    if (supplementInstances.length < 2) continue;
 
     const correlation = analyzeSupplementSleepCorrelation(
       supplementInstances,
@@ -858,7 +862,7 @@ function analyzeStressSymptomCorrelation(stressEntries, symptoms, symptomType) {
 }
 
 /**
- * Enhanced supplement improvement detection with personalized language
+ * FIXED: Enhanced supplement improvement detection - More lenient threshold
  */
 async function detectSupplementImprovements(timelineData, confidenceThreshold) {
   const correlations = [];
@@ -880,7 +884,8 @@ async function detectSupplementImprovements(timelineData, confidenceThreshold) {
   }
 
   for (const [supplementName, supplementInstances] of Object.entries(supplementGroups)) {
-    if (supplementInstances.length < 7) continue;
+    // FIXED: Changed from 7 to 5 minimum instances for more data
+    if (supplementInstances.length < 5) continue;
 
     const startDate = new Date(Math.min(...supplementInstances.map(s => parseDateTime(s).getTime())));
     
