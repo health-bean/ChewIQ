@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2025-07-09T00:28:31.159Z",
+    "generated": "2025-07-09T00:56:11.728Z",
     "version": "1.0.0",
     "generator": "AutomatedProfessionalDocsGenerator"
   },
@@ -17,7 +17,7 @@
     "workingAPIs": 12,
     "totalAPIs": 27,
     "totalTables": 21,
-    "totalCommits": 51,
+    "totalCommits": 52,
     "contributors": 1
   },
   "discoveredInfo": {
@@ -129,9 +129,75 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 4683,
+          "responseTime": 4616,
           "responseData": {
             "insights": [
+              {
+                "type": "food-property-pattern",
+                "trigger": "high oxalate foods",
+                "effect": "swelling",
+                "timeWindow": 48,
+                "timeWindowDescription": "within 48 hours",
+                "confidence": 0.68,
+                "frequency": "66/98 times",
+                "occurrences": 66,
+                "totalOpportunities": 98,
+                "propertyType": "oxalate",
+                "propertyValue": "high oxalate",
+                "contributingFoods": [
+                  "sweet potato",
+                  "swiss chard"
+                ],
+                "foodCount": 2,
+                "description": "🔍 Your data suggests high oxalate foods may trigger swelling (2 foods: sweet potato, swiss chard)",
+                "recommendation": "Consider avoiding high oxalate foods to test your sensitivity. This includes: sweet potato, swiss chard",
+                "patternInsight": "This pattern suggests you may be sensitive to high oxalate compounds. Common sources include: sweet potato, swiss chard",
+                "patternBoost": 0.1
+              },
+              {
+                "type": "food-property-pattern",
+                "trigger": "high oxalate foods",
+                "effect": "joint pain",
+                "timeWindow": 48,
+                "timeWindowDescription": "within 48 hours",
+                "confidence": 0.64,
+                "frequency": "58/91 times",
+                "occurrences": 58,
+                "totalOpportunities": 91,
+                "propertyType": "oxalate",
+                "propertyValue": "high oxalate",
+                "contributingFoods": [
+                  "spinach",
+                  "swiss chard"
+                ],
+                "foodCount": 2,
+                "description": "🔍 Your data suggests high oxalate foods may trigger joint pain (2 foods: spinach, swiss chard)",
+                "recommendation": "Consider avoiding high oxalate foods to test your sensitivity. This includes: spinach, swiss chard",
+                "patternInsight": "This pattern suggests you may be sensitive to high oxalate compounds. Common sources include: spinach, swiss chard",
+                "patternBoost": 0.1
+              },
+              {
+                "type": "food-property-pattern",
+                "trigger": "high histamine foods",
+                "effect": "joint pain",
+                "timeWindow": 48,
+                "timeWindowDescription": "within 48 hours",
+                "confidence": 0.69,
+                "frequency": "63/92 times",
+                "occurrences": 63,
+                "totalOpportunities": 92,
+                "propertyType": "histamine",
+                "propertyValue": "high histamine",
+                "contributingFoods": [
+                  "spinach",
+                  "tuna"
+                ],
+                "foodCount": 2,
+                "description": "🔍 Your data suggests high histamine foods may trigger joint pain (2 foods: spinach, tuna)",
+                "recommendation": "Consider avoiding high histamine foods to test your sensitivity. This includes: spinach, tuna",
+                "patternInsight": "This pattern suggests you may be sensitive to high histamine compounds. Common sources include: spinach, tuna",
+                "patternBoost": 0.1
+              },
               {
                 "type": "food-symptom",
                 "trigger": "mango",
@@ -221,36 +287,6 @@
                 "impactScore": 0.8119999999999999,
                 "description": "🔍 Your data suggests watermelon may trigger joint pain (60% of instances)",
                 "recommendation": "Monitor watermelon consumption and joint pain symptoms more closely"
-              },
-              {
-                "type": "food-symptom",
-                "trigger": "sweet potato",
-                "effect": "swelling",
-                "timeWindow": 48,
-                "timeWindowDescription": "within 48 hours",
-                "confidence": 0.63,
-                "frequency": "33/52 times",
-                "occurrences": 33,
-                "totalOpportunities": 52,
-                "avgSeverity": 4.8,
-                "impactScore": 0.8297668997668998,
-                "description": "🔍 Your data suggests sweet potato may trigger swelling (63% of instances)",
-                "recommendation": "Consider eliminating sweet potato for 2-4 weeks to test your sensitivity"
-              },
-              {
-                "type": "food-symptom",
-                "trigger": "spinach",
-                "effect": "joint pain",
-                "timeWindow": 48,
-                "timeWindowDescription": "within 48 hours",
-                "confidence": 0.67,
-                "frequency": "30/45 times",
-                "occurrences": 30,
-                "totalOpportunities": 45,
-                "avgSeverity": 6,
-                "impactScore": 0.8866666666666666,
-                "description": "🔍 Your data suggests spinach may trigger joint pain (67% of instances)",
-                "recommendation": "Consider eliminating spinach for 2-4 weeks to test your sensitivity"
               },
               {
                 "type": "food-symptom",
@@ -359,36 +395,6 @@
               },
               {
                 "type": "food-symptom",
-                "trigger": "swiss chard",
-                "effect": "swelling",
-                "timeWindow": 48,
-                "timeWindowDescription": "within 48 hours",
-                "confidence": 0.72,
-                "frequency": "33/46 times",
-                "occurrences": 33,
-                "totalOpportunities": 46,
-                "avgSeverity": 4.8,
-                "impactScore": 0.9143610013175231,
-                "description": "🔍 Your data suggests swiss chard may trigger swelling (72% of the time)",
-                "recommendation": "Consider eliminating swiss chard for 2-4 weeks to test your sensitivity"
-              },
-              {
-                "type": "food-symptom",
-                "trigger": "swiss chard",
-                "effect": "joint pain",
-                "timeWindow": 48,
-                "timeWindowDescription": "within 48 hours",
-                "confidence": 0.61,
-                "frequency": "28/46 times",
-                "occurrences": 28,
-                "totalOpportunities": 46,
-                "avgSeverity": 6.1,
-                "impactScore": 0.831552795031056,
-                "description": "🔍 Your data suggests swiss chard may trigger joint pain (61% of instances)",
-                "recommendation": "Consider eliminating swiss chard for 2-4 weeks to test your sensitivity"
-              },
-              {
-                "type": "food-symptom",
                 "trigger": "salmon",
                 "effect": "swelling",
                 "timeWindow": 48,
@@ -401,36 +407,6 @@
                 "impactScore": 0.7984973166368515,
                 "description": "🔍 Your data suggests salmon may trigger swelling (60% of instances)",
                 "recommendation": "Monitor salmon consumption and swelling symptoms more closely"
-              },
-              {
-                "type": "food-symptom",
-                "trigger": "tuna",
-                "effect": "swelling",
-                "timeWindow": 48,
-                "timeWindowDescription": "within 48 hours",
-                "confidence": 0.66,
-                "frequency": "31/47 times",
-                "occurrences": 31,
-                "totalOpportunities": 47,
-                "avgSeverity": 4.7,
-                "impactScore": 0.8531228551818805,
-                "description": "🔍 Your data suggests tuna may trigger swelling (66% of instances)",
-                "recommendation": "Consider eliminating tuna for 2-4 weeks to test your sensitivity"
-              },
-              {
-                "type": "food-symptom",
-                "trigger": "tuna",
-                "effect": "joint pain",
-                "timeWindow": 48,
-                "timeWindowDescription": "within 48 hours",
-                "confidence": 0.7,
-                "frequency": "33/47 times",
-                "occurrences": 33,
-                "totalOpportunities": 47,
-                "avgSeverity": 6.3,
-                "impactScore": 0.9275822050290136,
-                "description": "🔍 Your data suggests tuna may trigger joint pain (70% of instances)",
-                "recommendation": "Consider eliminating tuna for 2-4 weeks to test your sensitivity"
               },
               {
                 "type": "food-symptom",
@@ -711,20 +687,20 @@
               }
             ],
             "summary": {
-              "totalCorrelations": 41,
-              "triggers": 28,
+              "totalCorrelations": 38,
+              "triggers": 22,
               "improvements": 12,
               "medicationEffects": 0,
               "exerciseImpacts": 1,
               "sleepFactors": 0,
               "stressAmplifiers": 0,
-              "foodPatterns": 0
+              "foodPatterns": 3
             },
             "timeframe_days": 180,
             "confidence_threshold": 0.6,
             "user_id": "8e8a568a-c2f8-43a8-abf2-4e54408dbdc0"
           },
-          "responseSize": 18559
+          "responseSize": 18129
         },
         {
           "path": "/api/v1/detox-types",
@@ -735,7 +711,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 95,
+          "responseTime": 113,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -786,7 +762,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 48,
+          "responseTime": 76,
           "responseData": {
             "foods": [
               {
@@ -834,7 +810,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 60,
+          "responseTime": 89,
           "responseData": {
             "protocols": [
               {
@@ -1008,7 +984,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 78,
+          "responseTime": 86,
           "responseData": {
             "entries": [],
             "total": 0
@@ -1029,7 +1005,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 78,
+          "responseTime": 98,
           "responseData": {
             "error": "Failed to complete create timeline entry"
           },
@@ -1049,7 +1025,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 70,
+          "responseTime": 53,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1100,7 +1076,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 51,
+          "responseTime": 63,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1146,7 +1122,7 @@
           "params": [],
           "status": 400,
           "working": false,
-          "responseTime": 111,
+          "responseTime": 49,
           "responseData": {
             "error": "Email and password required"
           },
@@ -1161,7 +1137,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 46,
+          "responseTime": 50,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1207,7 +1183,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 38,
+          "responseTime": 61,
           "responseData": {
             "error": "No authorization header"
           },
@@ -1222,7 +1198,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 34,
+          "responseTime": 65,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1268,7 +1244,7 @@
           "params": [],
           "status": 400,
           "working": false,
-          "responseTime": 33,
+          "responseTime": 68,
           "responseData": {
             "error": "Missing required fields"
           },
@@ -1283,7 +1259,7 @@
           "params": [],
           "status": 400,
           "working": false,
-          "responseTime": 46,
+          "responseTime": 63,
           "responseData": {
             "error": "Email and password required"
           },
@@ -1298,7 +1274,7 @@
           "params": [],
           "status": 200,
           "working": true,
-          "responseTime": 47,
+          "responseTime": 60,
           "responseData": {
             "user": {
               "id": "8e8a568a-c2f8-43a8-abf2-4e54408dbdc0",
@@ -1324,7 +1300,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 78,
+          "responseTime": 224,
           "responseData": {
             "protocols": [],
             "total": 0
@@ -1345,10 +1321,10 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 45,
+          "responseTime": 153,
           "responseData": {
             "protocols": [
-              "a80be547-6db1-4722-a5a4-60930143a2d9"
+              "7c728266-7c7e-4389-a9b6-7c5280f2edd2"
             ],
             "quick_detox": [],
             "quick_foods": [],
@@ -1373,7 +1349,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 56,
+          "responseTime": 89,
           "responseData": {
             "foods": [
               {
@@ -5280,7 +5256,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 66,
+          "responseTime": 48,
           "responseData": {
             "symptoms": [],
             "total": 0,
@@ -5302,7 +5278,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 37,
+          "responseTime": 78,
           "responseData": {
             "supplements": [],
             "total": 0,
@@ -5324,7 +5300,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 37,
+          "responseTime": 49,
           "responseData": {
             "medications": [],
             "total": 0,
@@ -5346,7 +5322,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 38,
+          "responseTime": 56,
           "responseData": {
             "detox_types": [],
             "total": 0,
@@ -5363,7 +5339,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 42,
+          "responseTime": 47,
           "responseData": {
             "error": "Internal server error: handleGetJournalEntries is not a function"
           },
@@ -5378,7 +5354,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 127,
+          "responseTime": 57,
           "responseData": {
             "error": "Internal server error: handleGetJournalEntry is not a function"
           },
@@ -5393,7 +5369,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 38,
+          "responseTime": 119,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -5439,7 +5415,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 113,
+          "responseTime": 48,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -5734,7 +5710,7 @@
             {
               "name": "CorrelationInsights",
               "path": "frontend/web-app/src/features/insights/CorrelationInsights.jsx",
-              "size": 17033,
+              "size": 21816,
               "hooks": [
                 "useState",
                 "useCorrelations",
@@ -5852,7 +5828,7 @@
             }
           ],
           "utilities": [],
-          "size": "321.25 KB"
+          "size": "325.92 KB"
         },
         "frontend/shared": {
           "totalFiles": 24,
@@ -5972,7 +5948,7 @@
             }
           ],
           "utilities": [],
-          "size": "109.37 KB"
+          "size": "109.74 KB"
         },
         "backend/functions": {
           "totalFiles": 19,
@@ -5989,7 +5965,7 @@
             }
           ],
           "utilities": [],
-          "size": "109.37 KB"
+          "size": "109.74 KB"
         },
         "backend": {
           "totalFiles": 19,
@@ -6006,7 +5982,7 @@
             }
           ],
           "utilities": [],
-          "size": "109.37 KB"
+          "size": "109.74 KB"
         }
       },
       "shared": {},
@@ -6090,18 +6066,18 @@
       "repository": "https://github.com/deebyrne26/health-platform",
       "branch": "main",
       "lastCommit": {
-        "hash": "3cc99b6",
-        "message": "Correlations",
+        "hash": "94c6899",
+        "message": "insights",
         "author": "deebyrne26",
-        "date": "Tue Jul 8 20:27:48 2025 -0400"
+        "date": "Tue Jul 8 20:55:37 2025 -0400"
       },
       "contributors": [
         {
           "name": "deebyrne26",
-          "commits": 51
+          "commits": 52
         }
       ],
-      "totalCommits": 51
+      "totalCommits": 52
     }
   }
 }
