@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2025-07-11T01:27:38.437Z",
+    "generated": "2025-07-11T01:47:24.380Z",
     "version": "1.0.0",
     "generator": "AutomatedProfessionalDocsGenerator"
   },
@@ -17,7 +17,7 @@
     "workingAPIs": 12,
     "totalAPIs": 27,
     "totalTables": 21,
-    "totalCommits": 54,
+    "totalCommits": 55,
     "contributors": 1
   },
   "discoveredInfo": {
@@ -129,7 +129,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 4358,
+          "responseTime": 4859,
           "responseData": {
             "insights": [
               {
@@ -683,7 +683,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 112,
+          "responseTime": 166,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -734,7 +734,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 69,
+          "responseTime": 170,
           "responseData": {
             "foods": [
               {
@@ -782,7 +782,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 69,
+          "responseTime": 114,
           "responseData": {
             "protocols": [
               {
@@ -956,7 +956,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 70,
+          "responseTime": 148,
           "responseData": {
             "entries": [],
             "total": 0
@@ -977,7 +977,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 107,
+          "responseTime": 156,
           "responseData": {
             "error": "Failed to complete create timeline entry"
           },
@@ -997,7 +997,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 103,
+          "responseTime": 179,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1094,7 +1094,7 @@
           "params": [],
           "status": 400,
           "working": false,
-          "responseTime": 100,
+          "responseTime": 162,
           "responseData": {
             "error": "Email and password required"
           },
@@ -1109,7 +1109,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 107,
+          "responseTime": 117,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1155,7 +1155,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 119,
+          "responseTime": 246,
           "responseData": {
             "error": "No authorization header"
           },
@@ -1170,7 +1170,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 80,
+          "responseTime": 103,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1216,7 +1216,7 @@
           "params": [],
           "status": 400,
           "working": false,
-          "responseTime": 109,
+          "responseTime": 259,
           "responseData": {
             "error": "Missing required fields"
           },
@@ -1231,7 +1231,7 @@
           "params": [],
           "status": 400,
           "working": false,
-          "responseTime": 61,
+          "responseTime": 99,
           "responseData": {
             "error": "Email and password required"
           },
@@ -1246,7 +1246,7 @@
           "params": [],
           "status": 200,
           "working": true,
-          "responseTime": 106,
+          "responseTime": 240,
           "responseData": {
             "user": {
               "id": "8e8a568a-c2f8-43a8-abf2-4e54408dbdc0",
@@ -1272,7 +1272,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 112,
+          "responseTime": 137,
           "responseData": {
             "protocols": [],
             "total": 0
@@ -1293,7 +1293,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 118,
+          "responseTime": 102,
           "responseData": {
             "protocols": [
               "1495844a-19de-404c-a288-7660eda0cbe1"
@@ -1321,7 +1321,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 139,
+          "responseTime": 390,
           "responseData": {
             "foods": [
               {
@@ -5228,7 +5228,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 67,
+          "responseTime": 102,
           "responseData": {
             "symptoms": [],
             "total": 0,
@@ -5250,7 +5250,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 69,
+          "responseTime": 113,
           "responseData": {
             "supplements": [],
             "total": 0,
@@ -5272,7 +5272,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 67,
+          "responseTime": 105,
           "responseData": {
             "medications": [],
             "total": 0,
@@ -5294,7 +5294,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 68,
+          "responseTime": 110,
           "responseData": {
             "detox_types": [],
             "total": 0,
@@ -5311,7 +5311,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 104,
+          "responseTime": 99,
           "responseData": {
             "error": "Internal server error: handleGetJournalEntries is not a function"
           },
@@ -5326,7 +5326,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 63,
+          "responseTime": 103,
           "responseData": {
             "error": "Internal server error: handleGetJournalEntry is not a function"
           },
@@ -5341,7 +5341,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 60,
+          "responseTime": 109,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -5387,7 +5387,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 117,
+          "responseTime": 103,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -5433,7 +5433,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 62,
+          "responseTime": 253,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -5920,7 +5920,7 @@
             }
           ],
           "utilities": [],
-          "size": "109.74 KB"
+          "size": "109.83 KB"
         },
         "backend/functions": {
           "totalFiles": 19,
@@ -5937,7 +5937,7 @@
             }
           ],
           "utilities": [],
-          "size": "109.74 KB"
+          "size": "109.83 KB"
         },
         "backend": {
           "totalFiles": 19,
@@ -5954,7 +5954,7 @@
             }
           ],
           "utilities": [],
-          "size": "109.74 KB"
+          "size": "109.83 KB"
         }
       },
       "shared": {},
@@ -6038,18 +6038,18 @@
       "repository": "https://github.com/deebyrne26/health-platform",
       "branch": "main",
       "lastCommit": {
-        "hash": "6e7d7e5",
-        "message": "Logging cleanup",
+        "hash": "f904028",
+        "message": "security fixes",
         "author": "deebyrne26",
-        "date": "Thu Jul 10 21:27:01 2025 -0400"
+        "date": "Thu Jul 10 21:46:45 2025 -0400"
       },
       "contributors": [
         {
           "name": "deebyrne26",
-          "commits": 54
+          "commits": 55
         }
       ],
-      "totalCommits": 54
+      "totalCommits": 55
     }
   }
 }
