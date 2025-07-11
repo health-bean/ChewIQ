@@ -23,13 +23,16 @@ const CorrelationInsights = () => {
     const helpers = [];
     const patterns = [];
 
-    correlations.forEach(correlation => {
+    correlations.forEach((correlation, index) => {
       if (correlation.confidence < 0.3) return; // Skip low confidence
+      
+      // Create unique ID by combining multiple values
+      const uniqueId = `${correlation.trigger}-${correlation.type}-${correlation.effect}-${index}`;
       
       // Patterns (food-property-pattern)
       if (correlation.type === 'food-property-pattern') {
         patterns.push({
-          id: correlation.trigger,
+          id: uniqueId,
           name: correlation.trigger,
           description: correlation.effect,
           confidence: correlation.confidence,
@@ -50,7 +53,7 @@ const CorrelationInsights = () => {
                         (correlation.type === 'exercise-energy' && correlation.effect.includes('increased'));
 
       const item = {
-        id: correlation.trigger,
+        id: uniqueId,
         name: correlation.trigger,
         description: correlation.effect,
         confidence: correlation.confidence,
