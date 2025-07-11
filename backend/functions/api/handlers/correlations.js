@@ -53,7 +53,7 @@ async function handleGetCorrelationInsights(queryParams, event) {
 }
 
 /**
- * Get timeline data for correlation analysis - FIXED: SQL injection vulnerability
+ * Get timeline data for correlation analysis
  */
 async function getTimelineData(userId, timeframeDays) {
   const client = await pool.connect();
@@ -71,11 +71,11 @@ async function getTimelineData(userId, timeframeDays) {
         created_at
       FROM timeline_entries 
       WHERE user_id = $1 
-        AND entry_date >= CURRENT_DATE - INTERVAL $2 || ' days'
+        AND entry_date >= CURRENT_DATE - INTERVAL '${timeframeDays} days'
       ORDER BY entry_date, entry_time
     `;
 
-    const result = await client.query(query, [userId, timeframeDays]);
+    const result = await client.query(query, [userId]);
     return result.rows;
   } finally {
     client.release();
