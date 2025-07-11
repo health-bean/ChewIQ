@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export const useAppState = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
