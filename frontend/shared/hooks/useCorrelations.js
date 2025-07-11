@@ -25,7 +25,6 @@ export const useCorrelations = (userId, confidenceThreshold = 0.6, timeframeDays
       setCorrelations(data.insights || []);
       setSummary(data.summary || {});
     } catch (err) {
-      console.error('Error fetching correlations:', err);
       setError(err.message);
     } finally {
       setLoading(false);

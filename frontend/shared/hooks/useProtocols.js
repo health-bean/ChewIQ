@@ -12,7 +12,6 @@ const useProtocols = () => {
         const data = await apiClient.get('/api/v1/protocols');
         setProtocols(data.protocols || []);
       } catch (error) {
-        console.error('Failed to load protocols:', error);
         setError(error.message);
       } finally {
         setLoading(false);

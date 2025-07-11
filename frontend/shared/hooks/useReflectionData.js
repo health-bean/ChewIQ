@@ -33,7 +33,6 @@ const useReflectionData = (selectedDate) => {
           const parsed = JSON.parse(saved);
           setReflectionData(parsed);
         } catch (error) {
-          console.error('Failed to parse saved reflection data:', error);
         }
       } else {
         // Reset to defaults for new date
@@ -81,7 +80,6 @@ const useReflectionData = (selectedDate) => {
       setHasUnsavedChanges(false);
       return true;
     } catch (error) {
-      console.error('Failed to save reflection data:', error);
       return false;
     } finally {
       setLoading(false);
