@@ -1,12 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { Loader2, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Loader2, ChevronDown, Check, Filter } from 'lucide-react';
+import { Button, Card, Checkbox } from '../../../../shared/components/ui';
+import { cn } from '../../../../shared/design-system';
 
-const MultiSelectProtocolDropdown = ({ protocols, selectedProtocols, onSelectionChange }) => {
+const MultiSelectProtocolDropdown = ({ 
+  protocols, 
+  selectedProtocols, 
+  onProtocolChange,
+  loading,
+  error 
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const getDisplayText = () => {
-    if (!selectedProtocols || selectedProtocols.length === 0) return 'Select Protocols...';
+    if (!selectedProtocols || selectedProtocols.length === 0) {
+      return 'All Protocols';
+    }
     
     // Handle "No Protocol" selection
     if (selectedProtocols.includes('no_protocol')) {
@@ -26,7 +49,7 @@ const MultiSelectProtocolDropdown = ({ protocols, selectedProtocols, onSelection
       return names.join(' + ');
     }
     
-    return `${selectedProtocols.length} Active Protocols`;
+    return `${selectedProtocols.length} Protocols`;
   };
 
   const toggleProtocol = async (protocolId) => {
@@ -40,113 +63,143 @@ const MultiSelectProtocolDropdown = ({ protocols, selectedProtocols, onSelection
       // Special handling for "No Protocol" option
       if (protocolId === 'no_protocol') {
         if (selectedProtocols.includes('no_protocol')) {
-          // Deselecting "No Protocol" - remove it
-          newSelection = selectedProtocols.filter(id => id !== 'no_protocol');
+          // Deselecting "no protocol" - show all protocols
+          newSelection = [];
         } else {
-          // Selecting "No Protocol" - clear all others and select this
+          // Selecting "no protocol" - clear all other selections
           newSelection = ['no_protocol'];
         }
       } else {
         // Regular protocol selection
-        const filteredProtocols = selectedProtocols.filter(id => id !== 'no_protocol');
-        newSelection = filteredProtocols.includes(protocolId)
-          ? filteredProtocols.filter(id => id !== protocolId)
-          : [...filteredProtocols, protocolId];
+        const currentSelection = selectedProtocols.filter(id => id !== 'no_protocol');
+        
+        if (currentSelection.includes(protocolId)) {
+          // Remove protocol
+          newSelection = currentSelection.filter(id => id !== protocolId);
+        } else {
+          // Add protocol
+          newSelection = [...currentSelection, protocolId];
+        }
       }
       
-      await onSelectionChange(newSelection);
+      await onProtocolChange(newSelection);
     } catch (error) {
-      console.error('Failed to update protocol selection:', error);
+      console.error('Error updating protocol selection:', error);
     } finally {
       setIsUpdating(false);
     }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.protocol-dropdown')) {
-        setIsOpen(false);
-      }
-    };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-2">
+        <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+        <span className="ml-2 text-sm text-gray-500">Loading protocols...</span>
+      </div>
+    );
+  }
 
-    if (isOpen) {
-      document.addEventListener('click', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [isOpen]);
-
-  const isNoProtocolSelected = selectedProtocols && selectedProtocols.includes('no_protocol');
+  if (error) {
+    return (
+      <div className="text-sm text-red-600 p-2">
+        Error loading protocols
+      </div>
+    );
+  }
 
   return (
-    <div className="relative protocol-dropdown">
-      <button
+    <div className="relative" ref={dropdownRef}>
+      {/* Trigger Button */}
+      <Button
+        variant="outline"
+        size="sm"
         onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "w-full justify-between text-left",
+          isOpen && "ring-2 ring-primary-500"
+        )}
         disabled={isUpdating}
-        className="w-full p-2 text-left rounded-lg bg-white text-gray-900 text-sm border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent flex items-center justify-between hover:bg-gray-50 disabled:opacity-50"
       >
-        <span className="text-gray-900">{getDisplayText()}</span>
         <div className="flex items-center space-x-2">
-          {isUpdating && <Loader2 size={12} className="animate-spin text-gray-400" />}
-          <ChevronDown 
-            size={16} 
-            className={`text-gray-500 transform transition-transform ${isOpen ? 'rotate-180' : ''}`} 
-          />
+          <Filter className="w-4 h-4 text-gray-400" />
+          <span className="truncate">{getDisplayText()}</span>
         </div>
-      </button>
+        <ChevronDown className={cn(
+          "w-4 h-4 text-gray-400 transition-transform duration-200",
+          isOpen && "rotate-180"
+        )} />
+      </Button>
 
+      {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-          
-          {/* No Protocol Option - First */}
-          <label className="flex items-center space-x-3 p-3 hover:bg-purple-50 cursor-pointer border-b border-gray-100">
-            <input
-              type="checkbox"
-              checked={isNoProtocolSelected}
-              onChange={() => toggleProtocol('no_protocol')}
-              disabled={isUpdating}
-              className="rounded text-purple-600 focus:ring-purple-500"
-            />
-            <div className="flex-1">
-              <div className="font-medium text-sm text-gray-900">🔍 No Protocol</div>
-              <div className="text-xs text-gray-600">Track freely to discover your own patterns</div>
-            </div>
-          </label>
-
-          {/* Regular Protocols */}
-          {protocols.map((protocol) => (
-            <label
-              key={protocol.id}
-              className={`flex items-center space-x-3 p-3 cursor-pointer border-b border-gray-100 last:border-b-0 ${
-                isNoProtocolSelected 
-                  ? 'opacity-50 cursor-not-allowed hover:bg-gray-50' 
-                  : 'hover:bg-blue-50'
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={selectedProtocols && selectedProtocols.includes(protocol.id)}
-                onChange={() => toggleProtocol(protocol.id)}
-                disabled={isUpdating || isNoProtocolSelected}
-                className="rounded text-blue-600 focus:ring-blue-500"
-              />
-              <div className="flex-1">
-                <div className="font-medium text-sm text-gray-900">{protocol.name}</div>
-                <div className="text-xs text-gray-600">{protocol.description}</div>
+        <div className="absolute top-full left-0 right-0 mt-1 z-50">
+          <Card variant="elevated" padding="none" className="shadow-lg max-h-64 overflow-y-auto">
+            
+            {/* No Protocol Option */}
+            <div className="p-2 border-b border-gray-100">
+              <div className={cn(
+                "flex items-center space-x-2 p-2 rounded-md cursor-pointer transition-colors",
+                selectedProtocols.includes('no_protocol') 
+                  ? "bg-primary-50" 
+                  : "hover:bg-gray-50"
+              )}>
+                <Checkbox
+                  checked={selectedProtocols.includes('no_protocol')}
+                  onChange={() => toggleProtocol('no_protocol')}
+                  disabled={isUpdating}
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  No Protocol Filter
+                </span>
               </div>
-            </label>
-          ))}
-          
-          <div className="p-2 border-t border-gray-200 bg-gray-50">
-            <button
-              onClick={() => setIsOpen(false)}
-              className="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Done
-            </button>
-          </div>
+            </div>
+
+            {/* Protocol Options */}
+            <div className="p-2">
+              {protocols.map((protocol) => {
+                const isSelected = selectedProtocols.includes(protocol.id);
+                const isDisabled = selectedProtocols.includes('no_protocol') || isUpdating;
+                
+                return (
+                  <div
+                    key={protocol.id}
+                    className={cn(
+                      "flex items-center space-x-2 p-2 rounded-md cursor-pointer transition-colors",
+                      isSelected && !isDisabled && "bg-primary-50",
+                      isDisabled ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
+                    )}
+                    onClick={() => !isDisabled && toggleProtocol(protocol.id)}
+                  >
+                    <Checkbox
+                      checked={isSelected}
+                      disabled={isDisabled}
+                      onChange={() => !isDisabled && toggleProtocol(protocol.id)}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-700 truncate">
+                        {protocol.name}
+                      </p>
+                      {protocol.description && (
+                        <p className="text-xs text-gray-500 truncate">
+                          {protocol.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Footer */}
+            <div className="p-2 border-t border-gray-100 bg-gray-50">
+              <p className="text-xs text-gray-500 text-center">
+                {selectedProtocols.length === 0 
+                  ? "Showing all protocol data"
+                  : `Filtering by ${selectedProtocols.length} protocol${selectedProtocols.length > 1 ? 's' : ''}`
+                }
+              </p>
+            </div>
+          </Card>
         </div>
       )}
     </div>

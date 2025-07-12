@@ -190,10 +190,10 @@ const CorrelationInsights = () => {
             onChange={(e) => setTimeframeFilter(parseInt(e.target.value))}
             className="text-sm"
           >
-            <option value={30}>Last 30 days</option>
-            <option value={90}>Last 3 months</option>
-            <option value={180}>Last 6 months</option>
-            <option value={365}>Last year</option>
+            <Select.Option value={30}>Last 30 days</Select.Option>
+            <Select.Option value={90}>Last 3 months</Select.Option>
+            <Select.Option value={180}>Last 6 months</Select.Option>
+            <Select.Option value={365}>Last year</Select.Option>
           </Select>
         </div>
       </div>

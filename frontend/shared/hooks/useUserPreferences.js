@@ -54,8 +54,12 @@ const useUserPreferences = () => {
         if (preferencesData && typeof preferencesData === 'object' && Object.keys(preferencesData).length > 0) {
           // Merge with defaults to ensure all required fields exist
           const mergedPreferences = { ...getDefaultPreferences(), ...preferencesData };
+          console.log('🔍 Debug - API Response:', preferencesData);
+          console.log('🔍 Debug - Merged Preferences:', mergedPreferences);
+          console.log('🔍 Debug - Setup Complete:', mergedPreferences.setup_complete);
           setPreferences(mergedPreferences);
         } else {
+          console.log('🔍 Debug - Using default preferences');
           setPreferences(getDefaultPreferences());
         }
       } catch (error) {

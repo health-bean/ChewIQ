@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { Loader2, Mail, Lock, Rocket } from 'lucide-react';
-import { Button, Input, Alert } from '../../../../shared/components/ui';
+import { Button, Input, Alert, FormField, PasswordInput, Card } from '../../../../shared/components/ui';
+import { cn } from '../../../../shared/design-system';
 import useAuth from '../../../../shared/hooks/useAuth';
 
 const LoginPage = () => {
@@ -47,45 +48,39 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!email || !password) {
-      setError('Please enter both email and password');
+      setError('Please fill in all fields');
       return;
     }
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      const result = await login(email, password);
-      
-      if (result.success) {
-        console.log('Login successful, redirecting to app...');
-        // Auth provider will handle state change, App.jsx will re-render
-      } else {
-        setError(result.error || 'Login failed');
-      }
-    } catch (error) {
-      setError('An unexpected error occurred');
+      await login(email, password);
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDemoUserClick = (userEmail) => {
-    setEmail(userEmail);
+  const handleDemoLogin = (demoEmail) => {
+    setEmail(demoEmail);
+    setPassword('demo123');
     setError(null);
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white min-h-screen">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 text-center">
+    <div className="bg-gray-50 min-h-screen">
+      {/* Header - Using design system colors */}
+      <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-6 text-center">
         <div className="flex items-center justify-center mb-4">
           <Rocket className="mr-2" size={32} />
           <h1 className="text-2xl font-bold">FILO Health</h1>
         </div>
-        <p className="text-blue-100">Your Personal Health Journey</p>
+        <p className="text-primary-100">Your Personal Health Journey</p>
       </div>
 
       {/* Login Form */}
@@ -94,13 +89,16 @@ const LoginPage = () => {
           Welcome Back
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
-            </label>
+        {error && (
+          <Alert variant="error" className="mb-4" dismissible onDismiss={() => setError(null)}>
+            {error}
+          </Alert>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <FormField label="Email Address" required>
             <div className="relative">
-              <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 type="email"
                 value={email}
@@ -110,16 +108,12 @@ const LoginPage = () => {
                 disabled={isLoading}
               />
             </div>
-          </div>
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
+          <FormField label="Password" required>
             <div className="relative">
-              <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                type="password"
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
@@ -127,28 +121,16 @@ const LoginPage = () => {
                 disabled={isLoading}
               />
             </div>
-          </div>
-
-          {error && (
-            <Alert variant="danger" className="text-sm">
-              {error}
-            </Alert>
-          )}
+          </FormField>
 
           <Button
             type="submit"
             variant="primary"
-            disabled={isLoading}
+            size="lg"
+            loading={isLoading}
             className="w-full"
           >
-            {isLoading ? (
-              <>
-                <Loader2 className="animate-spin mr-2" size={16} />
-                Signing In...
-              </>
-            ) : (
-              'Sign In'
-            )}
+            {isLoading ? 'Signing In...' : 'Sign In'}
           </Button>
         </form>
 
@@ -159,42 +141,55 @@ const LoginPage = () => {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Demo Accounts</span>
+              <span className="px-2 bg-gray-50 text-gray-500">Demo Accounts</span>
             </div>
           </div>
 
           <div className="mt-6 space-y-3">
-            <p className="text-sm text-gray-600 text-center mb-4">
-              Click any user to demo their health journey
-            </p>
-            
             {demoUsers.map((user, index) => (
-              <div
-                key={index}
-                onClick={() => handleDemoUserClick(user.email)}
-                className="cursor-pointer p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
+              <Card 
+                key={index} 
+                variant="outlined" 
+                padding="sm"
+                className={cn(
+                  "cursor-pointer transition-all duration-200 hover:shadow-md hover:border-primary-300",
+                  "focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2"
+                )}
+                onClick={() => handleDemoLogin(user.email)}
               >
-                <div className="flex items-center">
-                  <div className="text-2xl mr-3">{user.avatar}</div>
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900">{user.name}</div>
-                    <div className="text-sm text-gray-500">{user.email}</div>
-                    <div className="text-xs text-blue-600">{user.protocol}</div>
+                <div className="flex items-center space-x-3">
+                  <div className="text-2xl">{user.avatar}</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {user.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {user.entries}
+                    </p>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium text-gray-700">{user.entries}</div>
-                    <div className="text-xs text-gray-500">6+ months</div>
+                  <div className="text-xs text-primary-600 font-medium">
+                    Try Demo
                   </div>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
 
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 text-center mt-1">
-              All demo accounts use the same password for easy access
+          <div className="mt-6 text-center">
+            <p className="text-xs text-gray-500">
+              Demo accounts showcase different health protocols and data patterns
             </p>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{' '}
+            <button className="text-primary-600 hover:text-primary-700 font-medium">
+              Sign up here
+            </button>
+          </p>
         </div>
       </div>
     </div>

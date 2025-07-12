@@ -1,38 +1,85 @@
 import React from 'react';
-import { Info, CheckCircle2, AlertCircle, X } from 'lucide-react';
+import { AlertCircle, CheckCircle, Info, AlertTriangle, X } from 'lucide-react';
+import { cn, cardVariants } from '../../design-system';
 
-const Alert = ({ 
-  variant = 'info', 
-  title, 
-  children, 
-  dismissible = false, 
+const Alert = ({
+  variant = 'info',
+  title,
+  children,
+  dismissible = false,
   onDismiss,
-  className = ''
+  className,
+  ...props
 }) => {
   const variants = {
-    info: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-800', icon: Info },
-    success: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-800', icon: CheckCircle2 },
-    warning: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-800', icon: AlertCircle },
-    danger: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-800', icon: AlertCircle }
+    info: {
+      container: 'border-blue-200 bg-blue-50 text-blue-800',
+      icon: 'text-blue-600',
+      IconComponent: Info,
+    },
+    success: {
+      container: 'border-green-200 bg-green-50 text-green-800',
+      icon: 'text-green-600',
+      IconComponent: CheckCircle,
+    },
+    warning: {
+      container: 'border-yellow-200 bg-yellow-50 text-yellow-800',
+      icon: 'text-yellow-600',
+      IconComponent: AlertTriangle,
+    },
+    error: {
+      container: 'border-red-200 bg-red-50 text-red-800',
+      icon: 'text-red-600',
+      IconComponent: AlertCircle,
+    },
   };
 
-  const config = variants[variant];
-  const Icon = config.icon;
+  const { container, icon, IconComponent } = variants[variant];
 
   return (
-    <div className={`${config.bg} ${config.border} border rounded-lg p-4 ${className}`}>
-      <div className="flex items-start space-x-3">
-        <Icon size={20} className={config.text} />
-        <div className="flex-1">
-          {title && (
-            <h4 className={`text-sm font-medium ${config.text} mb-1`}>{title}</h4>
-          )}
-          <div className={`text-sm ${config.text}`}>{children}</div>
+    <div
+      className={cn(
+        'rounded-lg border p-4',
+        container,
+        className
+      )}
+      {...props}
+    >
+      <div className="flex">
+        <div className="flex-shrink-0">
+          <IconComponent className={cn('h-5 w-5', icon)} />
         </div>
+        
+        <div className="ml-3 flex-1">
+          {title && (
+            <h3 className="text-sm font-medium mb-1">
+              {title}
+            </h3>
+          )}
+          
+          <div className="text-sm">
+            {children}
+          </div>
+        </div>
+        
         {dismissible && (
-          <button onClick={onDismiss} className={`${config.text} hover:opacity-75`}>
-            <X size={16} />
-          </button>
+          <div className="ml-auto pl-3">
+            <div className="-mx-1.5 -my-1.5">
+              <button
+                type="button"
+                onClick={onDismiss}
+                className={cn(
+                  'inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2',
+                  variant === 'info' && 'text-blue-500 hover:bg-blue-100 focus:ring-blue-600',
+                  variant === 'success' && 'text-green-500 hover:bg-green-100 focus:ring-green-600',
+                  variant === 'warning' && 'text-yellow-500 hover:bg-yellow-100 focus:ring-yellow-600',
+                  variant === 'error' && 'text-red-500 hover:bg-red-100 focus:ring-red-600'
+                )}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

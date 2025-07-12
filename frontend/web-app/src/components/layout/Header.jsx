@@ -2,7 +2,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Calendar, ChevronDown, User, Settings, LogOut } from 'lucide-react';
-import { Input, Button } from '../../../../shared/components/ui';
+import { Input, Button, Card } from '../../../../shared/components/ui';
+import { cn } from '../../../../shared/design-system';
 import useAuth from '../../../../shared/hooks/useAuth';
 import MultiSelectProtocolDropdown from '../common/MultiSelectProtocolDropdown';
 
@@ -32,124 +33,109 @@ const Header = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const selectedProtocolObjects = protocols.filter(p => 
-    selectedProtocols && selectedProtocols.includes(p.id)
-  );
-
   const handleLogout = async () => {
-    setShowUserDropdown(false);
-    await logout();
-  };
-
-  const handlePreferences = () => {
-    setShowUserDropdown(false);
-    onPreferencesClick();
-  };
-
-  const getUserAvatar = () => {
-    if (!user) return '👤';
-    switch (user.firstName) {
-      case 'Sarah': return '👩‍💼';
-      case 'Mike': return '👨‍💻';
-      case 'Lisa': return '👩‍🔬';
-      case 'John': return '👨‍🍳';
-      case 'Emma': return '👩‍⚕️';
-      default: return '👤';
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
     }
   };
 
   return (
-    <div className="bg-blue-600 text-white p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <h1 className="text-xl font-bold">🚀 FILO Health Journal</h1>
-          <Calendar size={20} className="ml-2" />
-        </div>
-        
-        {/* User Profile Dropdown */}
-        {user && (
+    <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
+      <div className="px-4 py-3">
+        <div className="flex items-center justify-between">
+          {/* Date Selector */}
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => onDateChange(e.target.value)}
+                className="pl-10 pr-3 py-2 text-sm w-36"
+                size="sm"
+              />
+            </div>
+          </div>
+
+          {/* User Menu */}
           <div className="relative" ref={dropdownRef}>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowUserDropdown(!showUserDropdown)}
-              className="flex items-center text-white hover:bg-blue-700 px-3 py-2 rounded-lg"
+              className="flex items-center space-x-2 p-2"
             >
-              <span className="text-lg mr-2">{getUserAvatar()}</span>
-              <span className="font-medium mr-1">{user.firstName}</span>
-              <ChevronDown size={16} />
+              <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-white" />
+              </div>
+              <ChevronDown className={cn(
+                "w-4 h-4 text-gray-400 transition-transform duration-200",
+                showUserDropdown && "rotate-180"
+              )} />
             </Button>
 
+            {/* Dropdown Menu */}
             {showUserDropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                {/* User Info */}
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <div className="flex items-center">
-                    <span className="text-lg mr-2">{getUserAvatar()}</span>
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        {user.firstName} {user.lastName}
+              <div className="absolute right-0 mt-2 w-64 z-50">
+                <Card variant="elevated" padding="none" className="shadow-lg">
+                  {/* User Info */}
+                  <div className="p-4 border-b border-gray-100">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center">
+                        <User className="w-5 h-5 text-white" />
                       </div>
-                      <div className="text-sm text-gray-600">
-                        {user.email}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {user?.firstName} {user?.lastName}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {user?.email}
+                        </p>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Menu Items */}
-                <button
-                  onClick={handlePreferences}
-                  className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center"
-                >
-                  <Settings size={16} className="mr-2" />
-                  Account Settings
-                </button>
-                
-                <button
-                  onClick={handleLogout}
-                  className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 flex items-center"
-                >
-                  <LogOut size={16} className="mr-2" />
-                  Logout
-                </button>
+                  {/* Menu Items */}
+                  <div className="py-2">
+                    <button
+                      onClick={() => {
+                        onPreferencesClick();
+                        setShowUserDropdown(false);
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-3 transition-colors"
+                    >
+                      <Settings className="w-4 h-4 text-gray-400" />
+                      <span>Preferences</span>
+                    </button>
+                    
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-3 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4 text-red-500" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </Card>
               </div>
             )}
           </div>
-        )}
-      </div>
-      
-      <Input
-        type="date"
-        value={selectedDate}
-        onChange={(e) => onDateChange(e.target.value)}
-        className="mt-2 text-gray-900 focus:ring-2 focus:ring-blue-300"
-      />
-      
-      {/* Multi-Protocol Selection */}
-      {!protocolsLoading && protocols.length > 0 && (
+        </div>
+
+        {/* Protocol Filter */}
         <div className="mt-3">
-          <label className="block text-sm font-medium text-white mb-1">Active Protocols</label>
           <MultiSelectProtocolDropdown
             protocols={protocols}
             selectedProtocols={selectedProtocols}
-            onSelectionChange={onProtocolChange}
+            onProtocolChange={onProtocolChange}
+            loading={protocolsLoading}
+            error={protocolsError}
           />
-          {selectedProtocolObjects.length > 0 && (
-            <p className="text-xs text-blue-100 mt-1">
-              {selectedProtocolObjects.map(p => p.name).join(' + ')}
-            </p>
-          )}
         </div>
-      )}
-
-      {/* Error Display */}
-      {protocolsError && (
-        <div className="mt-2 text-xs text-red-200">
-          Unable to load protocols: {protocolsError}
-        </div>
-      )}
-    </div>
+      </div>
+    </header>
   );
 };
 

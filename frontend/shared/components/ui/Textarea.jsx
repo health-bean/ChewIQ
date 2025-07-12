@@ -1,36 +1,42 @@
 import React from 'react';
+import { cn, inputVariants } from '../../design-system';
 
-const Textarea = ({ 
-  placeholder = '',
-  value,
-  onChange,
+const Textarea = React.forwardRef(({
+  variant = 'default',
   disabled = false,
+  error = false,
   rows = 3,
-  className = '',
-  focusColor = 'blue', // blue, green, purple, orange, etc.
-  ...props 
-}) => {
-  const focusColors = {
-    blue: 'focus:ring-blue-500 focus:border-transparent',
-    green: 'focus:ring-green-500 focus:border-transparent',
-    purple: 'focus:ring-purple-500 focus:border-transparent',
-    orange: 'focus:ring-orange-500 focus:border-transparent',
-    indigo: 'focus:ring-indigo-500 focus:border-transparent',
-    teal: 'focus:ring-teal-500 focus:border-transparent',
-    pink: 'focus:ring-pink-500 focus:border-transparent'
+  resize = 'vertical',
+  className,
+  ...props
+}, ref) => {
+  // Resize options
+  const resizeClasses = {
+    none: 'resize-none',
+    vertical: 'resize-y',
+    horizontal: 'resize-x',
+    both: 'resize',
   };
+
+  // Determine variant based on error state
+  const textareaVariant = error ? 'error' : variant;
 
   return (
     <textarea
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-      disabled={disabled}
+      ref={ref}
       rows={rows}
-      className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 ${focusColors[focusColor]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
+      disabled={disabled}
+      className={cn(
+        inputVariants(textareaVariant),
+        'min-h-[80px] py-2',
+        resizeClasses[resize],
+        className
+      )}
       {...props}
     />
   );
-};
+});
+
+Textarea.displayName = 'Textarea';
 
 export default Textarea;

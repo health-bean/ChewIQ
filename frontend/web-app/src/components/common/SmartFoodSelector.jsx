@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
-import { Input } from '../../../../shared/components/ui';
+import { Search, Plus, Check, Loader2 } from 'lucide-react';
+import { Input, Button, Card } from '../../../../shared/components/ui';
+import { cn } from '../../../../shared/design-system';
 
 const SmartFoodSelector = ({ selectedItems, onToggleItem, selectedProtocols = [] }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,6 +30,7 @@ const SmartFoodSelector = ({ selectedItems, onToggleItem, selectedProtocols = []
         setFoods(data.foods || []);
       } catch (err) {
         console.error('Failed to load foods:', err);
+        setFoods([]);
       } finally {
         setLoading(false);
       }
@@ -38,10 +40,24 @@ const SmartFoodSelector = ({ selectedItems, onToggleItem, selectedProtocols = []
     return () => clearTimeout(timer);
   }, [searchTerm, selectedProtocols, API_BASE_URL]);
 
+  const isSelected = (food) => {
+    return selectedItems.some(item => item.name === food.name);
+  };
+
+  const handleToggleFood = (food) => {
+    onToggleItem({
+      id: food.id,
+      name: food.name,
+      category: food.category || 'Food',
+      protocol_allowed: food.protocol_allowed
+    });
+  };
+
   return (
     <div className="space-y-4">
+      {/* Search Input */}
       <div className="relative">
-        <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
         <Input
           placeholder="Search foods..."
           value={searchTerm}
@@ -50,61 +66,119 @@ const SmartFoodSelector = ({ selectedItems, onToggleItem, selectedProtocols = []
         />
       </div>
 
-      {loading && <div className="text-center py-4 text-gray-500">Searching foods...</div>}
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-4">
+          <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+          <span className="ml-2 text-sm text-gray-500">Searching foods...</span>
+        </div>
+      )}
 
-      <div className="max-h-64 overflow-y-auto space-y-2">
-        {foods.map((food) => {
-          const isSelected = selectedItems.includes(food.name);
-          
-          return (
-            <div key={food.id} className={`p-3 border rounded-lg cursor-pointer transition-all ${
-              isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-            }`} onClick={() => onToggleItem(food.name)}>
-              <div className="flex items-center space-x-2 mb-2">
-                <input
-                  type="checkbox"
-                  checked={isSelected}
-                  onChange={() => onToggleItem(food.name)}
-                  className="rounded text-blue-600 focus:ring-blue-500"
-                />
-                <span className="font-medium capitalize">{food.name}</span>
-                {food.protocol_status && (
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    food.protocol_status === 'allowed' ? 'bg-green-100 text-green-800' :
-                    food.protocol_status === 'avoid' ? 'bg-red-100 text-red-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {food.protocol_status === 'allowed' ? '✅ Allowed' :
-                     food.protocol_status === 'avoid' ? '❌ Avoid' : 
-                     '🟡 Reintroduction'}
-                  </span>
-                )}
-              </div>
+      {/* Search Results */}
+      {!loading && foods.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-gray-700">
+            Search Results ({foods.length})
+          </h4>
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {foods.map((food) => {
+              const selected = isSelected(food);
               
-              {food.protocol_notes && (
-                <p className="text-xs text-blue-600 mb-2 italic">{food.protocol_notes}</p>
-              )}
-              
-              <div className="flex flex-wrap gap-1">
-                {food.nightshade && (
-                  <span className="px-2 py-1 bg-red-100 text-red-800 rounded text-xs">Nightshade</span>
-                )}
-                <span className={`px-2 py-1 rounded text-xs ${
-                  food.histamine === 'high' ? 'bg-red-100 text-red-800' :
-                  food.histamine === 'moderate' ? 'bg-orange-100 text-orange-800' :
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {food.histamine} histamine
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+              return (
+                <Card
+                  key={food.id}
+                  variant="outlined"
+                  padding="sm"
+                  className={cn(
+                    "cursor-pointer transition-all duration-200 hover:shadow-sm",
+                    selected && "border-primary-300 bg-primary-50"
+                  )}
+                  onClick={() => handleToggleFood(food)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {food.name}
+                        </p>
+                        {food.category && (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                            {food.category}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Protocol Status */}
+                      {selectedProtocols.length > 0 && selectedProtocols[0] !== 'no_protocol' && (
+                        <div className="mt-1">
+                          {food.protocol_allowed ? (
+                            <span className="inline-flex items-center text-xs text-green-600">
+                              <Check className="w-3 h-3 mr-1" />
+                              Protocol friendly
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center text-xs text-yellow-600">
+                              ⚠️ Check protocol guidelines
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <Button
+                      variant={selected ? "success" : "outline"}
+                      size="sm"
+                      className="ml-3"
+                    >
+                      {selected ? (
+                        <>
+                          <Check className="w-4 h-4 mr-1" />
+                          Added
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-4 h-4 mr-1" />
+                          Add
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
-      {searchTerm && !loading && foods.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          <p>No foods found matching "{searchTerm}"</p>
+      {/* No Results */}
+      {!loading && searchTerm.trim() && foods.length === 0 && (
+        <div className="text-center py-6">
+          <p className="text-sm text-gray-500 mb-2">
+            No foods found for "{searchTerm}"
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleToggleFood({
+              id: `custom_${Date.now()}`,
+              name: searchTerm,
+              category: 'Custom',
+              protocol_allowed: null
+            })}
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            Add "{searchTerm}" as custom food
+          </Button>
+        </div>
+      )}
+
+      {/* Search Prompt */}
+      {!loading && !searchTerm.trim() && (
+        <div className="text-center py-6">
+          <Search className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">
+            Start typing to search for foods
+          </p>
         </div>
       )}
     </div>

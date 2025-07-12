@@ -1,38 +1,74 @@
 import React from 'react';
+import { cn, cardVariants } from '../../design-system';
 
-const Card = ({ 
-  title, 
-  subtitle, 
-  icon: Icon, 
+const Card = React.forwardRef(({
   variant = 'default',
-  children, 
-  className = '' 
-}) => {
-  const variants = {
-    default: 'bg-white border-gray-200',
-    primary: 'bg-blue-50 border-blue-200',
-    success: 'bg-green-50 border-green-200',
-    warning: 'bg-orange-50 border-orange-200',
-    purple: 'bg-purple-50 border-purple-200',
-    indigo: 'bg-indigo-50 border-indigo-200',
-    pink: 'bg-pink-50 border-pink-200',
-    teal: 'bg-teal-50 border-teal-200'
+  padding = 'default',
+  children,
+  className,
+  ...props
+}, ref) => {
+  // Padding variants
+  const paddingVariants = {
+    none: '',
+    sm: 'p-4',
+    default: 'p-6',
+    lg: 'p-8',
   };
 
   return (
-    <div className={`${variants[variant]} border rounded-lg p-4 ${className}`}>
-      {(title || subtitle || Icon) && (
-        <div className="flex items-center space-x-3 mb-3">
-          {Icon && <Icon size={20} className="text-gray-600" />}
-          <div>
-            {title && <h3 className="font-medium text-gray-900">{title}</h3>}
-            {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
-          </div>
-        </div>
+    <div
+      ref={ref}
+      className={cn(
+        cardVariants(variant),
+        paddingVariants[padding],
+        className
       )}
+      {...props}
+    >
       {children}
     </div>
   );
-};
+});
+
+Card.displayName = 'Card';
+
+// Card sub-components for better composition
+const CardHeader = ({ children, className, ...props }) => (
+  <div className={cn('flex flex-col space-y-1.5 pb-6', className)} {...props}>
+    {children}
+  </div>
+);
+
+const CardTitle = ({ children, className, ...props }) => (
+  <h3 className={cn('text-lg font-semibold leading-none tracking-tight', className)} {...props}>
+    {children}
+  </h3>
+);
+
+const CardDescription = ({ children, className, ...props }) => (
+  <p className={cn('text-sm text-gray-500', className)} {...props}>
+    {children}
+  </p>
+);
+
+const CardContent = ({ children, className, ...props }) => (
+  <div className={cn('pt-0', className)} {...props}>
+    {children}
+  </div>
+);
+
+const CardFooter = ({ children, className, ...props }) => (
+  <div className={cn('flex items-center pt-6', className)} {...props}>
+    {children}
+  </div>
+);
+
+// Export all components
+Card.Header = CardHeader;
+Card.Title = CardTitle;
+Card.Description = CardDescription;
+Card.Content = CardContent;
+Card.Footer = CardFooter;
 
 export default Card;

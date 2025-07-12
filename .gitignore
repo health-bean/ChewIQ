@@ -136,7 +136,7 @@ dist
 .pnp.*
 
 # Mac system files
-.DS_Store
+**/.DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
@@ -160,26 +160,11 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 
-# Documentation build files (we'll add these later)
-docs/build/
-docs/.docusaurus/
-.DS_Store
-frontend/shared/components/.DS_Store
-frontend/.DS_Store
-.DS_Store
-backend/.DS_Store
-backend/.DS_Store
-backend/functions/.DS_Store
-backend/functions/api/.DS_Store
-backend/functions/api/.DS_Store
+# Build files
 *.zip
 backend/functions/api/*.zip
-**/.DS_Store
-frontend/practioner-dashboard/.DS_Store
-frontend/shared/.DS_Store
-frontend/shared/.DS_Store
-frontend/shared/.DS_Store
-frontend/shared/.DS_Store
-frontend/shared/.DS_Store
-frontend/shared/.DS_Store
-frontend/shared/.DS_Store
+
+# AI Analysis and Documentation
+docs/ai-analysis/
+docs/build/
+docs/.docusaurus/

@@ -69,9 +69,20 @@ const MainApp = () => {
 
   // Show setup if authenticated and not completed OR manually triggered
   useEffect(() => {
+    console.log('🔍 Setup Effect Debug:', {
+      isAuthenticated,
+      isReady,
+      preferences,
+      setup_complete: preferences?.setup_complete
+    });
+    
     if (isAuthenticated && isReady && preferences) {
+      console.log('🔍 Checking setup_complete:', preferences.setup_complete);
       if (!preferences.setup_complete) {
+        console.log('🔍 Triggering setup wizard');
         handleSetupToggle();
+      } else {
+        console.log('🔍 Setup already complete, showing main app');
       }
     }
   }, [isAuthenticated, preferences, isReady]);
@@ -102,7 +113,7 @@ const MainApp = () => {
     );
   }
 
-  // Create safe preferences with defaults
+  // Create safe preferences with defaults (but don't override setup_complete!)
   const safePreferences = {
     protocols: [],
     quick_supplements: [],
@@ -110,8 +121,8 @@ const MainApp = () => {
     quick_foods: [],
     quick_symptoms: [],
     quick_detox: [],
-    setup_complete: false,
-    ...preferences
+    setup_complete: false, // Only use as default if not provided
+    ...preferences // This should override the defaults with real API data
   };
 
   // Entry form handlers

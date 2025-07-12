@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button } from '../../../../../shared/components/ui';
+import { Button, Checkbox, Card } from '../../../../../shared/components/ui';
+import { cn } from '../../../../../shared/design-system';
 
 const ProtocolsStep = ({ setupData, updateSetupData, protocols, onNext, onBack, isLast, disabled }) => {
   // Just sort protocols alphabetically - no filtering or hardcoding
@@ -31,89 +32,86 @@ const ProtocolsStep = ({ setupData, updateSetupData, protocols, onNext, onBack, 
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Choose Your Approach</h3>
-        <p className="text-sm text-gray-600">
-          Select healing protocols you're following, or track freely to discover your own patterns.
+      {/* Header */}
+      <div className="text-center">
+        <h3 className="text-2xl font-bold text-gray-900 mb-3">
+          Health Protocols
+        </h3>
+        <p className="text-gray-600">
+          Select any health protocols you're currently following or interested in exploring.
         </p>
       </div>
 
+      {/* Protocol Options */}
       <div className="space-y-3">
-        {/* No Protocol Option - Always Clickable */}
-        <label className={`flex items-start space-x-3 p-3 border rounded-lg cursor-pointer transition-colors ${
-          isNoProtocolSelected
-            ? 'border-purple-500 bg-purple-50' 
-            : 'border-gray-200 hover:border-gray-300'
-        }`}>
-          <input
-            type="checkbox"
+        {/* No Protocol Option */}
+        <Card 
+          variant="outlined" 
+          padding="sm"
+          className={cn(
+            "transition-all duration-200",
+            isNoProtocolSelected && "border-primary-300 bg-primary-50"
+          )}
+        >
+          <Checkbox
             checked={isNoProtocolSelected}
             onChange={(e) => handleProtocolChange('no_protocol', e.target.checked)}
-            className="mt-1 rounded text-purple-600 focus:ring-purple-500"
+            label="I'm not following any specific protocol"
+            description="Just want to track my general health and symptoms"
           />
-          <div>
-            <div className="font-medium">🔍 No Protocol</div>
-            <div className="text-sm text-gray-600">
-              Track your health journey freely to discover your own patterns and correlations.
-            </div>
-          </div>
-        </label>
+        </Card>
 
-        {/* Regular Protocols - Direct from Database */}
-        {availableProtocols.map((protocol) => (
-          <label
-            key={protocol.id}
-            className={`flex items-start space-x-3 p-3 border rounded-lg cursor-pointer transition-colors ${
-              setupData.protocols.includes(protocol.id)
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            <input
-              type="checkbox"
-              checked={setupData.protocols.includes(protocol.id)}
-              onChange={(e) => handleProtocolChange(protocol.id, e.target.checked)}
-              className="mt-1 rounded text-blue-600 focus:ring-blue-500"
-            />
-            <div>
-              <div className="font-medium">{protocol.name}</div>
-              <div className="text-sm text-gray-600">{protocol.description}</div>
-            </div>
-          </label>
-        ))}
+        {/* Available Protocols */}
+        {availableProtocols.map((protocol) => {
+          const isSelected = setupData.protocols.includes(protocol.id);
+          const isDisabled = isNoProtocolSelected;
+          
+          return (
+            <Card
+              key={protocol.id}
+              variant="outlined"
+              padding="sm"
+              className={cn(
+                "transition-all duration-200",
+                isSelected && !isDisabled && "border-primary-300 bg-primary-50",
+                isDisabled && "opacity-50"
+              )}
+            >
+              <Checkbox
+                checked={isSelected}
+                disabled={isDisabled}
+                onChange={(e) => handleProtocolChange(protocol.id, e.target.checked)}
+                label={protocol.name}
+                description={protocol.description}
+              />
+            </Card>
+          );
+        })}
       </div>
 
-      {isNoProtocolSelected && (
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-          <div className="flex items-start space-x-2">
-            <div className="text-purple-600 text-lg">💡</div>
-            <div className="text-sm text-purple-800">
-              <div className="font-medium">Free Tracking Mode</div>
-              <div className="text-purple-700">
-                You'll be able to track foods, symptoms, and activities without protocol restrictions. 
-                Our AI will still analyze your data to find personalized patterns and correlations.
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Info */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <p className="text-sm text-blue-800">
+          <strong>Don't see your protocol?</strong> No worries! You can track any foods, 
+          supplements, and symptoms regardless of the protocol you select.
+        </p>
+      </div>
 
-      {/* Navigation Buttons - Respect disabled prop */}
+      {/* Navigation */}
       <div className="flex space-x-3">
         <Button 
           variant="secondary" 
           onClick={onBack} 
-          disabled={disabled}
           className="flex-1"
         >
           Back
         </Button>
         <Button 
           onClick={onNext} 
-          disabled={disabled || setupData.protocols.length === 0}
           className="flex-1"
+          disabled={disabled}
         >
-          {isLast ? 'Complete Setup' : 'Next'}
+          {isLast ? 'Complete Setup' : 'Continue'}
         </Button>
       </div>
     </div>

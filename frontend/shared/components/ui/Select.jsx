@@ -1,35 +1,71 @@
 import React from 'react';
+import { ChevronDown } from 'lucide-react';
+import { cn, inputVariants } from '../../design-system';
 
-const Select = ({ 
-  value,
-  onChange,
+const Select = React.forwardRef(({
+  variant = 'default',
+  size = 'md',
   disabled = false,
-  className = '',
-  focusColor = 'blue', // blue, green, purple, orange, etc.
+  error = false,
+  placeholder = 'Select an option...',
   children,
-  ...props 
-}) => {
-  const focusColors = {
-    blue: 'focus:ring-blue-500 focus:border-transparent',
-    green: 'focus:ring-green-500 focus:border-transparent',
-    purple: 'focus:ring-purple-500 focus:border-transparent',
-    orange: 'focus:ring-orange-500 focus:border-transparent',
-    indigo: 'focus:ring-indigo-500 focus:border-transparent',
-    teal: 'focus:ring-teal-500 focus:border-transparent',
-    pink: 'focus:ring-pink-500 focus:border-transparent'
+  className,
+  ...props
+}, ref) => {
+  // Size classes
+  const sizeClasses = {
+    sm: 'h-8 px-2 text-sm',
+    md: 'h-10 px-3',
+    lg: 'h-12 px-4 text-lg',
   };
 
+  // Determine variant based on error state
+  const selectVariant = error ? 'error' : variant;
+
   return (
-    <select
-      value={value}
-      onChange={onChange}
-      disabled={disabled}
-      className={`w-full p-2 border border-gray-300 rounded-lg focus:ring-2 ${focusColors[focusColor]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
-      {...props}
-    >
-      {children}
-    </select>
+    <div className="relative">
+      <select
+        ref={ref}
+        disabled={disabled}
+        className={cn(
+          inputVariants(selectVariant),
+          sizeClasses[size],
+          'appearance-none bg-white pr-8 cursor-pointer',
+          disabled && 'cursor-not-allowed',
+          className
+        )}
+        {...props}
+      >
+        {placeholder && (
+          <option value="" disabled>
+            {placeholder}
+          </option>
+        )}
+        {children}
+      </select>
+      
+      {/* Custom dropdown arrow */}
+      <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+        <ChevronDown 
+          className={cn(
+            'h-4 w-4 text-gray-400',
+            disabled && 'opacity-50'
+          )} 
+        />
+      </div>
+    </div>
   );
-};
+});
+
+Select.displayName = 'Select';
+
+// Option component for better composition
+const SelectOption = ({ children, ...props }) => (
+  <option {...props}>
+    {children}
+  </option>
+);
+
+Select.Option = SelectOption;
 
 export default Select;

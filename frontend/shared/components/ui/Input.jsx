@@ -1,36 +1,40 @@
 import React from 'react';
+import { cn, inputVariants } from '../../design-system';
 
-const Input = ({ 
+const Input = React.forwardRef(({
   type = 'text',
-  placeholder = '',
-  value,
-  onChange,
+  variant = 'default',
+  size = 'md',
   disabled = false,
-  className = '',
-  focusColor = 'blue', // blue, green, purple, orange, etc.
-  ...props 
-}) => {
-  const focusColors = {
-    blue: 'focus:ring-blue-500 focus:border-transparent',
-    green: 'focus:ring-green-500 focus:border-transparent',
-    purple: 'focus:ring-purple-500 focus:border-transparent',
-    orange: 'focus:ring-orange-500 focus:border-transparent',
-    indigo: 'focus:ring-indigo-500 focus:border-transparent',
-    teal: 'focus:ring-teal-500 focus:border-transparent',
-    pink: 'focus:ring-pink-500 focus:border-transparent'
+  error = false,
+  className,
+  ...props
+}, ref) => {
+  // Size classes
+  const sizeClasses = {
+    sm: 'h-8 px-2 text-sm',
+    md: 'h-10 px-3',
+    lg: 'h-12 px-4 text-lg',
   };
+
+  // Determine variant based on error state
+  const inputVariant = error ? 'error' : variant;
 
   return (
     <input
+      ref={ref}
       type={type}
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
       disabled={disabled}
-      className={`w-full p-2 border border-gray-300 rounded-lg focus:ring-2 ${focusColors[focusColor]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
+      className={cn(
+        inputVariants(inputVariant),
+        sizeClasses[size],
+        className
+      )}
       {...props}
     />
   );
-};
+});
+
+Input.displayName = 'Input';
 
 export default Input;
