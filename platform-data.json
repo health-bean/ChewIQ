@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2025-07-13T20:48:17.413Z",
+    "generated": "2025-07-13T22:18:12.748Z",
     "version": "1.0.0",
     "generator": "AutomatedProfessionalDocsGenerator"
   },
@@ -11,13 +11,13 @@
     "status": "Active Development"
   },
   "statistics": {
-    "totalComponents": 36,
+    "totalComponents": 37,
     "totalHooks": 12,
-    "totalFiles": 79,
-    "workingAPIs": 8,
+    "totalFiles": 80,
+    "workingAPIs": 7,
     "totalAPIs": 28,
-    "totalTables": 21,
-    "totalCommits": 84,
+    "totalTables": 22,
+    "totalCommits": 85,
     "contributors": 1
   },
   "discoveredInfo": {
@@ -51,10 +51,11 @@
         "last",
         "protocols",
         "protocol_food_rules",
+        "journal",
+        "SET",
         "user_protocols",
         "food_properties",
         "user",
-        "SET",
         "foods",
         "reflections",
         "correlations",
@@ -129,7 +130,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 4334,
+          "responseTime": 4538,
           "responseData": {
             "insights": [
               {
@@ -683,7 +684,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 93,
+          "responseTime": 110,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -732,41 +733,13 @@
               "value": "chicken"
             }
           ],
-          "status": 200,
-          "working": true,
-          "responseTime": 83,
+          "status": 500,
+          "working": false,
+          "responseTime": 115,
           "responseData": {
-            "foods": [
-              {
-                "id": "0e90ea7d-0b53-40a5-88bf-d601d056868e",
-                "name": "chicken",
-                "category": "protein",
-                "nightshade": false,
-                "histamine": "low",
-                "oxalate": "low",
-                "lectin": "low",
-                "fodmap": "low",
-                "salicylate": "low",
-                "compliance_status": "unknown"
-              },
-              {
-                "id": "d83e2241-ff9d-4f1c-a25c-92743c62b2e6",
-                "name": "chicken thigh",
-                "category": "protein",
-                "nightshade": false,
-                "histamine": "low",
-                "oxalate": "low",
-                "lectin": "low",
-                "fodmap": "low",
-                "salicylate": "low",
-                "compliance_status": "unknown"
-              }
-            ],
-            "total": 2,
-            "search_term": "chicken",
-            "protocol_id": null
+            "error": "Failed to complete search foods"
           },
-          "responseSize": 502
+          "responseSize": 43
         },
         {
           "path": "/api/v1/protocols",
@@ -782,7 +755,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 70,
+          "responseTime": 187,
           "responseData": {
             "protocols": [
               {
@@ -956,7 +929,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 60,
+          "responseTime": 254,
           "responseData": {
             "error": "Authentication required"
           },
@@ -976,7 +949,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 56,
+          "responseTime": 248,
           "responseData": {
             "error": "Authentication required"
           },
@@ -996,7 +969,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 52,
+          "responseTime": 108,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1047,7 +1020,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 76,
+          "responseTime": 234,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1093,7 +1066,7 @@
           "params": [],
           "status": 400,
           "working": false,
-          "responseTime": 67,
+          "responseTime": 98,
           "responseData": {
             "error": "Email and password required"
           },
@@ -1108,7 +1081,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 54,
+          "responseTime": 231,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1154,7 +1127,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 50,
+          "responseTime": 106,
           "responseData": {
             "error": "No authorization header"
           },
@@ -1169,7 +1142,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 59,
+          "responseTime": 239,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1215,7 +1188,7 @@
           "params": [],
           "status": 400,
           "working": false,
-          "responseTime": 75,
+          "responseTime": 111,
           "responseData": {
             "error": "Missing required fields"
           },
@@ -1230,7 +1203,7 @@
           "params": [],
           "status": 400,
           "working": false,
-          "responseTime": 135,
+          "responseTime": 112,
           "responseData": {
             "error": "Email and password required"
           },
@@ -1245,7 +1218,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 51,
+          "responseTime": 106,
           "responseData": {
             "error": "Authentication required"
           },
@@ -1265,7 +1238,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 49,
+          "responseTime": 248,
           "responseData": {
             "error": "Authentication required"
           },
@@ -1285,7 +1258,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 48,
+          "responseTime": 275,
           "responseData": {
             "error": "Authentication required"
           },
@@ -1305,7 +1278,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 81,
+          "responseTime": 182,
           "responseData": {
             "foods": [
               {
@@ -5212,13 +5185,14 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 58,
+          "responseTime": 103,
           "responseData": {
             "symptoms": [],
             "total": 0,
-            "search_term": "chicken"
+            "search_term": "chicken",
+            "user_history_included": false
           },
-          "responseSize": 49
+          "responseSize": 79
         },
         {
           "path": "/api/v1/supplements/search",
@@ -5234,7 +5208,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 50,
+          "responseTime": 99,
           "responseData": {
             "supplements": [],
             "total": 0,
@@ -5256,7 +5230,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 52,
+          "responseTime": 242,
           "responseData": {
             "medications": [],
             "total": 0,
@@ -5278,7 +5252,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 80,
+          "responseTime": 234,
           "responseData": {
             "detox_types": [],
             "total": 0,
@@ -5295,7 +5269,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 51,
+          "responseTime": 97,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -5341,11 +5315,11 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 58,
+          "responseTime": 102,
           "responseData": {
-            "error": "Internal server error: handleGetJournalEntries is not a function"
+            "error": "Failed to complete get journal entries"
           },
-          "responseSize": 76
+          "responseSize": 50
         },
         {
           "path": "/api/v1/journal/entries/",
@@ -5356,11 +5330,11 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 48,
+          "responseTime": 258,
           "responseData": {
-            "error": "Internal server error: handleGetJournalEntry is not a function"
+            "error": "Failed to complete get journal entry"
           },
-          "responseSize": 74
+          "responseSize": 48
         },
         {
           "path": "/api/v1/symptoms",
@@ -5371,7 +5345,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 48,
+          "responseTime": 103,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -5417,7 +5391,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 73,
+          "responseTime": 102,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -5463,7 +5437,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 63,
+          "responseTime": 233,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -5501,7 +5475,7 @@
           "responseSize": 842
         }
       ],
-      "workingCount": 8,
+      "workingCount": 7,
       "totalCount": 28,
       "categories": {
         "AI": {
@@ -5513,7 +5487,7 @@
           "total": 2
         },
         "Foods": {
-          "working": 1,
+          "working": 0,
           "total": 1
         },
         "Protocols": {
@@ -5635,7 +5609,7 @@
     "fileStructure": {
       "frontend": {
         "frontend/web-app": {
-          "totalFiles": 45,
+          "totalFiles": 46,
           "fileTypes": {
             ".development": 1,
             ".production": 1,
@@ -5646,7 +5620,7 @@
             ".html": 1,
             ".svg": 2,
             ".css": 2,
-            ".jsx": 25
+            ".jsx": 26
           },
           "components": [
             {
@@ -5693,7 +5667,16 @@
             {
               "name": "SmartFoodSelector",
               "path": "frontend/web-app/src/components/common/SmartFoodSelector.jsx",
-              "size": 6993,
+              "size": 7300,
+              "hooks": [
+                "useState",
+                "useEffect"
+              ]
+            },
+            {
+              "name": "SmartSymptomSelector",
+              "path": "frontend/web-app/src/components/common/SmartSymptomSelector.jsx",
+              "size": 7105,
               "hooks": [
                 "useState",
                 "useEffect"
@@ -5767,7 +5750,7 @@
             {
               "name": "ReflectionView",
               "path": "frontend/web-app/src/features/reflection/ReflectionView.jsx",
-              "size": 10798,
+              "size": 12002,
               "hooks": []
             },
             {
@@ -5866,7 +5849,7 @@
             }
           ],
           "utilities": [],
-          "size": "326.83 KB"
+          "size": "335.25 KB"
         },
         "frontend/shared": {
           "totalFiles": 34,
@@ -6020,7 +6003,7 @@
             }
           ],
           "utilities": [],
-          "size": "133.75 KB"
+          "size": "145.98 KB"
         },
         "backend/functions": {
           "totalFiles": 23,
@@ -6037,7 +6020,7 @@
             }
           ],
           "utilities": [],
-          "size": "133.75 KB"
+          "size": "145.98 KB"
         },
         "backend": {
           "totalFiles": 27,
@@ -6057,7 +6040,7 @@
             }
           ],
           "utilities": [],
-          "size": "151.38 KB"
+          "size": "163.6 KB"
         }
       },
       "shared": {},
@@ -6150,18 +6133,18 @@
       "repository": "https://github.com/deebyrne26/health-platform",
       "branch": "main",
       "lastCommit": {
-        "hash": "359b3ee",
-        "message": "User Pref issues",
+        "hash": "ec94cfb",
+        "message": "Cool stuff",
         "author": "deebyrne26",
-        "date": "Sun Jul 13 16:47:44 2025 -0400"
+        "date": "Sun Jul 13 18:17:36 2025 -0400"
       },
       "contributors": [
         {
           "name": "deebyrne26",
-          "commits": 84
+          "commits": 85
         }
       ],
-      "totalCommits": 84
+      "totalCommits": 85
     }
   }
 }
