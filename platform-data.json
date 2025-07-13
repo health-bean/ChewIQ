@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2025-07-13T01:53:36.555Z",
+    "generated": "2025-07-13T02:40:53.569Z",
     "version": "1.0.0",
     "generator": "AutomatedProfessionalDocsGenerator"
   },
@@ -17,7 +17,7 @@
     "workingAPIs": 0,
     "totalAPIs": 27,
     "totalTables": 21,
-    "totalCommits": 63,
+    "totalCommits": 67,
     "contributors": 1
   },
   "discoveredInfo": {
@@ -129,7 +129,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 994,
+          "responseTime": 817,
           "responseData": {
             "message": "Internal server error"
           },
@@ -144,7 +144,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 387,
+          "responseTime": 430,
           "responseData": {
             "message": "Internal server error"
           },
@@ -164,7 +164,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 399,
+          "responseTime": 275,
           "responseData": {
             "message": "Internal server error"
           },
@@ -184,7 +184,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 376,
+          "responseTime": 363,
           "responseData": {
             "message": "Internal server error"
           },
@@ -204,7 +204,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 367,
+          "responseTime": 259,
           "responseData": {
             "message": "Internal server error"
           },
@@ -224,7 +224,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 387,
+          "responseTime": 371,
           "responseData": {
             "message": "Internal server error"
           },
@@ -244,7 +244,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 394,
+          "responseTime": 240,
           "responseData": {
             "message": "Internal server error"
           },
@@ -264,7 +264,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 364,
+          "responseTime": 361,
           "responseData": {
             "message": "Internal server error"
           },
@@ -279,7 +279,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 417,
+          "responseTime": 282,
           "responseData": {
             "message": "Internal server error"
           },
@@ -294,7 +294,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 392,
+          "responseTime": 432,
           "responseData": {
             "message": "Internal server error"
           },
@@ -309,7 +309,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 394,
+          "responseTime": 366,
           "responseData": {
             "message": "Internal server error"
           },
@@ -324,7 +324,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 410,
+          "responseTime": 372,
           "responseData": {
             "message": "Internal server error"
           },
@@ -339,7 +339,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 367,
+          "responseTime": 386,
           "responseData": {
             "message": "Internal server error"
           },
@@ -354,7 +354,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 367,
+          "responseTime": 255,
           "responseData": {
             "message": "Internal server error"
           },
@@ -369,7 +369,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 419,
+          "responseTime": 230,
           "responseData": {
             "message": "Internal server error"
           },
@@ -389,7 +389,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 344,
+          "responseTime": 240,
           "responseData": {
             "message": "Internal server error"
           },
@@ -409,7 +409,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 396,
+          "responseTime": 370,
           "responseData": {
             "message": "Internal server error"
           },
@@ -429,7 +429,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 355,
+          "responseTime": 297,
           "responseData": {
             "message": "Internal server error"
           },
@@ -449,7 +449,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 400,
+          "responseTime": 279,
           "responseData": {
             "message": "Internal server error"
           },
@@ -469,7 +469,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 359,
+          "responseTime": 232,
           "responseData": {
             "message": "Internal server error"
           },
@@ -489,7 +489,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 404,
+          "responseTime": 239,
           "responseData": {
             "message": "Internal server error"
           },
@@ -509,7 +509,7 @@
           ],
           "status": 502,
           "working": false,
-          "responseTime": 358,
+          "responseTime": 242,
           "responseData": {
             "message": "Internal server error"
           },
@@ -524,7 +524,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 358,
+          "responseTime": 227,
           "responseData": {
             "message": "Internal server error"
           },
@@ -539,7 +539,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 355,
+          "responseTime": 287,
           "responseData": {
             "message": "Internal server error"
           },
@@ -554,7 +554,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 408,
+          "responseTime": 230,
           "responseData": {
             "message": "Internal server error"
           },
@@ -569,7 +569,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 373,
+          "responseTime": 235,
           "responseData": {
             "message": "Internal server error"
           },
@@ -584,7 +584,7 @@
           "params": [],
           "status": 502,
           "working": false,
-          "responseTime": 398,
+          "responseTime": 364,
           "responseData": {
             "message": "Internal server error"
           },
@@ -1080,26 +1080,42 @@
       },
       "backend": {
         "backend/functions/api": {
-          "totalFiles": 20,
+          "totalFiles": 12,
           "fileTypes": {
-            ".js": 18,
-            ".json": 2
+            ".js": 12
           },
           "components": [],
           "hooks": [
             {
               "name": "users",
               "path": "backend/functions/api/handlers/users.js",
-              "size": 8044
+              "size": 8096
             }
           ],
           "utilities": [],
-          "size": "115.46 KB"
+          "size": "88.19 KB"
         },
         "backend/functions": {
+          "totalFiles": 12,
+          "fileTypes": {
+            ".js": 12
+          },
+          "components": [],
+          "hooks": [
+            {
+              "name": "users",
+              "path": "backend/functions/api/handlers/users.js",
+              "size": 8096
+            }
+          ],
+          "utilities": [],
+          "size": "88.19 KB"
+        },
+        "backend": {
           "totalFiles": 20,
           "fileTypes": {
-            ".js": 18,
+            ".js": 17,
+            ".sh": 1,
             ".json": 2
           },
           "components": [],
@@ -1107,35 +1123,17 @@
             {
               "name": "users",
               "path": "backend/functions/api/handlers/users.js",
-              "size": 8044
+              "size": 8096
             }
           ],
           "utilities": [],
-          "size": "115.46 KB"
-        },
-        "backend": {
-          "totalFiles": 21,
-          "fileTypes": {
-            ".js": 18,
-            ".json": 2,
-            ".sh": 1
-          },
-          "components": [],
-          "hooks": [
-            {
-              "name": "users",
-              "path": "backend/functions/api/handlers/users.js",
-              "size": 8044
-            }
-          ],
-          "utilities": [],
-          "size": "116.13 KB"
+          "size": "116.55 KB"
         }
       },
       "shared": {},
       "configs": {
         "package.json": [
-          "backend/functions/api/package.json",
+          "backend/shared/package.json",
           "docs/package.json",
           "frontend/shared/package.json",
           "frontend/web-app/package.json"
@@ -1158,7 +1156,7 @@
       "docs": {}
     },
     "packages": {
-      "backend/functions/api/package.json": {
+      "backend/shared/package.json": {
         "name": "health-platform-test-db",
         "version": "1.0.0",
         "scripts": [],
@@ -1214,18 +1212,18 @@
       "repository": "https://github.com/deebyrne26/health-platform",
       "branch": "main",
       "lastCommit": {
-        "hash": "4aaf996",
-        "message": "Security fixes.",
+        "hash": "b81812f",
+        "message": "🔧 Fix deployment workflow paths",
         "author": "deebyrne26",
-        "date": "Sat Jul 12 21:52:59 2025 -0400"
+        "date": "Sat Jul 12 22:40:03 2025 -0400"
       },
       "contributors": [
         {
           "name": "deebyrne26",
-          "commits": 63
+          "commits": 67
         }
       ],
-      "totalCommits": 63
+      "totalCommits": 67
     }
   }
 }
