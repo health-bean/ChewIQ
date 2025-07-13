@@ -7,7 +7,7 @@ const TimelineEntry = ({ entry }) => {
     // Handle null/undefined
     if (!content) return 'No content';
     
-    // Handle strings
+    // Handle strings (new format or simple text)
     if (typeof content === 'string') {
       return content;
     }
@@ -18,11 +18,17 @@ const TimelineEntry = ({ entry }) => {
     }
     
     if (typeof content === 'object' && content !== null) {
-      // Handle structured content with name
+      // Handle structured food content with name and category
       if (content.name) {
         const parts = [content.name];
         
-        if (content.amount) parts.push(`(${content.amount})`);
+        // Add category if available
+        if (content.category && content.category !== 'unknown') {
+          parts.push(`(${content.category})`);
+        }
+        
+        // Add other details
+        if (content.amount) parts.push(`- ${content.amount}`);
         if (content.dosage) parts.push(`- ${content.dosage}`);
         if (content.timing) parts.push(`${content.timing}`);
         if (content.severity) parts.push(`Severity: ${content.severity}/10`);
@@ -44,13 +50,20 @@ const TimelineEntry = ({ entry }) => {
         return content.text;
       }
       
-      // Handle arrays
+      // Handle arrays (legacy format with food objects)
       if (Array.isArray(content)) {
-        return content.map(item => 
-          typeof item === 'string' ? item : 
-          typeof item === 'object' && item.name ? item.name :
-          String(item)
-        ).join(', ');
+        return content.map(item => {
+          if (typeof item === 'string') return item;
+          if (typeof item === 'object' && item.name) {
+            // Extract food name and category
+            const parts = [item.name];
+            if (item.category && item.category !== 'unknown') {
+              parts.push(`(${item.category})`);
+            }
+            return parts.join(' ');
+          }
+          return String(item);
+        }).join(', ');
       }
       
       // For objects without standard properties, show key-value pairs

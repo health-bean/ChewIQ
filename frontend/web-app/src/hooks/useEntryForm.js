@@ -40,17 +40,38 @@ export const useEntryForm = () => {
   };
 
   const buildEntryData = (selectedDate) => {
-    const allItems = [...formData.selectedFoods];
+    // Process foods to extract names and categories
+    const foodItems = formData.selectedFoods.map(food => {
+      if (typeof food === 'string') return food;
+      if (typeof food === 'object' && food.name) {
+        // Create proper food content structure
+        return {
+          name: food.name,
+          category: food.category || 'unknown',
+          compliance_status: food.compliance_status || food.protocol_status || 'unknown'
+        };
+      }
+      return String(food);
+    });
+    
+    const allItems = [...foodItems];
     if (formData.customText.trim()) {
       allItems.push(formData.customText.trim());
     }
+    
+    // For display, create a simple string of food names
+    const displayContent = formData.selectedFoods.map(food => {
+      if (typeof food === 'string') return food;
+      if (typeof food === 'object' && food.name) return food.name;
+      return String(food);
+    }).join(', ') + (formData.customText.trim() ? ', ' + formData.customText.trim() : '');
     
     return {
       entryDate: selectedDate,
       entryTime: formData.time,
       entryType: formData.type,
-      content: allItems.join(', '),
-      selectedFoods: formData.selectedFoods,
+      content: displayContent, // Simple string for display
+      selectedFoods: formData.selectedFoods, // Keep original objects for data
       severity: formData.type === ENTRY_TYPES.SYMPTOM ? formData.severity : null
     };
   };
