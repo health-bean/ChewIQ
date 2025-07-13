@@ -106,6 +106,7 @@ const LoginPage = () => {
                 placeholder="Enter your email"
                 className="pl-10"
                 disabled={isLoading}
+                autoComplete="email"
               />
             </div>
           </FormField>
@@ -119,6 +120,7 @@ const LoginPage = () => {
                 placeholder="Enter your password"
                 className="pl-10"
                 disabled={isLoading}
+                autoComplete="new-password"
               />
             </div>
           </FormField>
@@ -152,10 +154,19 @@ const LoginPage = () => {
                 variant="outlined" 
                 padding="sm"
                 className={cn(
-                  "cursor-pointer transition-all duration-200 hover:shadow-md hover:border-primary-300",
-                  "focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2"
+                  "cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary-400 hover:bg-primary-50",
+                  "focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2",
+                  "active:scale-[0.98] select-none"
                 )}
                 onClick={() => handleDemoLogin(user.email)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleDemoLogin(user.email);
+                  }
+                }}
               >
                 <div className="flex items-center space-x-3">
                   <div className="text-2xl">{user.avatar}</div>
@@ -167,8 +178,8 @@ const LoginPage = () => {
                       {user.entries}
                     </p>
                   </div>
-                  <div className="text-xs text-primary-600 font-medium">
-                    Try Demo
+                  <div className="text-xs text-primary-600 font-semibold bg-primary-100 px-2 py-1 rounded-full">
+                    Click to Try
                   </div>
                 </div>
               </Card>
