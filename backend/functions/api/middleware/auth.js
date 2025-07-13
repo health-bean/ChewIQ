@@ -20,23 +20,7 @@ const getCurrentUser = async (event) => {
     const authHeader = event.headers?.Authorization || event.headers?.authorization;
     
     if (!authHeader) {
-      // DEVELOPMENT MODE: Only allow demo user if explicitly enabled
-      if (process.env.NODE_ENV === 'development' && process.env.ALLOW_DEMO_USER === 'true') {
-        console.log('🔓 Development mode: Using demo user (set ALLOW_DEMO_USER=false to disable)');
-        return {
-          id: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0',
-          email: 'sarah.aip@test.com',
-          first_name: 'Sarah',
-          last_name: 'Demo',
-          user_type: 'patient',
-          is_active: true,
-          // Add these for compatibility with existing code
-          firstName: 'Sarah',
-          lastName: 'Demo',
-          userType: 'patient'
-        };
-      }
-      
+      // SECURITY: No hardcoded fallbacks - require proper authentication
       console.log('❌ No authorization header provided');
       return null;
     }
@@ -61,7 +45,12 @@ const getCurrentUser = async (event) => {
       console.log('User not found in database, creating unique demo user for:', decoded.email || 'unknown');
       
       // Create unique demo user based on email or token
-      const userEmail = decoded.email || decoded.username || 'demo@example.com';
+      const userEmail = decoded.email || decoded.username;
+      if (!userEmail) {
+        console.log('❌ No email found in token - cannot create user');
+        return null;
+      }
+      
       const demoUserId = generateDemoUserId(userEmail);
       
       return {
@@ -93,19 +82,8 @@ const getCurrentUser = async (event) => {
 
   } catch (error) {
     console.error('Authentication error:', error);
-    // Return demo user on any auth error
-    console.log('Auth error, returning demo user');
-    return {
-      id: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0',
-      email: 'patient@example.com',
-      first_name: 'Patient',
-      last_name: 'Demo',
-      user_type: 'patient',
-      is_active: true,
-      firstName: 'Patient',
-      lastName: 'Demo',
-      userType: 'patient'
-    };
+    // SECURITY: No hardcoded fallbacks - return null for proper error handling
+    return null;
   }
 };
 
@@ -163,8 +141,9 @@ const getAccessibleUserIds = async (event) => {
   const user = await getCurrentUser(event);
   
   if (!user) {
-    // Fallback to original demo user ID
-    return ['8e8a568a-c2f8-43a8-abf2-4e54408dbdc0'];
+    // SECURITY: No hardcoded fallbacks - return empty array to prevent data access
+    console.log('❌ No authenticated user - access denied');
+    return [];
   }
 
   if (user.userType === 'patient' || user.user_type === 'patient') {

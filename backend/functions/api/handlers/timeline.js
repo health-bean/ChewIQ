@@ -1,6 +1,6 @@
 const { pool } = require('../database/connection');
 const { successResponse, errorResponse } = require('../utils/responses');
-const { handleDatabaseError } = require('../utils/errors');
+const { AppError, ErrorTypes, handleDatabaseError, handleAuthError } = require('../utils/errorTypes');
 const { getCurrentUser, getAccessibleUserIds, requireAuth } = require('../middleware/auth');
 
 const handleGetTimelineEntries = async (queryParams, event) => {
@@ -17,9 +17,20 @@ const handleGetTimelineEntries = async (queryParams, event) => {
         if (user) {
             console.log('User found, getting accessible user IDs...');
             accessibleUserIds = await getAccessibleUserIds(event);
+            
+            // SECURITY: If no accessible users, return empty result
+            if (!accessibleUserIds || accessibleUserIds.length === 0) {
+                console.log('❌ No accessible users - returning empty timeline');
+                return successResponse({
+                    entries: [],
+                    total: 0,
+                    message: 'No accessible data'
+                });
+            }
         } else {
-            console.log('No user found - this should not happen with new auth system');
-            return errorResponse('Authentication required', 401);
+            console.log('❌ No authenticated user - access denied');
+            const authError = new AppError(ErrorTypes.AUTH_REQUIRED);
+            return errorResponse(authError.message, authError.statusCode);
         }
         
         console.log('Accessible user IDs:', accessibleUserIds);

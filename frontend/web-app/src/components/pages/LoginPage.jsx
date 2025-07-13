@@ -69,7 +69,8 @@ const LoginPage = () => {
 
   const handleDemoLogin = (demoEmail) => {
     setEmail(demoEmail);
-    setPassword('demo123');
+    // SECURITY: Don't auto-fill password - user must enter it
+    setPassword('');
     setError(null);
     setShowDemoWarning(true);
   };
@@ -184,12 +185,15 @@ const LoginPage = () => {
                     <p className="text-xs text-gray-500">
                       {user.entries}
                     </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Password: demo123
+                    </p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
                       Demo
                     </span>
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success-100 text-success-800">
                       Secure
                     </span>
                   </div>
