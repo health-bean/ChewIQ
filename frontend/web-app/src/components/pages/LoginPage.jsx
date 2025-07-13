@@ -133,7 +133,7 @@ const LoginPage = () => {
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
           <FormField label="Email Address" required>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -144,7 +144,8 @@ const LoginPage = () => {
                 placeholder="Enter your email"
                 className="pl-10"
                 disabled={isLoading}
-                name="email"
+                name="user-email"
+                autoComplete="off"
               />
             </div>
           </FormField>
@@ -158,12 +159,13 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e) => {
                   console.log('🔍 Password input onChange:', e.target.value);
-                  debugSetPassword(e.target.value);
+                  setPassword(e.target.value);
                 }}
                 placeholder="Enter your password"
                 className="pl-10"
                 disabled={isLoading}
-                name="password"
+                name="user-password"
+                autoComplete="off"
               />
             </div>
           </FormField>
