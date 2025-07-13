@@ -1,14 +1,9 @@
-// backend/functions/api/middleware/auth.js - Fixed demo user authentication
+// backend/functions/api/middleware/auth.js - Clean relationship-based authentication
 const jwt = require('jsonwebtoken');
 const { pool } = require('../database/connection');
 const { errorResponse } = require('../utils/responses');
 
-// Generate a secure JWT secret - MUST be set in production
-const JWT_SECRET = process.env.JWT_SECRET || (() => {
-  console.warn('⚠️  WARNING: JWT_SECRET not set! Using generated secret for development.');
-  console.warn('⚠️  This will invalidate tokens on restart. Set JWT_SECRET environment variable.');
-  return require('crypto').randomBytes(32).toString('base64');
-})();
+const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key';
 
 /**
  * Parse JWT token and return user information
@@ -20,26 +15,7 @@ const getCurrentUser = async (event) => {
     const authHeader = event.headers?.Authorization || event.headers?.authorization;
     
     if (!authHeader) {
-      // DEVELOPMENT MODE: Only allow demo user if explicitly enabled
-      if (process.env.NODE_ENV === 'development' && process.env.ALLOW_DEMO_USER === 'true') {
-        console.log('🔓 Development mode: Using demo user (set ALLOW_DEMO_USER=false to disable)');
-        return {
-          id: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0',
-          email: 'patient@example.com',
-          first_name: 'Patient',
-          last_name: 'Demo',
-          user_type: 'patient',
-          is_active: true,
-          // Add these for compatibility with existing code
-          firstName: 'Patient',
-          lastName: 'Demo',
-          userType: 'patient'
-        };
-      } else {
-        // PRODUCTION MODE: No authentication provided
-        console.log('🔒 No authentication provided and demo user disabled');
-        return null;
-      }
+      return null;
     }
 
     const token = authHeader.replace('Bearer ', '');
@@ -57,19 +33,7 @@ const getCurrentUser = async (event) => {
     client.release();
 
     if (result.rows.length === 0) {
-      console.log('User not found in database, returning demo user');
-      // Return demo user if database user not found
-      return {
-        id: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0',
-        email: 'patient@example.com',
-        first_name: 'Patient',
-        last_name: 'Demo',
-        user_type: 'patient',
-        is_active: true,
-        firstName: 'Patient',
-        lastName: 'Demo',
-        userType: 'patient'
-      };
+      return null;
     }
 
     const user = result.rows[0];
@@ -78,29 +42,12 @@ const getCurrentUser = async (event) => {
       email: user.email,
       firstName: user.first_name,
       lastName: user.last_name,
-      userType: user.user_type,
-      // Keep original format for compatibility
-      first_name: user.first_name,
-      last_name: user.last_name,
-      user_type: user.user_type,
-      is_active: user.is_active
+      userType: user.user_type
     };
 
   } catch (error) {
     console.error('Authentication error:', error);
-    // Return demo user on any auth error
-    console.log('Auth error, returning demo user');
-    return {
-      id: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0',
-      email: 'patient@example.com',
-      first_name: 'Patient',
-      last_name: 'Demo',
-      user_type: 'patient',
-      is_active: true,
-      firstName: 'Patient',
-      lastName: 'Demo',
-      userType: 'patient'
-    };
+    return null;
   }
 };
 
@@ -114,15 +61,14 @@ const getAccessibleUserIds = async (event) => {
   const user = await getCurrentUser(event);
   
   if (!user) {
-    // This shouldn't happen now, but just in case
-    return ['8e8a568a-c2f8-43a8-abf2-4e54408dbdc0'];
+    return [];
   }
 
-  if (user.userType === 'patient' || user.user_type === 'patient') {
+  if (user.userType === 'patient') {
     return [user.id]; // Patients can only access their own data
   }
 
-  if (user.userType === 'practitioner' || user.user_type === 'practitioner') {
+  if (user.userType === 'practitioner') {
     try {
       const client = await pool.connect();
       
@@ -163,9 +109,8 @@ const getRelationships = async (event) => {
 
   try {
     const client = await pool.connect();
-    const userType = user.userType || user.user_type;
     
-    if (userType === 'patient') {
+    if (user.userType === 'patient') {
       // Get all practitioners this patient has shared with
       const query = `
         SELECT 
@@ -196,7 +141,7 @@ const getRelationships = async (event) => {
       };
     }
     
-    if (userType === 'practitioner') {
+    if (user.userType === 'practitioner') {
       // Get all patients who have shared with this practitioner
       const query = `
         SELECT 
@@ -228,11 +173,11 @@ const getRelationships = async (event) => {
     }
     
     client.release();
-    return { userType: userType, relationships: [] };
+    return { userType: user.userType, relationships: [] };
     
   } catch (error) {
     console.error('Relationships error:', error);
-    return { userType: user.userType || user.user_type, relationships: [] };
+    return { userType: user.userType, relationships: [] };
   }
 };
 
@@ -264,8 +209,7 @@ const requireUserType = (allowedTypes) => {
       return errorResponse('Authentication required', 401);
     }
     
-    const userType = user.userType || user.user_type;
-    if (!allowedTypes.includes(userType)) {
+    if (!allowedTypes.includes(user.userType)) {
       return errorResponse('Insufficient permissions', 403);
     }
     
