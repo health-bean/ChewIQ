@@ -95,9 +95,9 @@ const handleGetTimelineEntries = async (queryParams, event) => {
                 te.id,
                 te.entry_time,
                 te.entry_type,
-                te.content,
                 te.severity,
                 te.protocol_compliant,
+                te.structured_content,
                 te.created_at,
                 je.entry_date,
                 te.user_id
@@ -228,8 +228,8 @@ const handleCreateTimelineEntry = async (body, event) => {
                 const timelineQuery = `
                     INSERT INTO timeline_entries (
                         journal_entry_id, user_id, entry_date, entry_time, 
-                        entry_type, content, severity, structured_content
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                        entry_type, severity, structured_content
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7)
                     RETURNING *
                 `;
                 
@@ -239,7 +239,6 @@ const handleCreateTimelineEntry = async (body, event) => {
                     entryDate,
                     entryTime,
                     entryType, 
-                    item.name, // content field for backward compatibility
                     item.severity || null,
                     JSON.stringify(structuredContent)
                 ];
@@ -259,8 +258,8 @@ const handleCreateTimelineEntry = async (body, event) => {
             const timelineQuery = `
                 INSERT INTO timeline_entries (
                     journal_entry_id, user_id, entry_date, entry_time, 
-                    entry_type, content, severity, protocol_compliant
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                    entry_type, severity, protocol_compliant
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7)
                 RETURNING *
             `;
             
@@ -269,7 +268,7 @@ const handleCreateTimelineEntry = async (body, event) => {
             
             const timelineValues = [
                 journalEntryId, userId, entryDate, entryTime,
-                entryType, content, severity, protocolCompliant
+                entryType, severity, protocolCompliant
             ];
             
             await client.query(timelineQuery, timelineValues);
