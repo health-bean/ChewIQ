@@ -232,6 +232,67 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Signup function
+  const signup = async (userData) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log('Attempting signup for:', userData.email);
+      
+      const response = await apiClient.post('/api/v1/auth/register', {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        password: userData.password
+      });
+
+      if (response?.user && response?.token) {
+        console.log('Signup successful:', response.user);
+        console.log('🔍 AUTH: Token received:', response.token ? 'YES' : 'NO');
+        
+        // New users are never demo users
+        setIsDemoMode(false);
+        
+        // SECURITY: Always use sessionStorage for personal health data
+        console.log('🔒 SECURE SIGNUP: Personal health data session created');
+        console.log('🔒 Using sessionStorage - data cleared when browser closes');
+        
+        // Set state
+        setUser(response.user);
+        setToken(response.token);
+        if (response.refreshToken) {
+          setRefreshToken(response.refreshToken);
+        }
+        
+        // SECURITY: Save to sessionStorage only
+        sessionStorage.setItem('auth_token', response.token);
+        sessionStorage.setItem('user', JSON.stringify(response.user));
+        if (response.refreshToken) {
+          sessionStorage.setItem('refresh_token', response.refreshToken);
+        }
+        
+        console.log('🔍 AUTH: New user token stored in sessionStorage');
+        
+        // SECURITY: Ensure localStorage is clean
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+        
+        return { success: true, user: response.user };
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Account creation failed';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Logout function
   const logout = async () => {
     try {
@@ -301,6 +362,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated,
     isDemoMode, // Expose demo mode status
     login,
+    signup,
     logout,
     verifyToken,
     getAuthHeaders,

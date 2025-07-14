@@ -7,6 +7,12 @@ import { Loader2, Mail, Lock, Rocket, AlertTriangle } from 'lucide-react';
 import { Button, Input, Alert, FormField, PasswordInput, Card } from '../../../../shared/components/ui';
 import { cn } from '../../../../shared/design-system';
 import useAuth from '../../../../shared/hooks/useAuth';
+import SignupPage from './SignupPage';
+
+const LoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showSignup, setShowSignup] = useState(false);
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -93,6 +99,11 @@ const LoginPage = () => {
       console.log('🔍 DEBUG v3.0: Password value after timeout:', password);
     }, 100);
   };
+
+  // Show signup page if requested
+  if (showSignup) {
+    return <SignupPage onBackToLogin={() => setShowSignup(false)} />;
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -242,7 +253,10 @@ const LoginPage = () => {
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-600">
             Don't have an account?{' '}
-            <button className="text-primary-600 hover:text-primary-700 font-medium">
+            <button 
+              onClick={() => setShowSignup(true)}
+              className="text-primary-600 hover:text-primary-700 font-medium"
+            >
               Sign up here
             </button>
           </p>
