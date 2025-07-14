@@ -213,9 +213,6 @@ const LoginPage = () => {
                     <p className="text-xs text-gray-500">
                       {user.entries}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      Password: demo1234
-                    </p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
@@ -235,6 +232,8 @@ const LoginPage = () => {
               Demo accounts showcase different health protocols and data patterns.
               <br />
               <strong>All sessions are secure:</strong> Health data automatically cleared when browser closes.
+              <br />
+              <strong>Demo Access:</strong> Contact support for demo account credentials.
             </p>
           </div>
         </div>
