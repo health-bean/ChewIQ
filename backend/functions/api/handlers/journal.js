@@ -48,8 +48,19 @@ const handleGetJournalEntries = async (queryParams, event) => {
 
 const handleGetJournalEntry = async (date, event) => {
     try {
+        console.log('🔍 Journal API: Getting entry for date:', date);
+        console.log('🔍 Journal API: Event user:', event.user ? 'present' : 'missing');
+        
         const client = await pool.connect();
-        const userId = event.user.id;
+        const userId = event.user?.id;
+        
+        if (!userId) {
+            console.error('❌ Journal API: No user ID found in event');
+            return errorResponse('User not authenticated', 401);
+        }
+        
+        console.log('🔍 Journal API: User ID:', userId);
+        console.log('🔍 Journal API: Date parameter:', date);
         
         const query = `
             SELECT 
@@ -73,21 +84,28 @@ const handleGetJournalEntry = async (date, event) => {
             WHERE user_id = $1 AND entry_date = $2
         `;
         
+        console.log('🔍 Journal API: Executing query with params:', [userId, date]);
         const result = await client.query(query, [userId, date]);
         client.release();
         
+        console.log('🔍 Journal API: Query result rows:', result.rows.length);
+        
         if (result.rows.length === 0) {
+            console.log('✅ Journal API: No entry found, returning null');
             return successResponse({
                 entry: null,
                 date: date
             });
         }
         
+        console.log('✅ Journal API: Entry found, returning data');
         return successResponse({
             entry: result.rows[0]
         });
         
     } catch (error) {
+        console.error('❌ Journal API Error:', error);
+        console.error('❌ Journal API Error stack:', error.stack);
         const appError = handleDatabaseError(error, 'get journal entry');
         return errorResponse(appError.message, appError.statusCode);
     }
