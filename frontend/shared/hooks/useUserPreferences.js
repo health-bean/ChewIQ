@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { apiClient } from '../services/api.js';
-import useAuth from './useAuth.js';
+import { useSimpleAuth } from '../components/SimpleAuthProvider.jsx';
 import safeLogger from '../utils/safeLogger';
 
 const useUserPreferences = (isAuthenticatedParam = null) => {
@@ -12,7 +12,7 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
   const [saving, setSaving] = useState(false);
   
   // Get auth context
-  const { user, token, isAuthenticated: authIsAuthenticated, getAuthHeaders } = useAuth();
+  const { user, token, isAuthenticated: authIsAuthenticated, getAuthHeaders } = useSimpleAuth();
   
   // Use parameter if provided, otherwise fall back to auth context
   const isAuthenticated = isAuthenticatedParam !== null ? isAuthenticatedParam : authIsAuthenticated;

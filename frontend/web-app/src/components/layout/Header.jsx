@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Calendar, ChevronDown, User, Settings, LogOut } from 'lucide-react';
 import { Input, Button, Card } from '../../../../shared/components/ui';
 import { cn } from '../../../../shared/design-system';
-import useAuth from '../../../../shared/hooks/useAuth';
+import { useSimpleAuth } from '../../../../shared/components/SimpleAuthProvider';
 import MultiSelectProtocolDropdown from '../common/MultiSelectProtocolDropdown';
 
 const Header = ({ 
@@ -17,7 +17,7 @@ const Header = ({
   protocolsError,
   onPreferencesClick 
 }) => {
-  const { user, logout } = useAuth();
+  const { user, logout } = useSimpleAuth();
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
