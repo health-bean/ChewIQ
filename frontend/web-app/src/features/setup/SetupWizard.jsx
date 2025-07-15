@@ -19,8 +19,7 @@ const SetupWizard = ({ onComplete, isAuthenticated }) => {
   const { protocols } = useProtocols(isAuthenticated);
   const { updatePreferences, saving } = useUserPreferences(isAuthenticated);
   
-  console.log('🔧 SetupWizard: Protocols from hook:', protocols);
-  console.log('🔧 SetupWizard: isAuthenticated:', isAuthenticated);
+  // Debug logs removed for security - protocols and auth status are handled by safe logger in hooks
   
   const setupWizardData = useSetupWizard(protocols, updatePreferences, onComplete);
   
