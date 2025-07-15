@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../services/api.js';
 import useAuth from './useAuth.js';
+import safeLogger from '../utils/safeLogger';
 
 const useUserPreferences = (isAuthenticatedParam = null) => {
   const [preferences, setPreferences] = useState(null);
@@ -40,7 +41,7 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
     const loadPreferences = async () => {
       // Prevent duplicate calls
       if (loading && preferences === null) {
-        console.log('🔧 useUserPreferences: Already loading, skipping duplicate call');
+        safeLogger.debug('Already loading preferences, skipping duplicate call');
         return;
       }
       

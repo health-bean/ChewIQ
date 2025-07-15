@@ -97,6 +97,12 @@ const useReflectionData = (selectedDate, isAuthenticated = false) => {
       } catch (error) {
         if (!isCancelled) {
           console.error('Failed to load reflection data:', error);
+          
+          // Check if it's a 500 error (backend issue) vs other errors
+          if (error.message && error.message.includes('500')) {
+            console.warn('Journal API returning 500 error - backend issue. Using defaults for now.');
+          }
+          
           // Use defaults on error
           setReflectionData({
             bedtime: '',
@@ -175,6 +181,13 @@ const useReflectionData = (selectedDate, isAuthenticated = false) => {
       }
     } catch (error) {
       console.error('Failed to save reflection data:', error);
+      
+      // Check if it's a 500 error (backend issue)
+      if (error.message && error.message.includes('500')) {
+        console.warn('Journal API save returning 500 error - backend issue. Data not saved to database.');
+        // Could add temporary localStorage fallback here if needed
+      }
+      
       return false;
     } finally {
       setLoading(false);

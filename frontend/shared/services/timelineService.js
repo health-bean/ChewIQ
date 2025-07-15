@@ -1,4 +1,5 @@
 import { apiClient } from './api';
+import safeLogger from '../utils/safeLogger';
 
 export const timelineService = {
   async getEntries(date) {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { timelineService } from '../../../shared/services/timelineService';
+import safeLogger from '../../../shared/utils/safeLogger';
 
 export const useTimelineEntries = (selectedDate, isAuthenticated = false) => {
   const [entries, setEntries] = useState([]);
@@ -7,10 +8,10 @@ export const useTimelineEntries = (selectedDate, isAuthenticated = false) => {
   const [error, setError] = useState(null);
 
   const loadEntries = async () => {
-    console.log('🔍 useTimelineEntries: loadEntries called', { selectedDate, isAuthenticated });
+    safeLogger.debug('Loading timeline entries', { selectedDate, isAuthenticated });
     
     if (!selectedDate || !isAuthenticated) {
-      console.log('🔍 useTimelineEntries: Skipping load - no date or not authenticated');
+      safeLogger.debug('Skipping timeline load - no date or not authenticated');
       setLoading(false);
       return;
     }
@@ -18,13 +19,12 @@ export const useTimelineEntries = (selectedDate, isAuthenticated = false) => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 useTimelineEntries: Calling timelineService.getEntries with date:', selectedDate);
+      safeLogger.debug('Fetching timeline entries', { date: selectedDate });
       const data = await timelineService.getEntries(selectedDate);
-      console.log('🔍 useTimelineEntries: Received data:', data);
       setEntries(data.entries || []);
-      console.log('🔍 useTimelineEntries: Set entries:', data.entries?.length || 0);
+      safeLogger.debug('Timeline entries loaded', { count: data.entries?.length || 0 });
     } catch (err) {
-      console.error('🔍 useTimelineEntries: Failed to load timeline entries:', err);
+      safeLogger.error('Failed to load timeline entries', { error: err.message, date: selectedDate });
       setError(err.message);
     } finally {
       setLoading(false);

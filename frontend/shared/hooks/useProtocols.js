@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../services/api.js';
+import safeLogger from '../utils/safeLogger';
 
 const useProtocols = (isAuthenticated = false) => {
   const [protocols, setProtocols] = useState([]);
@@ -14,18 +15,18 @@ const useProtocols = (isAuthenticated = false) => {
       const hasToken = sessionStorage.getItem('auth_token'); // Fixed: was 'authToken', should be 'auth_token'
       
       if (!isAuthenticated && !hasToken) {
-        console.log('🔧 useProtocols: No auth, skipping fetch');
+        safeLogger.debug('Skipping protocols fetch - not authenticated');
         setLoading(false);
         return;
       }
       
       // Prevent duplicate calls
       if (loading) {
-        console.log('🔧 useProtocols: Already loading, skipping duplicate call');
+        safeLogger.debug('Already loading protocols, skipping duplicate call');
         return;
       }
       
-      console.log('🔧 useProtocols: Fetching protocols...', { isAuthenticated, hasToken: !!hasToken });
+      safeLogger.debug('Fetching protocols', { isAuthenticated });
       
       try {
         setLoading(true);
@@ -33,13 +34,13 @@ const useProtocols = (isAuthenticated = false) => {
         
         // Only update state if component is still mounted
         if (!isCancelled) {
-          console.log('🔧 useProtocols: Received protocols:', data.protocols?.length || 0);
+          safeLogger.debug('Protocols loaded successfully', { count: data.protocols?.length || 0 });
           setProtocols(data.protocols || []);
           setError(null);
         }
       } catch (error) {
         if (!isCancelled) {
-          console.error('🔧 useProtocols: Error fetching protocols:', error);
+          safeLogger.error('Failed to load protocols', { error: error.message });
           setError(error.message);
           setProtocols([]);
         }

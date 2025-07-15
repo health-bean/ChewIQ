@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiClient } from '../services/api.js';
+import safeLogger from '../utils/safeLogger';
 
 // Create Auth Context
 const AuthContext = createContext(null);
@@ -43,7 +44,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        console.log('Initializing auth...');
+        safeLogger.info('Initializing authentication');
         
         // SECURITY: Only check sessionStorage for health data privacy
         const storedToken = sessionStorage.getItem('auth_token');
@@ -54,10 +55,10 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
-        console.log('🔒 Cleared any localStorage remnants for security');
+        safeLogger.debug('Cleared localStorage auth data for security');
 
         if (storedToken && storedUser) {
-          console.log('Found stored auth data, verifying...');
+          safeLogger.debug('Found stored auth data, verifying');
           
           try {
             // Parse stored user
@@ -67,30 +68,33 @@ export const AuthProvider = ({ children }) => {
             const isDemo = isDemoUser(parsedUser);
             setIsDemoMode(isDemo);
             
-            console.log(`🔒 SECURE SESSION: ${isDemo ? 'Demo' : 'Personal'} health data - ${parsedUser.email}`);
-            console.log('🔒 Using sessionStorage for maximum privacy protection');
+            safeLogger.auth('Secure session initialized', { 
+              email: parsedUser.email,
+              userType: isDemo ? 'demo' : 'personal'
+            });
+            safeLogger.debug('Using sessionStorage for maximum privacy protection');
             
             // Verify token is still valid
             const isValid = await verifyStoredToken(storedToken);
             
             if (isValid) {
-              console.log('Stored token is valid, restoring session');
+              safeLogger.debug('Stored token is valid, restoring session');
               setToken(storedToken);
               setRefreshToken(storedRefreshToken);
               setUser(parsedUser);
             } else if (storedRefreshToken) {
-              console.log('Access token expired, attempting refresh...');
+              safeLogger.debug('Access token expired, attempting refresh');
               await attemptTokenRefresh(storedRefreshToken);
             } else {
-              console.log('Token invalid and no refresh token, clearing storage');
+              safeLogger.warn('Token invalid and no refresh token, clearing storage');
               clearAuthStorage();
             }
           } catch (error) {
-            console.error('Error parsing stored auth data:', error);
+            safeLogger.error('Error parsing stored auth data', { error: error.message });
             clearAuthStorage();
           }
         } else {
-          console.log('No stored auth data found');
+          safeLogger.debug('No stored auth data found');
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
@@ -177,7 +181,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      console.log('Attempting login for:', email);
+      safeLogger.auth('Login attempt', { email });
       
       const response = await apiClient.post('/api/v1/auth/login', {
         email,
@@ -185,16 +189,17 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (response?.user && response?.token) {
-        console.log('Login successful:', response.user);
-        console.log('🔍 AUTH: Token received:', response.token ? 'YES' : 'NO');
+        safeLogger.auth('Login successful', { 
+          userId: response.user.id,
+          email: response.user.email,
+          userType: response.user.userType
+        });
         
         // Determine if this is a demo user
         const isDemo = isDemoUser(response.user);
         setIsDemoMode(isDemo);
         
-        // SECURITY: Always use sessionStorage for personal health data
-        console.log(`🔒 SECURE LOGIN: ${isDemo ? 'Demo' : 'Personal'} health data session`);
-        console.log('🔒 Using sessionStorage - data cleared when browser closes');
+        safeLogger.debug('Using sessionStorage for security - data cleared when browser closes');
         
         // Set state
         setUser(response.user);
@@ -210,9 +215,6 @@ export const AuthProvider = ({ children }) => {
           sessionStorage.setItem('refresh_token', response.refreshToken);
         }
         
-        console.log('🔍 AUTH: Token stored in sessionStorage');
-        console.log('🔍 AUTH: Verifying token storage:', sessionStorage.getItem('auth_token') ? 'STORED' : 'NOT STORED');
-        
         // SECURITY: Ensure localStorage is clean
         localStorage.removeItem('auth_token');
         localStorage.removeItem('refresh_token');
@@ -223,7 +225,7 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Invalid response from server');
       }
     } catch (error) {
-      console.error('Login error:', error);
+      safeLogger.error('Login failed', { error: error.message, email });
       const errorMessage = error.response?.data?.message || error.message || 'Login failed';
       setError(errorMessage);
       return { success: false, error: errorMessage };
@@ -238,7 +240,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      console.log('Attempting signup for:', userData.email);
+      safeLogger.auth('Signup attempt', { email: userData.email });
       
       const response = await apiClient.post('/api/v1/auth/register', {
         firstName: userData.firstName,
@@ -248,15 +250,16 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (response?.user && response?.token) {
-        console.log('Signup successful:', response.user);
-        console.log('🔍 AUTH: Token received:', response.token ? 'YES' : 'NO');
+        safeLogger.auth('Signup successful', { 
+          userId: response.user.id,
+          email: response.user.email,
+          userType: response.user.userType
+        });
         
         // New users are never demo users
         setIsDemoMode(false);
         
-        // SECURITY: Always use sessionStorage for personal health data
-        console.log('🔒 SECURE SIGNUP: Personal health data session created');
-        console.log('🔒 Using sessionStorage - data cleared when browser closes');
+        safeLogger.debug('Using sessionStorage for security - data cleared when browser closes');
         
         // Set state
         setUser(response.user);
@@ -272,8 +275,6 @@ export const AuthProvider = ({ children }) => {
           sessionStorage.setItem('refresh_token', response.refreshToken);
         }
         
-        console.log('🔍 AUTH: New user token stored in sessionStorage');
-        
         // SECURITY: Ensure localStorage is clean
         localStorage.removeItem('auth_token');
         localStorage.removeItem('refresh_token');
@@ -284,7 +285,7 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Invalid response from server');
       }
     } catch (error) {
-      console.error('Signup error:', error);
+      safeLogger.error('Signup failed', { error: error.message, email: userData.email });
       const errorMessage = error.response?.data?.message || error.message || 'Account creation failed';
       setError(errorMessage);
       return { success: false, error: errorMessage };
@@ -298,6 +299,8 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       
+      safeLogger.auth('User logout initiated', { userId: user?.id });
+      
       // Call backend logout endpoint
       if (token) {
         await apiClient.post('/api/v1/auth/logout', {}, {
@@ -305,10 +308,10 @@ export const AuthProvider = ({ children }) => {
         });
       }
       
-      console.log('Logout successful');
+      safeLogger.debug('Logout successful');
       
     } catch (error) {
-      console.error('Logout error:', error);
+      safeLogger.warn('Logout API error', { error: error.message });
       // Continue with logout anyway
     } finally {
       // Always clear auth state and storage

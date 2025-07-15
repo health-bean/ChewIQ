@@ -1,3 +1,5 @@
+import safeLogger from '../utils/safeLogger';
+
 class ApiConfig {
   constructor() {
     this.baseURL = import.meta.env.VITE_API_URL;
@@ -14,12 +16,13 @@ class ApiConfig {
     // Add auth headers when auth is enabled
     if (this.authEnabled) {
       const token = this.getAuthToken();
-      console.log('🔍 API Client authEnabled:', this.authEnabled, 'token:', token ? 'present' : 'missing');
+      safeLogger.debug('API authentication status', { authEnabled: this.authEnabled, hasToken: !!token });
+      
       if (token) {
         headers.Authorization = `Bearer ${token}`;
-        console.log('🔍 API Client added Authorization header');
+        safeLogger.debug('Authorization header added');
       } else {
-        console.log('🔍 API Client no token available for Authorization header');
+        safeLogger.debug('No auth token available');
       }
     }
 
@@ -29,7 +32,7 @@ class ApiConfig {
   getAuthToken() {
     // SECURITY: Use sessionStorage for health data privacy
     const token = sessionStorage.getItem('auth_token');
-    console.log('🔍 API Client getAuthToken():', token ? 'Token found' : 'No token found');
+    safeLogger.debug('Auth token status', { found: !!token });
     return token || null;
   }
 
@@ -43,8 +46,10 @@ class ApiConfig {
     };
 
     try {
-      console.log(`[API] ${options.method || 'GET'} ${endpoint}`);
-      console.log('🔍 API Request headers:', config.headers);
+      safeLogger.debug(`API Request: ${options.method || 'GET'} ${endpoint}`, { 
+        method: options.method || 'GET',
+        endpoint
+      });
       
       const response = await fetch(url, config);
       
@@ -53,8 +58,10 @@ class ApiConfig {
         if (response.status === 401 || response.status === 403) {
           if (this.authEnabled) {
             // Will trigger login flow when auth is implemented
-            console.warn('Authentication required');
-            // For now, just throw the error
+            safeLogger.warn('Authentication required for API request', { 
+              status: response.status, 
+              endpoint 
+            });
           }
         }
         
@@ -63,11 +70,15 @@ class ApiConfig {
 
       return await response.json();
     } catch (error) {
-      console.error(`[API Error] ${endpoint}:`, error);
+      safeLogger.error(`API Error for ${endpoint}`, { 
+        status: error.status || error.statusCode,
+        message: error.message,
+        endpoint
+      });
       
       // In local development without auth, provide helpful error messages
       if (this.isLocal && !this.authEnabled && error.message.includes('CORS')) {
-        console.error('💡 CORS Error: Make sure vite proxy is configured correctly');
+        safeLogger.error('CORS Error: Make sure vite proxy is configured correctly');
       }
       
       throw error;
