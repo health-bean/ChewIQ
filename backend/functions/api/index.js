@@ -126,8 +126,12 @@ exports.handler = async (event) => {
             response = await handleCreateJournalEntry(body, event);
         }
         else if (path.startsWith('/api/v1/journal/entries/') && method === 'GET') {
+            console.log('🔍 INDEX: Matched journal entries GET route');
             const date = path.split('/').pop();
+            console.log('🔍 INDEX: Extracted date:', date);
+            console.log('🔍 INDEX: Event user:', event.user ? 'present' : 'missing');
             response = await handleGetJournalEntry(date, event);
+            console.log('🔍 INDEX: handleGetJournalEntry returned:', response ? 'response' : 'null');
         }
         else if (path.startsWith('/api/v1/journal/entries/') && method === 'PUT') {
             const date = path.split('/').pop();
