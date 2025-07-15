@@ -114,11 +114,10 @@ const handleGetUserProtocols = async (queryParams, event) => {
         const query = `
             SELECT 
                 up.id,
-                up.current_phase,
                 up.start_date,
                 up.end_date,
-                up.compliance_score,
                 up.active,
+                up.protocol_data,
                 p.id as protocol_id,
                 p.name as protocol_name,
                 p.description,
@@ -284,10 +283,8 @@ const handleGetCurrentProtocol = async (queryParams, event) => {
         protocol: {
           protocol_id: protocol.protocol_id,
           protocol_name: protocol.protocol_name,
-          phase: protocol.phase,
-          compliance_score: protocol.compliance_score,
           protocol_data: protocol.protocol_data,
-          start_date: protocol.protocol_data?.phase_history?.[0]?.started
+          start_date: protocol.start_date
         }
       });
 

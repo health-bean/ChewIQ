@@ -178,16 +178,19 @@ const seedDemoData = async () => {
           await client.query(`
             INSERT INTO timeline_entries (
               user_id, journal_entry_id, entry_time, entry_type, 
-              content, severity, protocol_compliant
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+              entry_date, structured_content
+            ) VALUES ($1, $2, $3, $4, $5, $6)
           `, [
             entry.userId,
             journalEntryId,
             entry.entryTime,
             entry.entryType,
-            entry.content,
-            entry.severity,
-            entry.protocolCompliant
+            entry.entryDate,
+            JSON.stringify({
+              entry_source: 'demo_data',
+              item_name: entry.content,
+              severity: entry.severity || null
+            })
           ]);
         }
       }

@@ -107,7 +107,7 @@ const handleCreateJournalEntry = async (body, event) => {
             personal_reflection
         } = body;
         
-        // Structure data according to your JSONB format
+        // Structure data according to new JSONB format
         const reflectionData = {
             sleep: {
                 bedtime: bedtime || null,
@@ -125,7 +125,7 @@ const handleCreateJournalEntry = async (body, event) => {
             },
             meditation: {
                 meditation_duration: meditation_duration || 0,
-                meditation_practice: meditation_practice || false
+                meditation_practice: (meditation_duration && meditation_duration > 0) || meditation_practice || false
             },
             cycle: {
                 cycle_day: cycle_day || null,

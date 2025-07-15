@@ -83,10 +83,6 @@ const validateTimelineEntry = (data) => {
     }
   }
   
-  if (data.protocol_compliant !== undefined && typeof data.protocol_compliant !== 'boolean') {
-    errors.push('protocol_compliant must be a boolean');
-  }
-  
   if (errors.length > 0) {
     throw new AppError(ErrorTypes.VALIDATION_ERROR, 'Invalid timeline entry data', errors);
   }
@@ -96,8 +92,7 @@ const validateTimelineEntry = (data) => {
     entry_type: data.entry_type,
     entry_time: data.entry_time,
     content: typeof data.content === 'object' ? data.content : { name: sanitizeString(data.content) },
-    severity: data.severity ? parseInt(data.severity) : null,
-    protocol_compliant: data.protocol_compliant || null
+    severity: data.severity ? parseInt(data.severity) : null
   };
 };
 
