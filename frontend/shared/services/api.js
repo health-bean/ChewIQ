@@ -6,12 +6,13 @@ class ApiConfig {
     this.environment = import.meta.env.VITE_APP_ENV || 'development';
     this.authEnabled = import.meta.env.VITE_AUTH_ENABLED === 'true';
     this.isLocal = this.environment === 'development' && this.baseURL.includes('localhost');
-    this.authContext = null; // Will be set by AuthProvider
+    this.getTokenCallback = null; // Callback function to get current token
   }
 
-  // Method to set auth context from AuthProvider
-  setAuthContext(authContext) {
-    this.authContext = authContext;
+  // Method to set token getter callback from AuthProvider
+  setTokenGetter(getTokenCallback) {
+    this.getTokenCallback = getTokenCallback;
+    safeLogger.debug('API client token getter callback set');
   }
 
   getHeaders() {
@@ -26,9 +27,9 @@ class ApiConfig {
       
       if (token) {
         headers.Authorization = `Bearer ${token}`;
-        safeLogger.debug('Authorization header added');
+        safeLogger.debug('Authorization header added to request');
       } else {
-        safeLogger.debug('No auth token available');
+        safeLogger.warn('No auth token available for API request');
       }
     }
 
@@ -36,15 +37,22 @@ class ApiConfig {
   }
 
   getAuthToken() {
-    // First try to get token from auth context (preferred)
-    if (this.authContext && this.authContext.token) {
-      safeLogger.debug('Auth token from context', { found: true });
-      return this.authContext.token;
+    // First try to get token from callback (preferred - always current)
+    if (this.getTokenCallback && typeof this.getTokenCallback === 'function') {
+      try {
+        const token = this.getTokenCallback();
+        if (token) {
+          safeLogger.debug('Auth token from callback', { found: true });
+          return token;
+        }
+      } catch (error) {
+        safeLogger.error('Error getting token from callback', { error: error.message });
+      }
     }
     
-    // Fallback to sessionStorage for backward compatibility
+    // Fallback to sessionStorage
     const token = sessionStorage.getItem('auth_token');
-    safeLogger.debug('Auth token from sessionStorage', { found: !!token });
+    safeLogger.debug('Auth token from sessionStorage fallback', { found: !!token });
     return token || null;
   }
 

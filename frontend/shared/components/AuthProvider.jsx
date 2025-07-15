@@ -42,16 +42,14 @@ export const AuthProvider = ({ children }) => {
 
   // Update API client with current auth context whenever auth state changes
   useEffect(() => {
-    const authContext = {
-      user,
-      token,
-      refreshToken,
-      isAuthenticated,
-      isDemoMode
+    // Set up callback function that API client can call to get current token
+    const getTokenCallback = () => {
+      return token; // Return current token from state
     };
-    apiClient.setAuthContext(authContext);
-    safeLogger.debug('API client auth context updated', { hasToken: !!token, isAuthenticated });
-  }, [user, token, refreshToken, isAuthenticated, isDemoMode]);
+    
+    apiClient.setTokenGetter(getTokenCallback);
+    safeLogger.debug('API client token getter updated', { hasToken: !!token, isAuthenticated });
+  }, [token, isAuthenticated]); // Only depend on token, not all auth state
 
   // Verify existing token on app start
   useEffect(() => {
