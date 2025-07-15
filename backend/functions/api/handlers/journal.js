@@ -93,46 +93,53 @@ const handleGetJournalEntry = async (date, event) => {
 
 const handleCreateJournalEntry = async (body, event) => {
     try {
-        console.log('🔍 Journal API: Creating entry with body:', body);
+        console.log('🔍 Journal API: Creating entry with body:', JSON.stringify(body, null, 2));
         
         const client = await pool.connect();
         const userId = event.user.id;
-        const { 
-            entry_date, 
-            bedtime, wake_time, sleep_quality, sleep_symptoms = [],
-            energy_level, mood_level, physical_comfort,
-            activity_level,
-            meditation_duration, meditation_practice,
-            cycle_day, ovulation,
-            personal_reflection
-        } = body;
+        
+        // Extract data with robust error handling
+        const entry_date = body.entry_date || body.entryDate || new Date().toISOString().split('T')[0];
+        const bedtime = body.bedtime || null;
+        const wake_time = body.wake_time || null;
+        const sleep_quality = body.sleep_quality || null;
+        const sleep_symptoms = Array.isArray(body.sleep_symptoms) ? body.sleep_symptoms : [];
+        const energy_level = body.energy_level ? parseInt(body.energy_level) : null;
+        const mood_level = body.mood_level ? parseInt(body.mood_level) : null;
+        const physical_comfort = body.physical_comfort ? parseInt(body.physical_comfort) : null;
+        const activity_level = body.activity_level || null;
+        const meditation_duration = body.meditation_duration ? parseInt(body.meditation_duration) : 0;
+        const meditation_practice = body.meditation_practice || (meditation_duration > 0);
+        const cycle_day = body.cycle_day || null;
+        const ovulation = body.ovulation || false;
+        const personal_reflection = body.personal_reflection || null;
         
         // Structure data according to new JSONB format
         const reflectionData = {
             sleep: {
-                bedtime: bedtime || null,
-                wake_time: wake_time || null,
-                sleep_quality: sleep_quality || null,
-                sleep_symptoms: sleep_symptoms || []
+                bedtime: bedtime,
+                wake_time: wake_time,
+                sleep_quality: sleep_quality,
+                sleep_symptoms: sleep_symptoms
             },
             wellness: {
-                energy_level: energy_level || null,
-                mood_level: mood_level || null,
-                physical_comfort: physical_comfort || null
+                energy_level: energy_level,
+                mood_level: mood_level,
+                physical_comfort: physical_comfort
             },
             activity: {
-                activity_level: activity_level || null
+                activity_level: activity_level
             },
             meditation: {
-                meditation_duration: meditation_duration || 0,
-                meditation_practice: (meditation_duration && meditation_duration > 0) || meditation_practice || false
+                meditation_duration: meditation_duration,
+                meditation_practice: meditation_practice
             },
             cycle: {
-                cycle_day: cycle_day || null,
-                ovulation: ovulation || false
+                cycle_day: cycle_day,
+                ovulation: ovulation
             },
             notes: {
-                personal_reflection: personal_reflection || null
+                personal_reflection: personal_reflection
             }
         };
         
@@ -182,8 +189,8 @@ const handleCreateJournalEntry = async (body, event) => {
                 const timelineQuery = `
                     INSERT INTO timeline_entries (
                         user_id, journal_entry_id, entry_date, entry_time,
-                        entry_type, content, severity, structured_content
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                        entry_type, structured_content
+                    ) VALUES ($1, $2, $3, $4, $5, $6)
                 `;
                 
                 const structuredContent = {
@@ -199,8 +206,6 @@ const handleCreateJournalEntry = async (body, event) => {
                     entry_date,
                     '23:59:00', // Default end-of-day time for reflection symptoms
                     'symptom',
-                    symptom.name,
-                    symptom.severity,
                     JSON.stringify(structuredContent)
                 ]);
             }
@@ -218,8 +223,17 @@ const handleCreateJournalEntry = async (body, event) => {
         
     } catch (error) {
         console.error('❌ Journal API Create Error:', error);
-        await client.query('ROLLBACK');
-        client.release();
+        console.error('❌ Journal API Error message:', error.message);
+        console.error('❌ Journal API Error stack:', error.stack);
+        console.error('❌ Journal API Request body was:', JSON.stringify(body, null, 2));
+        
+        try {
+            await client.query('ROLLBACK');
+            client.release();
+        } catch (rollbackError) {
+            console.error('❌ Journal API Rollback Error:', rollbackError);
+        }
+        
         const appError = handleDatabaseError(error, 'create journal entry');
         return errorResponse(appError.message, appError.statusCode);
     }
