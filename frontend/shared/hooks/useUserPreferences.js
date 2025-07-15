@@ -29,6 +29,8 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
 
   // Load preferences from database when user is authenticated
   useEffect(() => {
+    let isCancelled = false;
+    
     if (!isAuthenticated || !user) {
       setPreferences(getDefaultPreferences());
       setLoading(false);
@@ -36,6 +38,12 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
     }
 
     const loadPreferences = async () => {
+      // Prevent duplicate calls
+      if (loading && preferences === null) {
+        console.log('🔧 useUserPreferences: Already loading, skipping duplicate call');
+        return;
+      }
+      
       try {
         setLoading(true);
         setError(null);
@@ -43,6 +51,9 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
         const response = await apiClient.get('/api/v1/user/preferences', {
           headers: getAuthHeaders()
         });
+        
+        // Only update state if component is still mounted
+        if (isCancelled) return;
         
         // Handle both response formats: {preferences: {...}} or {...} directly
         let preferencesData = response;
@@ -67,14 +78,23 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
           setPreferences(getDefaultPreferences());
         }
       } catch (error) {
-        setError('Failed to load preferences');
-        setPreferences(getDefaultPreferences());
+        if (!isCancelled) {
+          setError('Failed to load preferences');
+          setPreferences(getDefaultPreferences());
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     loadPreferences();
+    
+    // Cleanup function to prevent state updates on unmounted component
+    return () => {
+      isCancelled = true;
+    };
   }, [isAuthenticated, user, token, isAuthenticatedParam]);
 
   const updatePreferences = async (newPreferences) => {

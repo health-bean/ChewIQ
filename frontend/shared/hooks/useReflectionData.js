@@ -6,59 +6,130 @@ const useReflectionData = (selectedDate, isAuthenticated = false) => {
     bedtime: '',
     wake_time: '',
     sleep_quality: '',
-    overnight_symptoms: '',
+    sleep_symptoms: [],
     energy_level: 5,
     mood_level: 5,
     physical_comfort: 5,
-    overall_notes: '',
+    personal_reflection: '',
     activity_level: '',
     meditation_practice: false,
     meditation_duration: 0,
-    mindfulness_activities: '',
     cycle_day: '',
     ovulation: false,
-    additional_reflections: ''
+    stress_level: 5
   });
 
   const [loading, setLoading] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // Load reflection data for selected date
+  // Load reflection data for selected date from API
   useEffect(() => {
-    const loadReflectionData = () => {
-      // SECURITY: Use sessionStorage for personal health data privacy
-      const saved = sessionStorage.getItem(`reflection_${selectedDate}`);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          setReflectionData(parsed);
-        } catch (error) {
-        }
-      } else {
-        // Reset to defaults for new date
+    let isCancelled = false;
+    
+    const loadReflectionData = async () => {
+      if (!isAuthenticated || !selectedDate) {
+        // Reset to defaults when not authenticated or no date
         setReflectionData({
           bedtime: '',
           wake_time: '',
           sleep_quality: '',
-          overnight_symptoms: '',
+          sleep_symptoms: [],
           energy_level: 5,
           mood_level: 5,
           physical_comfort: 5,
-          overall_notes: '',
+          personal_reflection: '',
           activity_level: '',
           meditation_practice: false,
           meditation_duration: 0,
-          mindfulness_activities: '',
           cycle_day: '',
           ovulation: false,
-          additional_reflections: ''
+          stress_level: 5
         });
+        setHasUnsavedChanges(false);
+        return;
       }
-      setHasUnsavedChanges(false);
+
+      try {
+        setLoading(true);
+        const response = await apiClient.get(`/api/v1/journal/entries/${selectedDate}`);
+        
+        if (!isCancelled) {
+          if (response.entry) {
+            // Map API response to component format
+            const apiData = response.entry;
+            setReflectionData({
+              bedtime: apiData.bedtime || '',
+              wake_time: apiData.wake_time || '',
+              sleep_quality: apiData.sleep_quality || '',
+              sleep_symptoms: [], // This comes from timeline entries, handle separately if needed
+              energy_level: apiData.energy_level || 5,
+              mood_level: apiData.mood_level || 5,
+              physical_comfort: apiData.physical_comfort || 5,
+              personal_reflection: '', // Map from notes field if available
+              activity_level: apiData.activity_level || '',
+              meditation_practice: apiData.meditation_practice || false,
+              meditation_duration: apiData.meditation_minutes || 0,
+              cycle_day: apiData.cycle_day || '',
+              ovulation: apiData.ovulation || false,
+              stress_level: apiData.stress_level || 5
+            });
+          } else {
+            // No existing entry for this date, use defaults
+            setReflectionData({
+              bedtime: '',
+              wake_time: '',
+              sleep_quality: '',
+              sleep_symptoms: [],
+              energy_level: 5,
+              mood_level: 5,
+              physical_comfort: 5,
+              personal_reflection: '',
+              activity_level: '',
+              meditation_practice: false,
+              meditation_duration: 0,
+              cycle_day: '',
+              ovulation: false,
+              stress_level: 5
+            });
+          }
+          setHasUnsavedChanges(false);
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          console.error('Failed to load reflection data:', error);
+          // Use defaults on error
+          setReflectionData({
+            bedtime: '',
+            wake_time: '',
+            sleep_quality: '',
+            sleep_symptoms: [],
+            energy_level: 5,
+            mood_level: 5,
+            physical_comfort: 5,
+            personal_reflection: '',
+            activity_level: '',
+            meditation_practice: false,
+            meditation_duration: 0,
+            cycle_day: '',
+            ovulation: false,
+            stress_level: 5
+          });
+          setHasUnsavedChanges(false);
+        }
+      } finally {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      }
     };
 
     loadReflectionData();
-  }, [selectedDate]);
+    
+    // Cleanup function to prevent state updates on unmounted component
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedDate, isAuthenticated]);
 
   const updateReflectionData = (updates) => {
     setReflectionData(prev => ({ ...prev, ...updates }));
@@ -66,20 +137,44 @@ const useReflectionData = (selectedDate, isAuthenticated = false) => {
   };
 
   const saveReflectionData = async () => {
+    if (!isAuthenticated || !selectedDate) {
+      console.error('Cannot save reflection data: not authenticated or no date selected');
+      return false;
+    }
+
     setLoading(true);
     try {
-      // SECURITY: Save to sessionStorage for health data privacy
-      sessionStorage.setItem(`reflection_${selectedDate}`, JSON.stringify(reflectionData));
+      // Map component data to API format
+      const apiData = {
+        entry_date: selectedDate,
+        bedtime: reflectionData.bedtime,
+        wake_time: reflectionData.wake_time,
+        sleep_quality: reflectionData.sleep_quality,
+        energy_level: reflectionData.energy_level,
+        mood_level: reflectionData.mood_level,
+        physical_comfort: reflectionData.physical_comfort,
+        activity_level: reflectionData.activity_level,
+        stress_level: reflectionData.stress_level,
+        meditation_practice: reflectionData.meditation_practice,
+        meditation_minutes: reflectionData.meditation_duration,
+        cycle_day: reflectionData.cycle_day,
+        ovulation: reflectionData.ovulation,
+        sleep_symptoms: reflectionData.sleep_symptoms || []
+      };
+
+      // Save to API
+      const response = await apiClient.post('/api/v1/journal/entries', apiData);
       
-      // TODO: Send to API when ready
-      // await apiClient.post('/api/v1/journal/entries', {
-      //   date: selectedDate,
-      //   ...reflectionData
-      // });
-      
-      setHasUnsavedChanges(false);
-      return true;
+      if (response && response.message) {
+        console.log('Reflection data saved successfully:', response.message);
+        setHasUnsavedChanges(false);
+        return true;
+      } else {
+        console.error('Unexpected API response:', response);
+        return false;
+      }
     } catch (error) {
+      console.error('Failed to save reflection data:', error);
       return false;
     } finally {
       setLoading(false);

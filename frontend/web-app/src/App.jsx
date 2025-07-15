@@ -14,8 +14,9 @@ import PreferencesPage from './components/pages/PreferencesPage';
 import { Button, Alert } from '../../shared/components/ui';
 import useProtocols from '../../shared/hooks/useProtocols';
 import useUserPreferences from '../../shared/hooks/useUserPreferences';
-import useExposureTypes from '../../shared/hooks/useExposureTypes';
-import useDetoxTypes from '../../shared/hooks/useDetoxTypes';
+// DISABLED: These hooks were causing duplicate API calls
+// import useExposureTypes from '../../shared/hooks/useExposureTypes';
+// import useDetoxTypes from '../../shared/hooks/useDetoxTypes';
 import useReflectionData from '../../shared/hooks/useReflectionData';
 
 // Import local hooks
@@ -60,8 +61,15 @@ const MainApp = () => {
   // Data hooks (only run when authenticated)
   const { protocols, loading: protocolsLoading, error: protocolsError } = useProtocols(isAuthenticated);
   const { preferences, updatePreferences, refreshPreferences, loading: preferencesLoading, error: preferencesError, isReady } = useUserPreferences(isAuthenticated);
-  const { exposureTypes } = useExposureTypes(isAuthenticated);
-  const { detoxTypes } = useDetoxTypes(isAuthenticated);
+  
+  // DISABLED: These hooks are causing duplicate API calls
+  // const { exposureTypes } = useExposureTypes(isAuthenticated);
+  // const { detoxTypes } = useDetoxTypes(isAuthenticated);
+  
+  // Temporary replacements to prevent breaking the app
+  const exposureTypes = [];
+  const detoxTypes = [];
+  // Re-enabled: useReflectionData only uses sessionStorage, no API calls
   const { reflectionData, updateReflectionData, saveReflectionData, loading: reflectionLoading, hasUnsavedChanges } = useReflectionData(selectedDate, isAuthenticated);
 
   // Timeline and entry form (only when authenticated)
