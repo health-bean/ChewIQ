@@ -12,18 +12,8 @@ const handleGetJournalEntries = async (queryParams, event) => {
             SELECT 
                 id,
                 entry_date,
-                bedtime,
-                wake_time,
-                sleep_quality,
-                energy_level,
-                mood_level,
-                physical_comfort,
-                activity_level,
-                stress_level,
-                meditation_practice,
-                meditation_minutes,
-                cycle_day,
-                ovulation,
+                reflection_data,
+                consent_to_anonymize,
                 created_at,
                 updated_at
             FROM journal_entries
@@ -66,18 +56,8 @@ const handleGetJournalEntry = async (date, event) => {
             SELECT 
                 id,
                 entry_date,
-                bedtime,
-                wake_time,
-                sleep_quality,
-                energy_level,
-                mood_level,
-                physical_comfort,
-                activity_level,
-                stress_level,
-                meditation_practice,
-                meditation_minutes,
-                cycle_day,
-                ovulation,
+                reflection_data,
+                consent_to_anonymize,
                 created_at,
                 updated_at
             FROM journal_entries
@@ -113,64 +93,81 @@ const handleGetJournalEntry = async (date, event) => {
 
 const handleCreateJournalEntry = async (body, event) => {
     try {
+        console.log('🔍 Journal API: Creating entry with body:', body);
+        
         const client = await pool.connect();
         const userId = event.user.id;
-        const {
-            entry_date,
-            bedtime,
-            wake_time,
-            sleep_quality,
-            energy_level,
-            mood_level,
-            physical_comfort,
+        const { 
+            entry_date, 
+            bedtime, wake_time, sleep_quality, sleep_symptoms = [],
+            energy_level, mood_level, physical_comfort,
             activity_level,
-            stress_level,
-            meditation_practice,
-            meditation_minutes,
-            cycle_day,
-            ovulation,
-            sleep_symptoms = []
+            meditation_duration, meditation_practice,
+            cycle_day, ovulation,
+            personal_reflection
         } = body;
+        
+        // Structure data according to your JSONB format
+        const reflectionData = {
+            sleep: {
+                bedtime: bedtime || null,
+                wake_time: wake_time || null,
+                sleep_quality: sleep_quality || null,
+                sleep_symptoms: sleep_symptoms || []
+            },
+            wellness: {
+                energy_level: energy_level || null,
+                mood_level: mood_level || null,
+                physical_comfort: physical_comfort || null
+            },
+            activity: {
+                activity_level: activity_level || null
+            },
+            meditation: {
+                meditation_duration: meditation_duration || 0,
+                meditation_practice: meditation_practice || false
+            },
+            cycle: {
+                cycle_day: cycle_day || null,
+                ovulation: ovulation || false
+            },
+            notes: {
+                personal_reflection: personal_reflection || null
+            }
+        };
+        
+        console.log('🔍 Journal API: User ID:', userId);
+        console.log('🔍 Journal API: Entry date:', entry_date);
+        console.log('🔍 Journal API: Structured reflection data:', JSON.stringify(reflectionData, null, 2));
         
         await client.query('BEGIN');
         
-        // Insert or update journal entry
+        // Insert or update journal entry with JSONB structure
         const journalQuery = `
             INSERT INTO journal_entries (
-                user_id, entry_date, bedtime, wake_time, sleep_quality,
-                energy_level, mood_level, physical_comfort, activity_level,
-                stress_level, meditation_practice, meditation_minutes,
-                cycle_day, ovulation
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+                user_id, entry_date, reflection_data, consent_to_anonymize
+            ) VALUES ($1, $2, $3, $4)
             ON CONFLICT (user_id, entry_date) 
             DO UPDATE SET
-                bedtime = EXCLUDED.bedtime,
-                wake_time = EXCLUDED.wake_time,
-                sleep_quality = EXCLUDED.sleep_quality,
-                energy_level = EXCLUDED.energy_level,
-                mood_level = EXCLUDED.mood_level,
-                physical_comfort = EXCLUDED.physical_comfort,
-                activity_level = EXCLUDED.activity_level,
-                stress_level = EXCLUDED.stress_level,
-                meditation_practice = EXCLUDED.meditation_practice,
-                meditation_minutes = EXCLUDED.meditation_minutes,
-                cycle_day = EXCLUDED.cycle_day,
-                ovulation = EXCLUDED.ovulation,
+                reflection_data = EXCLUDED.reflection_data,
                 updated_at = CURRENT_TIMESTAMP
             RETURNING id
         `;
         
         const journalResult = await client.query(journalQuery, [
-            userId, entry_date, bedtime, wake_time, sleep_quality,
-            energy_level, mood_level, physical_comfort, activity_level,
-            stress_level, meditation_practice, meditation_minutes,
-            cycle_day, ovulation
+            userId, 
+            entry_date, 
+            JSON.stringify(reflectionData),
+            false // Default consent_to_anonymize
         ]);
         
         const journalEntryId = journalResult.rows[0].id;
+        console.log('🔍 Journal API: Journal entry created/updated with ID:', journalEntryId);
         
         // Handle sleep symptoms - add to timeline_entries
         if (sleep_symptoms && sleep_symptoms.length > 0) {
+            console.log('🔍 Journal API: Processing sleep symptoms:', sleep_symptoms.length);
+            
             // First, remove existing sleep symptoms for this date
             await client.query(`
                 DELETE FROM timeline_entries 
@@ -212,6 +209,7 @@ const handleCreateJournalEntry = async (body, event) => {
         await client.query('COMMIT');
         client.release();
         
+        console.log('✅ Journal API: Entry saved successfully');
         return successResponse({
             message: 'Journal entry saved successfully',
             entry_id: journalEntryId,
@@ -219,6 +217,7 @@ const handleCreateJournalEntry = async (body, event) => {
         });
         
     } catch (error) {
+        console.error('❌ Journal API Create Error:', error);
         await client.query('ROLLBACK');
         client.release();
         const appError = handleDatabaseError(error, 'create journal entry');

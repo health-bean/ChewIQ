@@ -54,24 +54,24 @@ const useReflectionData = (selectedDate, isAuthenticated = false) => {
         const response = await apiClient.get(`/api/v1/journal/entries/${selectedDate}`);
         
         if (!isCancelled) {
-          if (response.entry) {
-            // Map API response to component format
-            const apiData = response.entry;
+          if (response.entry && response.entry.reflection_data) {
+            // Map API response from nested JSONB structure to component format
+            const data = response.entry.reflection_data;
             setReflectionData({
-              bedtime: apiData.bedtime || '',
-              wake_time: apiData.wake_time || '',
-              sleep_quality: apiData.sleep_quality || '',
-              sleep_symptoms: [], // This comes from timeline entries, handle separately if needed
-              energy_level: apiData.energy_level || 5,
-              mood_level: apiData.mood_level || 5,
-              physical_comfort: apiData.physical_comfort || 5,
-              personal_reflection: '', // Map from notes field if available
-              activity_level: apiData.activity_level || '',
-              meditation_practice: apiData.meditation_practice || false,
-              meditation_duration: apiData.meditation_minutes || 0,
-              cycle_day: apiData.cycle_day || '',
-              ovulation: apiData.ovulation || false,
-              stress_level: apiData.stress_level || 5
+              bedtime: data.sleep?.bedtime || '',
+              wake_time: data.sleep?.wake_time || '',
+              sleep_quality: data.sleep?.sleep_quality || '',
+              sleep_symptoms: data.sleep?.sleep_symptoms || [],
+              energy_level: data.wellness?.energy_level || 5,
+              mood_level: data.wellness?.mood_level || 5,
+              physical_comfort: data.wellness?.physical_comfort || 5,
+              personal_reflection: data.notes?.personal_reflection || '',
+              activity_level: data.activity?.activity_level || '',
+              meditation_practice: data.meditation?.meditation_practice || false,
+              meditation_duration: data.meditation?.meditation_duration || 0,
+              cycle_day: data.cycle?.cycle_day || '',
+              ovulation: data.cycle?.ovulation || false,
+              stress_level: data.wellness?.stress_level || 5
             });
           } else {
             // No existing entry for this date, use defaults
@@ -150,7 +150,7 @@ const useReflectionData = (selectedDate, isAuthenticated = false) => {
 
     setLoading(true);
     try {
-      // Map component data to API format
+      // Map component data to API format (flat structure for backend processing)
       const apiData = {
         entry_date: selectedDate,
         bedtime: reflectionData.bedtime,
@@ -159,10 +159,11 @@ const useReflectionData = (selectedDate, isAuthenticated = false) => {
         energy_level: reflectionData.energy_level,
         mood_level: reflectionData.mood_level,
         physical_comfort: reflectionData.physical_comfort,
+        personal_reflection: reflectionData.personal_reflection,
         activity_level: reflectionData.activity_level,
         stress_level: reflectionData.stress_level,
         meditation_practice: reflectionData.meditation_practice,
-        meditation_minutes: reflectionData.meditation_duration,
+        meditation_duration: reflectionData.meditation_duration,
         cycle_day: reflectionData.cycle_day,
         ovulation: reflectionData.ovulation,
         sleep_symptoms: reflectionData.sleep_symptoms || []
