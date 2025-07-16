@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCorrelations } from '../../../../shared/hooks/useCorrelations';
-import { useSimpleAuth } from '../../../../shared/components/SimpleAuthProvider';
+import { useSimpleAuth } from '../../components/auth/SimpleAuthProvider';
 import { AlertTriangle, CheckCircle, Eye, Target, Activity, Clock } from 'lucide-react';
 import { Button, Select, Alert, Card } from '../../../../shared/components/ui';
 

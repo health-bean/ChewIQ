@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Calendar, ChevronDown, User, Settings, LogOut } from 'lucide-react';
 import { Input, Button, Card } from '../../../../shared/components/ui';
 import { cn } from '../../../../shared/design-system';
-import { useSimpleAuth } from '../../../../shared/components/SimpleAuthProvider';
+import { useSimpleAuth } from '../auth/SimpleAuthProvider';
 import MultiSelectProtocolDropdown from '../common/MultiSelectProtocolDropdown';
 
 const Header = ({ 

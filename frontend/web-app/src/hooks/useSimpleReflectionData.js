@@ -1,9 +1,9 @@
-// File: frontend/shared/hooks/useSimpleReflectionData.js
+// File: frontend/web-app/src/hooks/useSimpleReflectionData.js
 // Simple reflection data hook using clean API system
 
 import { useState, useEffect } from 'react';
 import { useJournalApi } from './useSimpleApi';
-import safeLogger from '../utils/safeLogger';
+import safeLogger from '../../../shared/utils/safeLogger';
 
 const useSimpleReflectionData = (selectedDate, isAuthenticated = false) => {
   const [reflectionData, setReflectionData] = useState({

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Plus, Check, Loader2, X, AlertCircle, Pill, Droplets } from 'lucide-react';
 import { Input, Button, Card } from '../../../../shared/components/ui';
 import { cn } from '../../../../shared/design-system';
-import { useSimpleApi } from '../../../../shared/hooks/useSimpleApi';
+import { useSimpleApi } from '../../hooks/useSimpleApi';
 
 // Import the working food search hook
 import { useFoodSearch } from '../../../../shared/hooks/useProtocolFoods';

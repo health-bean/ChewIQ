@@ -19,8 +19,8 @@ import {
 } from 'lucide-react';
 import { Button, Card, Alert, Badge } from '../../../../shared/components/ui';
 import { cn } from '../../../../shared/design-system';
-import { useSimpleAuth } from '../../../../shared/components/SimpleAuthProvider';
-import { usePreferencesApi, useProtocolsApi } from '../../../../shared/hooks/useSimpleApi';
+import { useSimpleAuth } from '../auth/SimpleAuthProvider';
+import { usePreferencesApi, useProtocolsApi } from '../../hooks/useSimpleApi';
 
 const PreferencesPage = ({ onBack }) => {
   const { user } = useSimpleAuth();
