@@ -1,13 +1,13 @@
-// File: frontend/shared/components/SimpleAuthProvider.jsx
+// File: frontend/web-app/src/components/auth/SimpleAuthProvider.jsx
 // Dual-track authentication: Cognito for real users, demo mode for testing
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { signIn, signOut, getCurrentUser, fetchAuthSession } from '@aws-amplify/auth';
-import safeLogger from '../utils/safeLogger';
-import { simpleApiClient } from '../services/simpleApi.js';
+import safeLogger from '../../../../shared/utils/safeLogger';
+import { simpleApiClient } from '../../../../shared/services/simpleApi.js';
 
 // Import Amplify config
-import '../../../web-app/src/config/amplify.js';
+import '../../config/amplify.js';
 
 // Create Auth Context
 const AuthContext = createContext(null);
@@ -124,34 +124,36 @@ export const SimpleAuthProvider = ({ children }) => {
         return;
       }
 
-      // Check for real user with Cognito
-      try {
-        const cognitoUser = await getCurrentUser();
-        if (cognitoUser) {
-          const session = await fetchAuthSession();
-          const token = session.tokens?.accessToken?.toString();
-          
-          if (token) {
-            const realUser = {
-              id: cognitoUser.userId,
-              email: cognitoUser.signInDetails?.loginId || cognitoUser.username,
-              name: cognitoUser.signInDetails?.loginId || cognitoUser.username,
-              isDemo: false,
-              cognitoUser: cognitoUser
-            };
+      // Check for real user with Cognito (only if Cognito functions are available)
+      if (getCurrentUser && fetchAuthSession) {
+        try {
+          const cognitoUser = await getCurrentUser();
+          if (cognitoUser) {
+            const session = await fetchAuthSession();
+            const token = session.tokens?.accessToken?.toString();
             
-            setCurrentUser(realUser);
-            setUserType('real');
-            
-            // Store token for API calls
-            sessionStorage.setItem('auth_token', token);
-            
-            safeLogger.debug('Real user session restored', { userId: realUser.id });
+            if (token) {
+              const realUser = {
+                id: cognitoUser.userId,
+                email: cognitoUser.signInDetails?.loginId || cognitoUser.username,
+                name: cognitoUser.signInDetails?.loginId || cognitoUser.username,
+                isDemo: false,
+                cognitoUser: cognitoUser
+              };
+              
+              setCurrentUser(realUser);
+              setUserType('real');
+              
+              // Store token for API calls
+              sessionStorage.setItem('auth_token', token);
+              
+              safeLogger.debug('Real user session restored', { userId: realUser.id });
+            }
           }
+        } catch (cognitoError) {
+          // No Cognito user found - this is normal
+          safeLogger.debug('No Cognito user session found');
         }
-      } catch (cognitoError) {
-        // No Cognito user found - this is normal
-        safeLogger.debug('No Cognito user session found');
       }
       
     } catch (error) {
@@ -241,6 +243,10 @@ export const SimpleAuthProvider = ({ children }) => {
 
   // Real user login with Cognito
   const loginReal = async (email, password) => {
+    if (!signIn) {
+      throw new Error('Cognito authentication not available');
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -307,7 +313,7 @@ export const SimpleAuthProvider = ({ children }) => {
     try {
       safeLogger.debug('Logout initiated', { userId: currentUser?.id, userType });
       
-      if (isRealUser) {
+      if (isRealUser && signOut) {
         // Sign out from Cognito
         await signOut();
         sessionStorage.removeItem('auth_token');
