@@ -1,14 +1,6 @@
 const { pool } = require('../database/connection');
 const { successResponse, errorResponse } = require('../utils/responses');
-
-// Demo user ID mapping - maps frontend demo IDs to database UUIDs
-const DEMO_USER_MAPPING = {
-  'sarah-aip': '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0',
-  'mike-fodmap': 'mike-fodmap-uuid-here', // Add actual UUID when available
-  'lisa-histamine': 'lisa-histamine-uuid-here', // Add actual UUID when available
-  'john-paleo': 'john-paleo-uuid-here', // Add actual UUID when available
-  'emma-multi': 'emma-multi-uuid-here' // Add actual UUID when available
-};
+const { getCurrentUser, getAccessibleUserIds } = require('../middleware/auth');
 
 /**
  * Main correlation insights handler - Enhanced for comprehensive health tracking
@@ -16,26 +8,24 @@ const DEMO_USER_MAPPING = {
  */
 async function handleGetCorrelationInsights(queryParams, event) {
   try {
-    const requestedUserId = queryParams?.user_id || queryParams?.userId;
     const timeframeDays = parseInt(queryParams?.timeframe_days) || 180;
     const confidenceThreshold = parseFloat(queryParams?.confidence_threshold) || 0.6;
 
-    if (!requestedUserId) {
-      return errorResponse('user_id parameter is required', 400);
+    // Use auth middleware to get current user (handles both demo and Cognito users)
+    const user = await getCurrentUser(event);
+    if (!user) {
+      return errorResponse('Authentication required', 401);
     }
 
-    // Check if this is a demo user request and map to actual database UUID
-    const isDemoUser = DEMO_USER_MAPPING.hasOwnProperty(requestedUserId);
-    const actualUserId = isDemoUser ? DEMO_USER_MAPPING[requestedUserId] : requestedUserId;
-
-    console.log('Correlation request:', {
-      requested: requestedUserId,
-      actual: actualUserId,
-      isDemo: isDemoUser
+    console.log('Correlation request for user:', {
+      userId: user.id,
+      email: user.email,
+      isDemo: user.isDemo || false,
+      isCognito: user.isCognito || false
     });
 
-    // Get timeline data for the user (use actualUserId, not userId)
-    const timelineData = await getTimelineData(actualUserId, timeframeDays);
+    // Get timeline data for the authenticated user
+    const timelineData = await getTimelineData(user.id, timeframeDays);
     
     if (timelineData.length === 0) {
       return successResponse({
@@ -63,7 +53,7 @@ async function handleGetCorrelationInsights(queryParams, event) {
       summary,
       timeframe_days: timeframeDays,
       confidence_threshold: confidenceThreshold,
-      user_id: requestedUserId
+      user_id: user.id
     });
 
   } catch (error) {
