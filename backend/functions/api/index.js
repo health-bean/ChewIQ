@@ -1,5 +1,5 @@
 // backend/functions/api/index.js (CLEAN AUTH SYSTEM)
-const { handleGetCorrelationInsights } = require('./handlers/correlations');
+const { handleGetCorrelationInsights } = require('./handlers/correlations-simple');
 const { handleCors } = require('./utils/responses');
 const { handleGetUser, handleUpdateUser, handleGetUserProtocols, handleGetUserPreferences, handleUpdateUserPreferences, handleGetCurrentProtocol, handleGetProtocolHistory, handleChangeProtocol } = require('./handlers/users');
 const { handleGetJournalEntries, handleCreateJournalEntry, handleGetJournalEntry, handleUpdateJournalEntry } = require('./handlers/journal');

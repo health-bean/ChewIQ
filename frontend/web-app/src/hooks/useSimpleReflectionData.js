@@ -136,7 +136,7 @@ const useSimpleReflectionData = (selectedDate, isAuthenticated = false) => {
     return () => {
       isCancelled = true;
     };
-  }, [selectedDate, isAuthenticated, getJournalEntry]);
+  }, [selectedDate, isAuthenticated]);
 
   const updateReflectionData = (updates) => {
     setReflectionData(prev => ({ ...prev, ...updates }));
