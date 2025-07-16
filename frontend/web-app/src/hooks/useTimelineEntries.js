@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useTimelineApi } from '../../../shared/hooks/useSimpleApi';
+import { timelineService } from '../../../shared/services/timelineService';
 import safeLogger from '../../../shared/utils/safeLogger';
 
 export const useTimelineEntries = (selectedDate, isAuthenticated = false) => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  // Use the proper API hook that sends demo headers
-  const { getTimelineEntries, addTimelineEntry } = useTimelineApi();
 
   const loadEntries = async () => {
     safeLogger.debug('Loading timeline entries', { selectedDate, isAuthenticated });
@@ -23,7 +20,7 @@ export const useTimelineEntries = (selectedDate, isAuthenticated = false) => {
       setLoading(true);
       setError(null);
       safeLogger.debug('Fetching timeline entries', { date: selectedDate });
-      const data = await getTimelineEntries(selectedDate);
+      const data = await timelineService.getEntries(selectedDate);
       setEntries(data.entries || []);
       safeLogger.debug('Timeline entries loaded', { count: data.entries?.length || 0 });
     } catch (err) {
@@ -36,7 +33,7 @@ export const useTimelineEntries = (selectedDate, isAuthenticated = false) => {
 
   const addEntry = async (entryData) => {
     try {
-      await addTimelineEntry(entryData);
+      await timelineService.createEntry(entryData);
       await loadEntries(); // Refresh entries after adding
     } catch (err) {
       console.error('Failed to add entry:', err);
