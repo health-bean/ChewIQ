@@ -246,10 +246,12 @@ const getCurrentUser = async (event) => {
       return null;
     }
     
-    // Priority 2: Check for demo mode
-    const demoMode = event.headers['X-Demo-Mode'] || event.headers['x-demo-mode'];
-    const demoUserId = event.headers['X-Demo-User-Id'] || event.headers['x-demo-user-id'];
-    const demoSessionId = event.headers['X-Demo-Session-Id'] || event.headers['x-demo-session-id'];
+    // Priority 2: Check for demo mode (handle all case variations)
+    const demoMode = findHeaderCaseInsensitive(event.headers, 'x-demo-mode');
+    const demoUserId = findHeaderCaseInsensitive(event.headers, 'x-demo-user-id');
+    const demoSessionId = findHeaderCaseInsensitive(event.headers, 'x-demo-session-id');
+    
+    console.log('AUTH MIDDLEWARE: Demo headers found:', { demoMode, demoUserId, demoSessionId });
     
     if (demoMode === 'true' && demoUserId) {
       console.log('AUTH MIDDLEWARE: Demo mode detected', { 
@@ -426,6 +428,26 @@ const requireUserType = (allowedTypes) => {
     return null;
   };
 };
+
+/**
+ * Helper function to find a header regardless of case
+ * This is needed because different browsers and frameworks may send headers with different casing
+ */
+function findHeaderCaseInsensitive(headers, headerName) {
+  if (!headers || typeof headers !== 'object') return null;
+  
+  // Convert the header name to lowercase for comparison
+  const lowerHeaderName = headerName.toLowerCase();
+  
+  // Check all possible variations
+  for (const key in headers) {
+    if (key.toLowerCase() === lowerHeaderName) {
+      return headers[key];
+    }
+  }
+  
+  return null;
+}
 
 module.exports = {
   getCurrentUser,
