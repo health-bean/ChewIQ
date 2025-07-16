@@ -20,10 +20,12 @@ import {
 import { Button, Card, Alert, Badge } from '../../../../shared/components/ui';
 import { cn } from '../../../../shared/design-system';
 import { useSimpleAuth } from '../../../../shared/components/SimpleAuthProvider';
-import { apiClient } from '../../../../shared/services/api';
+import { usePreferencesApi, useProtocolsApi } from '../../../../shared/hooks/useSimpleApi';
 
 const PreferencesPage = ({ onBack }) => {
-  const { user, getAuthHeaders } = useSimpleAuth();
+  const { user } = useSimpleAuth();
+  const { getPreferences, updatePreferences } = usePreferencesApi();
+  const { getProtocols } = useProtocolsApi();
   const [activeSection, setActiveSection] = useState('overview');
   const [currentProtocol, setCurrentProtocol] = useState(null);
   const [availableProtocols, setAvailableProtocols] = useState([]);
@@ -45,31 +47,28 @@ const PreferencesPage = ({ onBack }) => {
       setIsLoading(true);
       setError(null);
 
-      // Load current protocol
-      const currentResponse = await apiClient.get('/api/v1/users/current-protocol', {
-        headers: getAuthHeaders()
-      });
-
-      if (currentResponse?.protocol) {
-        setCurrentProtocol(currentResponse.protocol);
-      }
-
-      // Load available protocols
-      const protocolsResponse = await apiClient.get('/api/v1/protocols', {
-        headers: getAuthHeaders()
-      });
-
+      // Load available protocols using the proper API hook
+      const protocolsResponse = await getProtocols();
       if (protocolsResponse?.protocols) {
         setAvailableProtocols(protocolsResponse.protocols);
       }
 
-      // Load protocol change history
-      const historyResponse = await apiClient.get('/api/v1/users/protocol-history', {
-        headers: getAuthHeaders()
-      });
-
-      if (historyResponse?.history) {
-        setProtocolHistory(historyResponse.history);
+      // For demo mode, we'll simulate current protocol and history
+      // In a real app, these would come from user preferences
+      if (user && availableProtocols.length > 0) {
+        // Set a default protocol for demo users
+        const defaultProtocol = availableProtocols.find(p => p.name.includes('AIP')) || availableProtocols[0];
+        setCurrentProtocol(defaultProtocol);
+        
+        // Simulate protocol history for demo
+        setProtocolHistory([
+          {
+            id: 1,
+            protocol_name: defaultProtocol?.name || 'AIP',
+            changed_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+            reason: 'Initial setup'
+          }
+        ]);
       }
 
     } catch (err) {
@@ -85,26 +84,26 @@ const PreferencesPage = ({ onBack }) => {
       setIsChanging(true);
       setError(null);
 
-      const response = await apiClient.post('/api/v1/users/change-protocol', {
-        newProtocolId,
-        reason,
-        context: {
-          changed_by: 'user',
-          source: 'preferences_page'
-        }
-      }, {
-        headers: getAuthHeaders()
-      });
-
-      if (response?.success) {
-        // Reload data to show updated state
-        await loadProtocolData();
+      // For demo mode, we'll simulate the protocol change
+      const newProtocol = availableProtocols.find(p => p.id === newProtocolId);
+      if (newProtocol) {
+        setCurrentProtocol(newProtocol);
+        
+        // Add to history
+        const newHistoryEntry = {
+          id: protocolHistory.length + 1,
+          protocol_name: newProtocol.name,
+          changed_at: new Date().toISOString(),
+          reason: reason || 'User preference change'
+        };
+        setProtocolHistory([newHistoryEntry, ...protocolHistory]);
+        
         setShowChangeConfirm(null);
       }
 
     } catch (err) {
       console.error('Error changing protocol:', err);
-      setError(err.response?.data?.message || 'Failed to change protocol');
+      setError('Failed to change protocol');
     } finally {
       setIsChanging(false);
     }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Plus, X, Pill } from 'lucide-react';
 import { Input, Button, Card } from '../../../../shared/components/ui';
 import { cn } from '../../../../shared/design-system';
+import { useSimpleApi } from '../../../../shared/hooks/useSimpleApi';
 
 const SmartSupplementSelector = ({ 
   selectedSupplements = [], 
@@ -12,8 +13,9 @@ const SmartSupplementSelector = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [supplements, setSupplements] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  
+  // Use the proper API client that sends demo headers
+  const apiClient = useSimpleApi();
 
   useEffect(() => {
     const loadSupplements = async () => {
@@ -24,19 +26,12 @@ const SmartSupplementSelector = ({
 
       setLoading(true);
       try {
-        let url = `${API_BASE_URL}/api/v1/supplements/search?search=${encodeURIComponent(searchTerm)}`;
+        let endpoint = `/api/v1/supplements/search?search=${encodeURIComponent(searchTerm)}`;
         if (prioritizeUserHistory) {
-          url += '&prioritize_user_history=true';
+          endpoint += '&prioritize_user_history=true';
         }
 
-        const response = await fetch(url, {
-          headers: {
-            'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        const data = await response.json();
+        const data = await apiClient.get(endpoint);
         setSupplements(data.supplements || []);
       } catch (err) {
         console.error('Failed to load supplements:', err);
@@ -48,7 +43,7 @@ const SmartSupplementSelector = ({
 
     const timer = setTimeout(loadSupplements, 300);
     return () => clearTimeout(timer);
-  }, [searchTerm, prioritizeUserHistory, API_BASE_URL]);
+  }, [searchTerm, prioritizeUserHistory, apiClient]);
 
   const isSelected = (supplement) => {
     return selectedSupplements.some(item => item.name === supplement.name);

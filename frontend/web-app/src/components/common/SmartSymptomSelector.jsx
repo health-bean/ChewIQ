@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Plus, X, AlertCircle } from 'lucide-react';
 import { Input, Button, Card } from '../../../../shared/components/ui';
 import { cn } from '../../../../shared/design-system';
+import { useSimpleApi } from '../../../../shared/hooks/useSimpleApi';
 
 const SmartSymptomSelector = ({ 
   selectedSymptoms = [], 
@@ -12,8 +13,9 @@ const SmartSymptomSelector = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [symptoms, setSymptoms] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  
+  // Use the proper API client that sends demo headers
+  const apiClient = useSimpleApi();
 
   useEffect(() => {
     const loadSymptoms = async () => {
@@ -24,20 +26,13 @@ const SmartSymptomSelector = ({
 
       setLoading(true);
       try {
-        // First try to get user's symptom history, then fall back to symptom database
-        let url = `${API_BASE_URL}/api/v1/symptoms/search?search=${encodeURIComponent(searchTerm)}`;
+        // Build search URL with parameters
+        let endpoint = `/api/v1/symptoms/search?search=${encodeURIComponent(searchTerm)}`;
         if (prioritizeUserHistory) {
-          url += '&prioritize_user_history=true';
+          endpoint += '&prioritize_user_history=true';
         }
 
-        const response = await fetch(url, {
-          headers: {
-            'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        const data = await response.json();
+        const data = await apiClient.get(endpoint);
         setSymptoms(data.symptoms || []);
       } catch (err) {
         console.error('Failed to load symptoms:', err);
@@ -49,7 +44,7 @@ const SmartSymptomSelector = ({
 
     const timer = setTimeout(loadSymptoms, 300);
     return () => clearTimeout(timer);
-  }, [searchTerm, prioritizeUserHistory, API_BASE_URL]);
+  }, [searchTerm, prioritizeUserHistory, apiClient]);
 
   const isSelected = (symptom) => {
     return selectedSymptoms.some(item => item.name === symptom.name);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Plus, Check, Loader2, X, AlertCircle, Pill, Droplets } from 'lucide-react';
 import { Input, Button, Card } from '../../../../shared/components/ui';
 import { cn } from '../../../../shared/design-system';
+import { useSimpleApi } from '../../../../shared/hooks/useSimpleApi';
 
 // Import the working food search hook
 import { useFoodSearch } from '../../../../shared/hooks/useProtocolFoods';
@@ -16,8 +17,9 @@ const UnifiedSmartSelector = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  
+  // Use the proper API client that sends demo headers
+  const apiClient = useSimpleApi();
 
   // Use the working food search hook for food searches
   const { 
@@ -120,20 +122,13 @@ const UnifiedSmartSelector = ({
   const loadNonFoodItems = async () => {
     setLoading(true);
     try {
-      let url = `${API_BASE_URL}${config.endpoint}?search=${encodeURIComponent(searchTerm)}`;
+      let endpoint = `${config.endpoint}?search=${encodeURIComponent(searchTerm)}`;
       
       if (prioritizeUserHistory) {
-        url += '&prioritize_user_history=true';
+        endpoint += '&prioritize_user_history=true';
       }
 
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      const data = await response.json();
+      const data = await apiClient.get(endpoint);
       
       // Handle different response formats
       const itemsKey = {
