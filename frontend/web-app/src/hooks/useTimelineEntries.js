@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { timelineService } from '../../../shared/services/timelineService';
 import safeLogger from '../../../shared/utils/safeLogger';
 
@@ -7,7 +7,7 @@ export const useTimelineEntries = (selectedDate, isAuthenticated = false) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadEntries = async () => {
+  const loadEntries = useCallback(async () => {
     safeLogger.debug('Loading timeline entries', { selectedDate, isAuthenticated });
     
     if (!selectedDate || !isAuthenticated) {
@@ -29,9 +29,9 @@ export const useTimelineEntries = (selectedDate, isAuthenticated = false) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDate, isAuthenticated]);
 
-  const addEntry = async (entryData) => {
+  const addEntry = useCallback(async (entryData) => {
     try {
       await timelineService.createEntry(entryData);
       await loadEntries(); // Refresh entries after adding
@@ -40,15 +40,15 @@ export const useTimelineEntries = (selectedDate, isAuthenticated = false) => {
       setError(err.message);
       throw err;
     }
-  };
+  }, [loadEntries]);
 
-  const hasCriticalInsights = () => {
+  const hasCriticalInsights = useCallback(() => {
     return entries.some(entry => entry.protocol_compliant === false);
-  };
+  }, [entries]);
 
   useEffect(() => {
     loadEntries();
-  }, [selectedDate, isAuthenticated]);
+  }, [loadEntries]);
 
   return {
     entries,
