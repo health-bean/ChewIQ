@@ -75,12 +75,14 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
                            preferencesData.setup_complete === 1;
           }
           
+          // Create merged preferences with setup_complete explicitly set as boolean
           const mergedPreferences = { 
             ...defaults, 
-            ...preferencesData,
-            // Explicitly set setup_complete as boolean
-            setup_complete: setupComplete
+            ...preferencesData
           };
+          
+          // Explicitly override setup_complete to ensure it's a boolean
+          mergedPreferences.setup_complete = setupComplete;
           
           setPreferences(mergedPreferences);
         } else {
@@ -192,12 +194,14 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
                          preferencesData.setup_complete === 1;
         }
         
+        // Create merged preferences with setup_complete explicitly set as boolean
         const mergedPreferences = { 
           ...defaults, 
-          ...preferencesData,
-          // Explicitly set setup_complete as boolean
-          setup_complete: setupComplete
+          ...preferencesData
         };
+        
+        // Explicitly override setup_complete to ensure it's a boolean
+        mergedPreferences.setup_complete = setupComplete;
         
         setPreferences(mergedPreferences);
       } else {
@@ -226,6 +230,9 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
     return preferences[key] !== undefined ? preferences[key] : defaultValue;
   };
 
+  // Determine if preferences are ready (loaded and not in error state)
+  const isReady = !loading && !error && preferences !== null;
+
   return { 
     preferences, 
     updatePreferences, 
@@ -234,7 +241,8 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
     getPreference,
     loading, 
     error,
-    saving
+    saving,
+    isReady
   };
 };
 
