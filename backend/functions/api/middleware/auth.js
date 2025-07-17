@@ -19,7 +19,7 @@ const DEMO_USERS = {
     is_active: true
   },
   'mike-fodmap': {
-    id: '7d7b457b-b1a7-42b7-a177-6550dcb9cae1',
+    id: 'bb5c54ee-0304-4e7b-8ad4-b464f5b1e37f', // Updated to match the database ID
     email: 'mike.fodmap@test.com',
     first_name: 'Mike',
     last_name: 'Chen',
