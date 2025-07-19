@@ -168,6 +168,9 @@ backend/functions/api/*.zip
 dev-notes/
 .temp/
 
+# Kiro IDE files and specs
+.kiro/
+
 # AI Analysis and Documentation (legacy - moved to dev-notes/)
 docs/build/
 docs/.docusaurus/

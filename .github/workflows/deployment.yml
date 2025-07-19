@@ -38,7 +38,7 @@ jobs:
           --zip-file fileb://deploy.zip \
           --publish || { echo "❌ Lambda deployment failed"; exit 1; }
 
-  generate-professional-docs:
+  build-hybrid-docs:
     needs: deploy-backend
     runs-on: ubuntu-latest
     steps:
@@ -50,9 +50,15 @@ jobs:
       with:
         node-version: '18'
         
-    - name: Generate Professional Documentation
+    - name: Build Docusaurus Documentation
+      working-directory: docs
       run: |
-        # Make the documentation generator executable (back in root directory)
+        npm ci || { echo "❌ npm install failed"; exit 1; }
+        npm run build || { echo "❌ Docusaurus build failed"; exit 1; }
+        
+    - name: Generate Automated Dashboard
+      run: |
+        # Make the documentation generator executable
         chmod +x comprehensive-docs-generator.js || { echo "❌ chmod failed"; exit 1; }
         
         # Run the enhanced documentation generator
@@ -61,27 +67,36 @@ jobs:
         # Verify generated files
         ls -la docs-site/ || { echo "❌ docs-site directory not found"; exit 1; }
         
-        # Display summary
-        if [ -f "docs-site/platform-data.json" ]; then
-          echo "✅ Professional documentation generated successfully"
-          echo "📊 Generated files:"
-          echo "   - index.html (Professional documentation site)"
-          echo "   - platform-data.json (Structured data)"
-          echo "   - README.md (Developer guide)"
-        else
-          echo "❌ Documentation generation failed"
-          exit 1
-        fi
+    - name: Combine Documentation Sites
+      run: |
+        # Create combined documentation structure
+        mkdir -p combined-docs
+        
+        # Copy hub and dashboard from docs-site
+        cp -r docs-site/* combined-docs/
+        
+        # Copy Docusaurus build to docs subdirectory
+        mkdir -p combined-docs/docs
+        cp -r docs/build/* combined-docs/docs/
+        
+        # Verify structure
+        echo "✅ Combined documentation structure:"
+        echo "   - index.html (Documentation hub)"
+        echo "   - dashboard.html (Live metrics)"
+        echo "   - api.html (API explorer)"
+        echo "   - docs/ (Docusaurus technical docs)"
+        
+        ls -la combined-docs/
         
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs-site
+        publish_dir: ./combined-docs
         cname: # Optional: Add your custom domain here
 
   summary:
-    needs: [deploy-backend, generate-professional-docs]
+    needs: [deploy-backend, build-hybrid-docs]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -90,7 +105,7 @@ jobs:
         REPO_OWNER: ${{ github.repository_owner }}
         REPO_NAME: ${{ github.event.repository.name }}
         BACKEND_RESULT: ${{ needs.deploy-backend.result }}
-        DOCS_RESULT: ${{ needs.generate-professional-docs.result }}
+        DOCS_RESULT: ${{ needs.build-hybrid-docs.result }}
       run: |
         echo "## 🎯 Deployment Results" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY

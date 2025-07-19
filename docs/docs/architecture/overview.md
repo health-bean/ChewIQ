@@ -2,24 +2,62 @@
 
 ## Overview
 
-The Health Platform follows a modern monorepo architecture with clear separation of concerns and scalable design patterns.
+The Health Platform is built as a modern, scalable web application with clear separation between frontend applications and backend services, utilizing JSONB for flexible data storage and a security-first approach.
+
+## High-Level Architecture
+
+```mermaid
+graph TB
+    subgraph "Frontend Applications"
+        WA[Web App<br/>Patient Portal]
+        PD[Practitioner Dashboard<br/>Provider Interface]
+        SH[Shared Components<br/>UI Library]
+    end
+    
+    subgraph "Backend Services"
+        API[API Gateway<br/>Express.js]
+        AUTH[Authentication<br/>JWT + Refresh Tokens]
+        BL[Business Logic<br/>Functions]
+    end
+    
+    subgraph "Data Layer"
+        DB[(PostgreSQL<br/>JSONB Storage)]
+        CACHE[(Redis<br/>Session Cache)]
+    end
+    
+    subgraph "Infrastructure"
+        AWS[AWS Amplify<br/>Hosting & CI/CD]
+        RDS[AWS RDS<br/>Database]
+        S3[AWS S3<br/>File Storage]
+    end
+    
+    WA --> API
+    PD --> API
+    API --> AUTH
+    API --> BL
+    BL --> DB
+    AUTH --> CACHE
+    
+    AWS --> WA
+    AWS --> PD
+    RDS --> DB
+```
 
 ## Project Structure
 
 ```
-Health Platform/
+health-platform/
 ├── frontend/
-│   ├── web-app/          # Main React application
-│   ├── mobile-app/       # Future mobile app (not planned)
-│   ├── practitioner-dashboard/  # Future practitioner interface
-│   └── shared/           # Shared components and utilities
+│   ├── web-app/           # Main user-facing application
+│   ├── practioner-dashboard/ # Healthcare provider interface
+│   └── shared/            # Shared components and utilities
 ├── backend/
-│   ├── functions/        # AWS Lambda functions
-│   ├── database/         # Database schemas and migrations
-│   └── shared/           # Shared backend utilities
-├── docs/                 # Documentation (Docusaurus)
-├── infrastructure/       # Infrastructure as Code
-└── scripts/              # Build and deployment scripts
+│   ├── functions/         # API endpoints and business logic
+│   ├── database/          # Schema, migrations, and queries
+│   └── scripts/           # Utility and maintenance scripts
+├── docs/                  # Project documentation
+├── dev-notes/             # Development notes (gitignored)
+└── scripts/               # Build and deployment scripts
 ```
 
 ## Technology Stack
@@ -70,9 +108,39 @@ Health Platform/
 
 
 ### Database Design
-- **Primary Database:** PostgreSQL (RDS)
-- **Caching:** Redis (planned for production)
-- **File Storage:** AWS S3 (planned)
+- **Primary Database:** PostgreSQL 14+ with JSONB support
+- **Modern Schema:** JSONB-first approach for health data
+- **Indexing:** GIN indexes for fast JSONB queries
+- **Backup:** Automated backups with point-in-time recovery
+
+### JSONB Data Architecture
+
+#### **journal_entries Table:**
+```sql
+CREATE TABLE journal_entries (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id),
+    entry_date DATE NOT NULL,
+    reflection_data JSONB DEFAULT '{}',
+    consent_to_anonymize BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT now(),
+    updated_at TIMESTAMP DEFAULT now()
+);
+```
+
+#### **timeline_entries Table:**
+```sql
+CREATE TABLE timeline_entries (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    journal_entry_id UUID REFERENCES journal_entries(id),
+    user_id UUID REFERENCES users(id),
+    entry_time TIME NOT NULL,
+    entry_type VARCHAR(50) NOT NULL,
+    entry_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    structured_content JSONB,
+    created_at TIMESTAMP DEFAULT now()
+);
+```
 
 ## Data Flow Architecture
 

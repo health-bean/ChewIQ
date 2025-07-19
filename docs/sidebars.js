@@ -15,10 +15,21 @@
 const sidebars = {
   tutorialSidebar: [
     'intro',
+    'quick-start',
+    {
+      type: 'category',
+      label: 'Getting Started',
+      items: ['development/setup'],
+    },
     {
       type: 'category',
       label: 'Architecture',
       items: ['architecture/overview'],
+    },
+    {
+      type: 'category',
+      label: 'Database',
+      items: ['database/overview'],
     },
     {
       type: 'category', 
@@ -32,8 +43,13 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Development',
-      items: ['development/setup'],
+      label: 'Security',
+      items: ['security/overview'],
+    },
+    {
+      type: 'category',
+      label: 'Configuration',
+      items: ['configuration/deployment', 'configuration/environment'],
     },
     {
       type: 'category',
