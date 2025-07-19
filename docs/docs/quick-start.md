@@ -52,7 +52,7 @@ Expected response: List of health protocols
 ## Next Steps
 
 1. **[Explore the API](./api/overview)** - Test available endpoints
-2. **[Configure Database](./database/schema)** - Set up database connection
+2. **[Configure Database](./database/overview)** - Set up database connection
 3. **[Set Environment Variables](./configuration/environment)** - Configure credentials
 4. **[Browse Components](./components/overview)** - Use shared components
 5. **[Understand Architecture](./architecture/overview)** - System design
