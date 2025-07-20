@@ -16,6 +16,50 @@ const { handleTestAuth } = require('./handlers/test-auth');
 const { successResponse, errorResponse } = require('./utils/responses');
 const { getCurrentUser } = require('./middleware/auth');
 
+// Import demo users for direct access in index.js
+const DEMO_USERS = {
+  'sarah-aip': {
+    id: '8e8a568a-c2f8-43a8-abf2-4e54408dbdc0',
+    email: 'sarah.aip@test.com',
+    first_name: 'Sarah',
+    last_name: 'Johnson',
+    user_type: 'demo',
+    is_active: true
+  },
+  'mike-fodmap': {
+    id: 'bb5c54ee-0304-4e7b-8ad4-b464f5b1e37f',
+    email: 'mike.fodmap@test.com',
+    first_name: 'Mike',
+    last_name: 'Chen',
+    user_type: 'demo',
+    is_active: true
+  },
+  'lisa-histamine': {
+    id: '74ae8620-d183-46ea-a17d-9da8f23f39be',
+    email: 'lisa.histamine@test.com',
+    first_name: 'Lisa',
+    last_name: 'Rodriguez',
+    user_type: 'demo',
+    is_active: true
+  },
+  'john-paleo': {
+    id: '3e209467-b142-4101-a399-adb3f3232dba',
+    email: 'john.paleo@test.com',
+    first_name: 'John',
+    last_name: 'Williams',
+    user_type: 'demo',
+    is_active: true
+  },
+  'emma-multi': {
+    id: '3923a221-97f6-4425-b863-e9b3b450ebfb',
+    email: 'emma.multi@test.com',
+    first_name: 'Emma',
+    last_name: 'Davis',
+    user_type: 'demo',
+    is_active: true
+  }
+};
+
 exports.handler = async (event) => {
     console.log('Event:', JSON.stringify(event, null, 2));
     
@@ -59,6 +103,23 @@ exports.handler = async (event) => {
         }
         else if (path === '/api/v1/user/preferences' && method === 'GET') {
             console.log('🔍 INDEX: Matched user preferences GET route');
+            
+            // If no user is authenticated but demo_user is in query params, try to authenticate as demo user
+            if (!event.user && queryParams.demo_user) {
+                console.log('🔍 INDEX: No authenticated user but demo_user param found:', queryParams.demo_user);
+                const demoUser = DEMO_USERS[queryParams.demo_user];
+                if (demoUser) {
+                    console.log('🔍 INDEX: Setting event.user to demo user:', demoUser.email);
+                    event.user = {
+                        ...demoUser,
+                        firstName: demoUser.first_name,
+                        lastName: demoUser.last_name,
+                        userType: demoUser.user_type,
+                        isDemo: true
+                    };
+                }
+            }
+            
             response = await handleGetUserPreferences(queryParams, event);
             console.log('🔍 INDEX: handleGetUserPreferences returned:', response ? 'response' : 'null');
         }
@@ -123,6 +184,23 @@ exports.handler = async (event) => {
             const date = path.split('/').pop();
             console.log('🔍 INDEX: Extracted date:', date);
             console.log('🔍 INDEX: Event user:', event.user ? 'present' : 'missing');
+            
+            // If no user is authenticated but demo_user is in query params, try to authenticate as demo user
+            if (!event.user && queryParams.demo_user) {
+                console.log('🔍 INDEX: No authenticated user but demo_user param found:', queryParams.demo_user);
+                const demoUser = DEMO_USERS[queryParams.demo_user];
+                if (demoUser) {
+                    console.log('🔍 INDEX: Setting event.user to demo user:', demoUser.email);
+                    event.user = {
+                        ...demoUser,
+                        firstName: demoUser.first_name,
+                        lastName: demoUser.last_name,
+                        userType: demoUser.user_type,
+                        isDemo: true
+                    };
+                }
+            }
+            
             response = await handleGetJournalEntry(date, event);
             console.log('🔍 INDEX: handleGetJournalEntry returned:', response ? 'response' : 'null');
         }
@@ -132,6 +210,22 @@ exports.handler = async (event) => {
         }
         // Timeline routes
         else if (path === '/api/v1/timeline/entries' && method === 'GET') {
+            // If no user is authenticated but demo_user is in query params, try to authenticate as demo user
+            if (!event.user && queryParams.demo_user) {
+                console.log('🔍 INDEX: No authenticated user but demo_user param found:', queryParams.demo_user);
+                const demoUser = DEMO_USERS[queryParams.demo_user];
+                if (demoUser) {
+                    console.log('🔍 INDEX: Setting event.user to demo user:', demoUser.email);
+                    event.user = {
+                        ...demoUser,
+                        firstName: demoUser.first_name,
+                        lastName: demoUser.last_name,
+                        userType: demoUser.user_type,
+                        isDemo: true
+                    };
+                }
+            }
+            
             response = await handleGetTimelineEntries(queryParams, event);
         }
         else if (path === '/api/v1/timeline/entries' && method === 'POST') {

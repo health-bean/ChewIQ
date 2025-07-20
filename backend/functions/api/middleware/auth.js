@@ -243,7 +243,7 @@ const getCurrentUser = async (event) => {
       }
       
       console.log('AUTH MIDDLEWARE: Cognito verification failed');
-      return null;
+      // Don't return null here - continue to check for demo user
     }
     
     // Priority 2: Check for demo mode (handle all case variations)
@@ -272,7 +272,27 @@ const getCurrentUser = async (event) => {
         };
       } else {
         console.log('AUTH MIDDLEWARE: Demo user not found:', demoUserId);
-        return null;
+        // Don't return null here - check for demo_user in query params
+      }
+    }
+    
+    // Priority 3: Check for demo_user in query parameters
+    const queryParams = event.queryStringParameters || {};
+    if (queryParams.demo_user) {
+      console.log('AUTH MIDDLEWARE: Found demo_user in query params:', queryParams.demo_user);
+      
+      const demoUser = DEMO_USERS[queryParams.demo_user];
+      if (demoUser) {
+        console.log('AUTH MIDDLEWARE: Demo user found from query params:', demoUser.email);
+        return {
+          ...demoUser,
+          firstName: demoUser.first_name,
+          lastName: demoUser.last_name,
+          userType: demoUser.user_type,
+          isDemo: true
+        };
+      } else {
+        console.log('AUTH MIDDLEWARE: Demo user not found from query params:', queryParams.demo_user);
       }
     }
     
