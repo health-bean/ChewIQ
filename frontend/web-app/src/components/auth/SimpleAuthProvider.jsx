@@ -76,7 +76,9 @@ export const SimpleAuthProvider = ({ children }) => {
   // Get auth token for API calls
   const getAuthToken = React.useCallback(() => {
     if (isRealUser) {
-      return sessionStorage.getItem('auth_token');
+      const token = sessionStorage.getItem('auth_token');
+      console.log('🔑 getAuthToken called, token exists:', !!token, token ? `length: ${token.length}` : 'no token');
+      return token;
     }
     return null; // Demo users don't use JWT tokens
   }, [isRealUser]);
@@ -85,14 +87,23 @@ export const SimpleAuthProvider = ({ children }) => {
   const getAuthHeaders = React.useCallback(() => {
     if (isRealUser) {
       const token = getAuthToken();
-      return token ? { Authorization: `Bearer ${token}` } : {};
+      console.log('🔑 getAuthHeaders for real user, token exists:', !!token);
+      if (token) {
+        console.log('🔑 Adding Authorization header with Bearer token');
+        return { Authorization: `Bearer ${token}` };
+      } else {
+        console.log('🔑 No token available for Authorization header');
+        return {};
+      }
     } else if (isDemoMode && currentUser) {
       // Demo users use special headers
+      console.log('🔑 Adding demo headers for user:', currentUser.id);
       return {
         'x-demo-mode': 'true',
         'x-demo-user-id': currentUser.id
       };
     }
+    console.log('🔑 No auth headers added - not authenticated');
     return {};
   }, [isRealUser, isDemoMode, currentUser, getAuthToken]);
 
@@ -129,8 +140,15 @@ export const SimpleAuthProvider = ({ children }) => {
         try {
           const cognitoUser = await getCurrentUser();
           if (cognitoUser) {
+            console.log('🔑 Cognito user found during initialization:', cognitoUser.userId);
+            
             const session = await fetchAuthSession();
+            console.log('🔑 Session obtained during initialization:', !!session);
+            console.log('🔑 Session tokens:', !!session.tokens);
+            console.log('🔑 Access token:', !!session.tokens?.accessToken);
+            
             const token = session.tokens?.accessToken?.toString();
+            console.log('🔑 Token extracted during initialization:', !!token, token ? `length: ${token.length}` : 'no token');
             
             if (token) {
               const realUser = {
@@ -147,7 +165,13 @@ export const SimpleAuthProvider = ({ children }) => {
               // Store token for API calls
               sessionStorage.setItem('auth_token', token);
               
+              // Verify token was stored correctly
+              const storedToken = sessionStorage.getItem('auth_token');
+              console.log('🔑 Token stored in sessionStorage during initialization:', !!storedToken, storedToken ? `length: ${storedToken.length}` : 'failed');
+              
               safeLogger.debug('Real user session restored', { userId: realUser.id });
+            } else {
+              console.log('🔑 No token available during initialization');
             }
           }
         } catch (cognitoError) {
@@ -269,7 +293,14 @@ export const SimpleAuthProvider = ({ children }) => {
         // Get user info and session
         const cognitoUser = await getCurrentUser();
         const session = await fetchAuthSession();
+        
+        console.log('🔑 Session obtained:', !!session);
+        console.log('🔑 Session tokens:', !!session.tokens);
+        console.log('🔑 Access token:', !!session.tokens?.accessToken);
+        
         const token = session.tokens?.accessToken?.toString();
+        
+        console.log('🔑 Token extracted:', !!token, token ? `length: ${token.length}` : 'no token');
         
         if (token) {
           const realUser = {
@@ -283,11 +314,19 @@ export const SimpleAuthProvider = ({ children }) => {
           // Store user and token
           setCurrentUser(realUser);
           setUserType('real');
+          
+          // Store token in sessionStorage
           sessionStorage.setItem('auth_token', token);
+          
+          // Verify token was stored correctly
+          const storedToken = sessionStorage.getItem('auth_token');
+          console.log('🔑 Token stored in sessionStorage:', !!storedToken, storedToken ? `length: ${storedToken.length}` : 'failed');
           
           safeLogger.debug('Real user login successful', { userId: realUser.id });
           
           return { success: true, user: realUser };
+        } else {
+          throw new Error('Failed to obtain authentication token');
         }
       } else {
         // Handle additional auth steps (MFA, etc.)

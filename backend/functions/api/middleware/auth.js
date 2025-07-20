@@ -3,8 +3,8 @@ const { pool } = require('../database/connection');
 const { errorResponse } = require('../utils/responses');
 
 // Cognito configuration
-const COGNITO_USER_POOL_ID = 'us-east-1_8lWGDfv0w';
-const COGNITO_CLIENT_ID = '20gj35c0vmamtm4qgtk3euoh27';
+const COGNITO_USER_POOL_ID = 'us-east-1_vr1pPiP6N'; // Updated to match frontend
+const COGNITO_CLIENT_ID = '5luhu590qnjdgi7579k1mqoct9'; // Updated to match frontend
 const COGNITO_REGION = 'us-east-1';
 const COGNITO_ISSUER = `https://cognito-idp.${COGNITO_REGION}.amazonaws.com/${COGNITO_USER_POOL_ID}`;
 
@@ -55,11 +55,13 @@ const DEMO_USERS = {
 // Function to verify Cognito JWT tokens
 const verifyCognitoToken = async (token) => {
   try {
+    console.log('AUTH MIDDLEWARE: Verifying Cognito token');
+    
     // Decode token without verification first to get header
     const decodedHeader = jwt.decode(token, { complete: true });
     
     if (!decodedHeader || !decodedHeader.header || !decodedHeader.header.kid) {
-      console.log('Invalid token structure');
+      console.log('AUTH MIDDLEWARE: Invalid token structure');
       return null;
     }
 
@@ -68,34 +70,40 @@ const verifyCognitoToken = async (token) => {
     const decoded = jwt.decode(token);
     
     if (!decoded) {
-      console.log('Failed to decode Cognito token');
+      console.log('AUTH MIDDLEWARE: Failed to decode Cognito token');
       return null;
     }
 
+    console.log('AUTH MIDDLEWARE: Token decoded, checking issuer and audience');
+    console.log('AUTH MIDDLEWARE: Token issuer:', decoded.iss);
+    console.log('AUTH MIDDLEWARE: Expected issuer:', COGNITO_ISSUER);
+    console.log('AUTH MIDDLEWARE: Token audience/client:', decoded.aud || decoded.client_id);
+    console.log('AUTH MIDDLEWARE: Expected client ID:', COGNITO_CLIENT_ID);
+
     // Verify token issuer
     if (decoded.iss !== COGNITO_ISSUER) {
-      console.log('Invalid token issuer:', decoded.iss);
+      console.log('AUTH MIDDLEWARE: Invalid token issuer:', decoded.iss);
       return null;
     }
 
     // Verify token audience (client ID)
     if (decoded.aud !== COGNITO_CLIENT_ID && decoded.client_id !== COGNITO_CLIENT_ID) {
-      console.log('Invalid token audience');
+      console.log('AUTH MIDDLEWARE: Invalid token audience');
       return null;
     }
 
     // Check token expiration
     const now = Math.floor(Date.now() / 1000);
     if (decoded.exp && decoded.exp < now) {
-      console.log('Token expired');
+      console.log('AUTH MIDDLEWARE: Token expired');
       return null;
     }
 
-    console.log('Cognito token verified successfully for user:', decoded.sub);
+    console.log('AUTH MIDDLEWARE: Cognito token verified successfully for user:', decoded.sub);
     return decoded;
 
   } catch (error) {
-    console.error('Cognito token verification error:', error);
+    console.error('AUTH MIDDLEWARE: Cognito token verification error:', error);
     return null;
   }
 };

@@ -55,6 +55,13 @@ class SimpleApiClient {
       
       // Debug log the headers being sent (without sensitive info)
       const headerKeys = Object.keys(authHeaders);
+      console.log('🔑 API headers from getter:', { 
+        headerCount: headerKeys.length,
+        hasAuthHeader: headerKeys.includes('Authorization'),
+        hasDemoHeaders: headerKeys.includes('x-demo-mode'),
+        headers: headerKeys.join(', ')
+      });
+      
       safeLogger.debug('API headers from getter', { 
         headerCount: headerKeys.length,
         hasAuthHeader: headerKeys.includes('Authorization'),
@@ -69,7 +76,10 @@ class SimpleApiClient {
       const token = this.tokenGetter();
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
+        console.log('🔑 API headers from token getter:', { hasToken: !!token, tokenLength: token.length });
         safeLogger.debug('API headers from token', { hasToken: !!token });
+      } else {
+        console.log('🔑 No token available from token getter');
       }
     }
 
@@ -80,6 +90,11 @@ class SimpleApiClient {
       if (this.userContext.sessionId) {
         headers['x-demo-session-id'] = this.userContext.sessionId;
       }
+      console.log('🔑 API headers from user context:', { 
+        userId: this.userContext.userId,
+        isDemo: this.userContext.isDemo,
+        headers: Object.keys(headers).join(', ')
+      });
       safeLogger.debug('API headers from user context', { 
         userId: this.userContext.userId,
         isDemo: this.userContext.isDemo
@@ -93,10 +108,20 @@ class SimpleApiClient {
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
     
+    const headers = this.getHeaders();
     const config = {
-      headers: this.getHeaders(),
+      headers,
       ...options,
     };
+
+    // Log the actual headers being sent (without sensitive values)
+    const headerKeys = Object.keys(headers);
+    console.log('🔑 Request headers for', endpoint, {
+      headerCount: headerKeys.length,
+      hasAuthHeader: headerKeys.includes('Authorization'),
+      hasDemoHeaders: headerKeys.includes('x-demo-mode'),
+      headers: headerKeys.join(', ')
+    });
 
     try {
       safeLogger.debug(`API Request: ${options.method || 'GET'} ${endpoint}`, { 
