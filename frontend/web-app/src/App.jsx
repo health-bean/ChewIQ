@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 
 import HeaderDebugger from './components/debug/HeaderDebugger';// Import clean auth components (keeping existing SimpleAuth)
 import { SimpleAuthProvider, useSimpleAuth } from './components/auth/SimpleAuthProvider';
-import { apiClient } from '../../shared/services/api';
+import { simpleApiClient } from '../../shared/services/simpleApi';
 import SimpleLoginPage from './components/pages/SimpleLoginPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import PreferencesPage from './components/pages/PreferencesPage';
@@ -48,8 +48,8 @@ const MainApp = () => {
   // Connect API client with auth provider
   useEffect(() => {
     if (getAuthToken && getAuthHeaders) {
-      apiClient.setTokenGetter(getAuthToken);
-      apiClient.setHeadersGetter(getAuthHeaders);
+      simpleApiClient.setTokenGetter(getAuthToken);
+      simpleApiClient.setHeaderGetter(getAuthHeaders);
     }
   }, [getAuthToken, getAuthHeaders]);
   

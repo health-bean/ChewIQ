@@ -82,6 +82,9 @@ const verifyCognitoToken = async (token) => {
     
     // Debug: Log all token contents to see what's available
     console.log('AUTH MIDDLEWARE: Full token payload:', JSON.stringify(decoded, null, 2));
+    
+    // Debug: Log all token contents to see what's available
+    console.log('AUTH MIDDLEWARE: Full token payload:', JSON.stringify(decoded, null, 2));
 
     // Verify token issuer
     if (decoded.iss !== COGNITO_ISSUER) {
