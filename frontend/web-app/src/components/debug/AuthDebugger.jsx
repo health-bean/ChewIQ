@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSimpleAuth } from '../auth/SimpleAuthProvider';
-import { apiClient } from '../../../../shared/services/simpleApi';
+import { apiClient } from '../../../../shared/services/api';
 
 export const AuthDebugger = () => {
   const auth = useSimpleAuth();

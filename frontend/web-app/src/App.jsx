@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 
 import HeaderDebugger from './components/debug/HeaderDebugger';// Import clean auth components (keeping existing SimpleAuth)
 import { AuthProvider, useAuth } from './contexts/AuthProvider';
-import { apiClient } from '../../shared/services/simpleApi';
+import { apiClient } from '../../shared/services/api';
 import LoginPage from './components/pages/LoginPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import PreferencesPage from './components/pages/PreferencesPage';

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { apiClient } from '../services/simpleApi.js';
+import { apiClient } from '../services/api.js';
 
 export const useCorrelations = (confidenceThreshold = 0.6, timeframeDays = 180) => {
   const [correlations, setCorrelations] = useState([]);

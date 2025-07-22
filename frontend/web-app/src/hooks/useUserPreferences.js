@@ -1,7 +1,7 @@
 // File: frontend/web-app/src/hooks/useUserPreferences.js (FIXED)
 
 import { useState, useEffect } from 'react';
-import { apiClient } from '../../../shared/services/simpleApi.js';
+import { apiClient } from '../../../shared/services/api.js';
 import { useAuth } from '../contexts/AuthProvider';
 import safeLogger from '../../../shared/utils/safeLogger';
 

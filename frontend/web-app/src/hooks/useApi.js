@@ -2,7 +2,7 @@
 // API hook for clean auth integration
 
 import { useEffect } from 'react';
-import { apiClient } from '../../../shared/services/simpleApi';
+import { apiClient } from '../../../shared/services/api';
 import { useAuth } from '../contexts/AuthProvider';
 import safeLogger from '../../../shared/utils/safeLogger';
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { apiClient } from '../services/simpleApi.js';
+import { apiClient } from '../services/api.js';
 
 export const useProtocolFoods = (protocolId) => {
   const [foodsByCategory, setFoodsByCategory] = useState({});

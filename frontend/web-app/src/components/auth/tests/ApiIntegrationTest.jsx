@@ -1,7 +1,7 @@
 // Test for API integration with authentication
 import React, { useState, useEffect } from 'react';
 import { SimpleAuthProvider, useSimpleAuth } from '../SimpleAuthProvider';
-import { apiClient } from '../../../../../shared/services/simpleApi';
+import { apiClient } from '../../../../../shared/services/api';
 
 // API test component (must be used inside SimpleAuthProvider)
 const ApiTester = () => {

@@ -1,127 +1,184 @@
+// File: frontend/shared/services/simpleApi.js
+// Clean, simple API client for health platform prototype
+
 import safeLogger from '../utils/safeLogger';
 
-class ApiConfig {
+class SimpleApiClient {
   constructor() {
     this.baseURL = import.meta.env.VITE_API_BASE_URL || 'https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev';
     this.environment = import.meta.env.VITE_APP_ENV || 'development';
-    this.authEnabled = import.meta.env.VITE_AUTH_ENABLED === 'true';
-    this.isLocal = this.environment === 'development' && this.baseURL.includes('localhost');
-    this.getTokenCallback = null; // Callback function to get current token
-    this.getHeadersCallback = null; // Callback function to get auth headers
+    this.userContext = null;
+    this.tokenGetter = null;
+    this.headerGetter = null;
   }
 
-  // Method to set token getter callback from AuthProvider
-  setTokenGetter(getTokenCallback) {
-    this.getTokenCallback = getTokenCallback;
-    safeLogger.debug('API client token getter callback set');
+  // Set token getter function (for standard users)
+  setTokenGetter(tokenGetter) {
+    this.tokenGetter = tokenGetter;
+    safeLogger.debug('API token getter callback set');
   }
 
-  // Method to set headers getter callback from AuthProvider
-  setHeadersGetter(getHeadersCallback) {
-    this.getHeadersCallback = getHeadersCallback;
+  // Set header getter function (for both standard and demo users)
+  setHeaderGetter(headerGetter) {
+    this.headerGetter = headerGetter;
     safeLogger.debug('API client headers getter callback set');
   }
 
-  getHeaders() {
+  // Set user context for API calls
+  setUserContext(userContext) {
+    this.userContext = userContext;
+    safeLogger.debug('API user context set', { 
+      userId: userContext?.userId,
+      isDemo: userContext?.isDemo 
+    });
+  }
+
+  // Clear user context
+  clearUserContext() {
+    this.userContext = null;
+    this.tokenGetter = null;
+    this.headerGetter = null;
+    safeLogger.debug('API user context cleared');
+  }
+
+  // Get headers for API requests
+  getHeaders(additionalHeaders = {}) {
     const headers = {
       'Content-Type': 'application/json',
+      ...additionalHeaders
     };
 
-    // Add auth headers when auth is enabled
-    if (this.authEnabled) {
-      // First try to get headers from auth provider callback
-      if (this.getHeadersCallback && typeof this.getHeadersCallback === 'function') {
-        try {
-          const authHeaders = this.getHeadersCallback();
-          if (authHeaders && typeof authHeaders === 'object') {
-            Object.assign(headers, authHeaders);
-            safeLogger.debug('Auth headers added from provider callback');
-            return headers;
-          }
-        } catch (error) {
-          safeLogger.error('Error getting headers from callback', { error: error.message });
-        }
-      }
-      
-      // Fallback to token-based auth
-      const token = this.getAuthToken();
-      safeLogger.debug('API authentication status', { authEnabled: this.authEnabled, hasToken: !!token });
-      
+    // First try to get the token directly for standard users
+    if (this.tokenGetter) {
+      const token = this.tokenGetter();
       if (token) {
-        headers.Authorization = `Bearer ${token}`;
-        safeLogger.debug('Authorization header added to request');
+        headers['Authorization'] = `Bearer ${token}`;
+        console.log('🔑 API headers from token getter:', { 
+          hasToken: true, 
+          tokenLength: token.length,
+          authHeader: `Bearer ${token.substring(0, 10)}...`
+        });
+        safeLogger.debug('API headers from token', { hasToken: true });
       } else {
-        safeLogger.warn('No auth token available for API request');
+        console.log('🔑 No token available from token getter');
       }
+    }
+    
+    // Use header getter if available (may override token)
+    if (this.headerGetter) {
+      const authHeaders = this.headerGetter();
+      
+      // Debug log the headers being sent (without sensitive info)
+      const headerKeys = Object.keys(authHeaders);
+      console.log('🔑 API headers from getter:', { 
+        headerCount: headerKeys.length,
+        hasAuthHeader: headerKeys.includes('Authorization'),
+        hasDemoHeaders: headerKeys.includes('x-demo-mode'),
+        headers: headerKeys.join(', ')
+      });
+      
+      // Important: Add auth headers to the request
+      Object.assign(headers, authHeaders);
+      
+      safeLogger.debug('API headers from getter', { 
+        headerCount: headerKeys.length,
+        hasAuthHeader: headerKeys.includes('Authorization'),
+        hasDemoHeaders: headerKeys.includes('x-demo-mode')
+      });
+    }
+    // Legacy: Add user context to headers for demo mode
+    else if (this.userContext && this.userContext.isDemo) {
+      headers['x-demo-mode'] = 'true';
+      headers['x-demo-user-id'] = this.userContext.userId;
+      if (this.userContext.sessionId) {
+        headers['x-demo-session-id'] = this.userContext.sessionId;
+      }
+      console.log('🔑 API headers from user context:', { 
+        userId: this.userContext.userId,
+        isDemo: this.userContext.isDemo,
+        headers: Object.keys(headers).join(', ')
+      });
+      safeLogger.debug('API headers from user context', { 
+        userId: this.userContext.userId,
+        isDemo: this.userContext.isDemo
+      });
     }
 
     return headers;
   }
 
-  getAuthToken() {
-    // First try to get token from callback (preferred - always current)
-    if (this.getTokenCallback && typeof this.getTokenCallback === 'function') {
-      try {
-        const token = this.getTokenCallback();
-        if (token) {
-          safeLogger.debug('Auth token from callback', { found: true });
-          return token;
-        }
-      } catch (error) {
-        safeLogger.error('Error getting token from callback', { error: error.message });
-      }
-    }
-    
-    // Fallback to sessionStorage
-    const token = sessionStorage.getItem('auth_token');
-    safeLogger.debug('Auth token from sessionStorage fallback', { found: !!token });
-    return token || null;
-  }
-
+  // Main request method
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
     
-    // Always get fresh headers (including token) for each request
+    const headers = this.getHeaders();
     const config = {
-      headers: this.getHeaders(),
+      headers,
       ...options,
     };
+
+    // Log the actual headers being sent (without sensitive values)
+    const headerKeys = Object.keys(headers);
+    console.log('🔑 Request headers for', endpoint, {
+      headerCount: headerKeys.length,
+      hasAuthHeader: headerKeys.includes('Authorization'),
+      hasDemoHeaders: headerKeys.includes('x-demo-mode'),
+      headers: headerKeys.join(', ')
+    });
 
     try {
       safeLogger.debug(`API Request: ${options.method || 'GET'} ${endpoint}`, { 
         method: options.method || 'GET',
-        endpoint
+        endpoint,
+        hasUserContext: !!this.userContext
       });
       
       const response = await fetch(url, config);
       
       if (!response.ok) {
-        // Handle auth errors specifically
-        if (response.status === 401 || response.status === 403) {
-          if (this.authEnabled) {
-            // Will trigger login flow when auth is implemented
-            safeLogger.warn('Authentication required for API request', { 
-              status: response.status, 
-              endpoint 
-            });
-          }
+        // Handle different error types
+        if (response.status === 401) {
+          safeLogger.warn('API authentication required', { 
+            status: response.status, 
+            endpoint 
+          });
+          throw new Error(`Authentication required for ${endpoint}`);
+        }
+        
+        if (response.status === 404) {
+          safeLogger.warn('API endpoint not found', { 
+            status: response.status, 
+            endpoint 
+          });
+          throw new Error(`Endpoint not found: ${endpoint}`);
+        }
+        
+        if (response.status >= 500) {
+          safeLogger.error('API server error', { 
+            status: response.status, 
+            endpoint 
+          });
+          throw new Error(`Server error (${response.status}): ${endpoint}`);
         }
         
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      return await response.json();
-    } catch (error) {
-      safeLogger.error(`API Error for ${endpoint}`, { 
-        status: error.status || error.statusCode,
-        message: error.message,
-        endpoint
+      const data = await response.json();
+      
+      safeLogger.debug(`API Response: ${options.method || 'GET'} ${endpoint}`, { 
+        status: response.status,
+        hasData: !!data
       });
       
-      // In local development without auth, provide helpful error messages
-      if (this.isLocal && !this.authEnabled && error.message.includes('CORS')) {
-        safeLogger.error('CORS Error: Make sure vite proxy is configured correctly');
-      }
+      return data;
+      
+    } catch (error) {
+      safeLogger.error(`API Error for ${endpoint}`, { 
+        message: error.message,
+        endpoint,
+        method: options.method || 'GET'
+      });
       
       throw error;
     }
@@ -132,56 +189,45 @@ class ApiConfig {
     return this.request(endpoint, { method: 'GET' });
   }
 
-  // Safe JSON serialization that handles circular references
-  safeStringify(data) {
-    const seen = new WeakSet();
-    return JSON.stringify(data, (key, value) => {
-      // Skip React-specific properties that cause circular references
-      if (key.startsWith('__react') || key.startsWith('_react') || key === 'stateNode') {
-        return undefined;
-      }
-      
-      // Handle circular references
-      if (typeof value === 'object' && value !== null) {
-        if (seen.has(value)) {
-          return '[Circular Reference]';
-        }
-        seen.add(value);
-      }
-      
-      // Skip functions and DOM elements
-      if (typeof value === 'function' || 
-          (value && typeof value === 'object' && value.nodeType)) {
-        return undefined;
-      }
-      
-      return value;
-    });
-  }
-
   async post(endpoint, data) {
     return this.request(endpoint, {
       method: 'POST',
-      body: this.safeStringify(data),
+      body: JSON.stringify(data),
     });
   }
 
   async put(endpoint, data) {
     return this.request(endpoint, {
       method: 'PUT', 
-      body: this.safeStringify(data),
+      body: JSON.stringify(data),
     });
   }
 
   async delete(endpoint) {
     return this.request(endpoint, { method: 'DELETE' });
   }
+
+  // Demo-specific methods
+  async getDemoData(userId, endpoint) {
+    // Add user ID to endpoint for demo data
+    const demoEndpoint = `${endpoint}?demo_user=${userId}`;
+    return this.get(demoEndpoint);
+  }
+
+  async saveDemoData(userId, endpoint, data) {
+    // Add user ID to data for demo saves
+    const demoData = {
+      ...data,
+      demo_user: userId,
+      demo_session: this.userContext?.sessionId
+    };
+    return this.post(endpoint, demoData);
+  }
 }
 
 // Export singleton instance
-export const apiClient = new ApiConfig();
+export const apiClient = new SimpleApiClient();
 
 // Export environment helpers
 export const isProduction = () => import.meta.env.VITE_APP_ENV === 'production';
 export const isDevelopment = () => import.meta.env.VITE_APP_ENV === 'development';
-export const isAuthEnabled = () => import.meta.env.VITE_AUTH_ENABLED === 'true';

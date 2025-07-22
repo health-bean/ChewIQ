@@ -1,7 +1,7 @@
 // Test for the full authentication flow
 import React, { useState, useEffect } from 'react';
 import { SimpleAuthProvider, useSimpleAuth } from '../SimpleAuthProvider';
-import { apiClient } from '../../../../../shared/services/simpleApi';
+import { apiClient } from '../../../../../shared/services/api';
 
 // Protected content component
 const ProtectedContent = ({ onApiCall }) => {

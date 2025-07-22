@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { useSimpleAuth } from './SimpleAuthProvider.jsx';
-import { apiClient } from '../services/simpleApi.js';
+import { apiClient } from '../services/api.js';
 import { Badge, Alert, Button } from './ui';
 import safeLogger from '../utils/safeLogger';
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { apiClient } from '../services/simpleApi.js';
+import { apiClient } from '../services/api.js';
 import safeLogger from '../utils/safeLogger';
 
 const useProtocols = (isAuthenticated = false) => {

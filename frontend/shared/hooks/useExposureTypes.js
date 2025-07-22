@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { apiClient } from '../services/simpleApi.js';
+import { apiClient } from '../services/api.js';
 
 const useExposureTypes = (isAuthenticated = false) => {
   const [exposureTypes, setExposureTypes] = useState([]);
