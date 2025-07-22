@@ -20,8 +20,9 @@ const useProtocols = (isAuthenticated = false) => {
         return;
       }
       
-      // Prevent duplicate calls
-      if (loading) {
+      // Prevent duplicate calls - but only if we're actually in the middle of a fetch
+      // Check if we already have data and are not in an error state
+      if (loading && protocols.length === 0 && !error) {
         safeLogger.debug('Already loading protocols, skipping duplicate call');
         return;
       }
