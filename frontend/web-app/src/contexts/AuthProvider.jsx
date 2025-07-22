@@ -1,11 +1,11 @@
-// File: frontend/web-app/src/contexts/AmplifyAuthProvider.jsx
-// Simplified authentication provider with AWS Amplify + Demo mode support
+// File: frontend/web-app/src/contexts/AuthProvider.jsx
+// Authentication provider with AWS Amplify + Demo mode support
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { signIn, signUp, signOut, getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
 
 // Amplify is already configured in amplifyInit.js
-console.log('🔧 AmplifyAuthProvider loaded - using centralized Amplify config');
+console.log('🔧 AuthProvider loaded - using centralized Amplify config');
 
 // Create Auth Context
 const AuthContext = createContext(null);
@@ -67,7 +67,7 @@ const logger = {
 };
 
 // Enhanced Auth Provider Component
-export const AmplifyAuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -304,6 +304,21 @@ export const AmplifyAuthProvider = ({ children }) => {
     };
   };
 
+  // Token and header getters for API client
+  const getAuthToken = () => {
+    return authToken;
+  };
+
+  const getAuthHeaders = () => {
+    if (!authToken) {
+      return {};
+    }
+    
+    return {
+      'Authorization': `Bearer ${authToken}`
+    };
+  };
+
   // Enhanced auth context value
   const value = {
     // State
@@ -321,6 +336,8 @@ export const AmplifyAuthProvider = ({ children }) => {
     getUserContext,
     setError,
     checkAuthState,
+    getAuthToken,
+    getAuthHeaders,
     
     // Demo users for UI
     demoUsers: DEMO_USERS
@@ -334,10 +351,10 @@ export const AmplifyAuthProvider = ({ children }) => {
 };
 
 // Custom hook to use auth context
-export const useAmplifyAuth = () => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAmplifyAuth must be used within an AmplifyAuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

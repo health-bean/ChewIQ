@@ -226,7 +226,7 @@ class SimpleApiClient {
 }
 
 // Export singleton instance
-export const simpleApiClient = new SimpleApiClient();
+export const apiClient = new SimpleApiClient();
 
 // Export environment helpers
 export const isProduction = () => import.meta.env.VITE_APP_ENV === 'production';

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Loader2, Mail, Lock, User, Rocket, ArrowLeft, Shield, Heart } from 'lucide-react';
 import { Button, Input, Alert, FormField, PasswordInput, Card } from '../../../../shared/components/ui';
 import { cn } from '../../../../shared/design-system';
-import { useSimpleAuth } from '../auth/SimpleAuthProvider';
+import { useAuth } from '../../contexts/AuthProvider';
 
 const SignupPage = ({ onBackToLogin }) => {
   const [formData, setFormData] = useState({
@@ -16,7 +16,7 @@ const SignupPage = ({ onBackToLogin }) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const { signup, error, setError } = useSimpleAuth();
+  const { signup, error, setError } = useAuth();
 
   const validateForm = () => {
     const newErrors = {};
@@ -60,12 +60,12 @@ const SignupPage = ({ onBackToLogin }) => {
     setError(null);
 
     try {
-      await signup({
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        email: formData.email.trim().toLowerCase(),
-        password: formData.password
-      });
+      await signup(
+        formData.email.trim().toLowerCase(),
+        formData.password,
+        formData.firstName.trim(),
+        formData.lastName.trim()
+      );
       // Success - useAuth will handle redirect
     } catch (err) {
       console.error('Signup error:', err);

@@ -1,11 +1,11 @@
-// File: frontend/web-app/src/hooks/useSimpleReflectionData.js
-// Simple reflection data hook using clean API system
+// File: frontend/web-app/src/hooks/useReflectionData.js
+// Reflection data hook using clean API system
 
 import { useState, useEffect } from 'react';
-import { useJournalApi } from './useSimpleApi';
+import { useJournalApi } from './useApi';
 import safeLogger from '../../../shared/utils/safeLogger';
 
-const useSimpleReflectionData = (selectedDate, isAuthenticated = false) => {
+const useReflectionData = (selectedDate, isAuthenticated = false) => {
   const [reflectionData, setReflectionData] = useState({
     bedtime: '',
     wake_time: '',
@@ -198,4 +198,4 @@ const useSimpleReflectionData = (selectedDate, isAuthenticated = false) => {
   };
 };
 
-export default useSimpleReflectionData;
+export default useReflectionData;

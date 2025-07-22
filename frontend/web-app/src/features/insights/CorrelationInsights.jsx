@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCorrelations } from '../../../../shared/hooks/useCorrelations';
-import { useSimpleAuth } from '../../components/auth/SimpleAuthProvider';
+import { useAuth } from '../../contexts/AuthProvider';
 import { AlertTriangle, CheckCircle, Eye, Target, Activity, Clock } from 'lucide-react';
 import { Button, Select, Alert, Card } from '../../../../shared/components/ui';
 
@@ -10,7 +10,7 @@ const CorrelationInsights = () => {
   const [showAllHelpers, setShowAllHelpers] = useState(false);
   const [showAllPatterns, setShowAllPatterns] = useState(false);
   
-  const { user, loading: authLoading } = useSimpleAuth();
+  const { user, loading: authLoading } = useAuth();
   const { 
     correlations,  
     loading: correlationsLoading, 

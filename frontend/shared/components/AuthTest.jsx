@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { useSimpleAuth } from './SimpleAuthProvider.jsx';
-import { simpleApiClient } from '../services/simpleApi.js';
+import { apiClient } from '../services/simpleApi.js';
 import { Badge, Alert, Button } from './ui';
 import safeLogger from '../utils/safeLogger';
 
@@ -27,7 +27,7 @@ const AuthTest = () => {
   const testApiCall = async () => {
     try {
       setTesting(true);
-      const result = await simpleApiClient.get('/api/v1/user/preferences');
+      const result = await apiClient.get('/api/v1/user/preferences');
       setTestResults(prev => [...prev, {
         type: 'success',
         message: 'API call successful',

@@ -1,29 +1,59 @@
 // File: frontend/web-app/src/components/pages/LoginPage.jsx
-// Main login page with Cognito authentication + Demo mode
+// Main login page for FILO Health platform with signup functionality
 
 import React, { useState } from 'react';
-import { useSimpleAuth } from '../auth/SimpleAuthProvider';
+import { Rocket, AlertTriangle, User, Shield } from 'lucide-react';
+import { Button, Alert, Card } from '../../../../shared/components/ui';
+import { cn } from '../../../../shared/design-system';
+import { useAuth } from '../../contexts/AuthProvider';
+import SignupPage from './SignupPage';
 
 const LoginPage = () => {
-  const { login, error, setError, demoUsers, loading } = useSimpleAuth();
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showLoginForm, setShowLoginForm] = useState(false);
+  const [showSignup, setShowSignup] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showSignup, setShowSignup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginMode, setLoginMode] = useState('standard'); // 'standard' or 'demo'
+  const { login, error, setError, demoUsers } = useAuth();
 
-  // Handle regular login (both demo and real users)
+  const handleUserSelect = (demoUser) => {
+    setSelectedUser(demoUser);
+    setEmail(demoUser.email);
+    setPassword(''); // Clear password field
+    setLoginMode('demo');
+    setShowLoginForm(true);
+    setError(null);
+  };
+
+  const handleStandardLogin = () => {
+    setSelectedUser(null);
+    setEmail('');
+    setPassword('');
+    setLoginMode('standard');
+    setShowLoginForm(true);
+    setError(null);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (isLoading) return;
-
-    setIsLoading(true);
-    setError(null);
+    
+    if (!email || !password) {
+      setError('Email and password are required');
+      return;
+    }
 
     try {
-      const result = await login(email, password);
+      setIsLoading(true);
+      setError(null);
+      
+      const result = await login(email, password, loginMode);
+      
       if (!result.success) {
-        console.error('Login failed:', result.error);
+        setError(result.error || 'Login failed');
       }
+      
     } catch (err) {
       console.error('Login error:', err);
       setError(err.message || 'Login failed. Please try again.');
@@ -32,262 +62,260 @@ const LoginPage = () => {
     }
   };
 
-  // Handle demo user quick login
-  const handleDemoLogin = async (demoUser) => {
-    if (isLoading) return;
-
-    setIsLoading(true);
+  const handleBack = () => {
+    setShowLoginForm(false);
+    setSelectedUser(null);
+    setEmail('');
+    setPassword('');
     setError(null);
-
-    try {
-      const result = await login(demoUser.email, 'demo123');
-      if (!result.success) {
-        console.error('Demo login failed:', result.error);
-        setError(result.error);
-      }
-    } catch (err) {
-      console.error('Demo login error:', err);
-      setError(err.message || 'Demo login failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
   };
 
+  const handleShowSignup = () => {
+    setShowSignup(true);
+    setError(null);
+  };
+
+  const handleBackToLogin = () => {
+    setShowSignup(false);
+    setError(null);
+  };
+
+  // Show signup page
   if (showSignup) {
-    return <SignupPage onBackToLogin={() => setShowSignup(false)} />;
+    return <SignupPage onBackToLogin={handleBackToLogin} />;
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-8">
+  // Show login form when user is selected
+  if (showLoginForm) {
+    return (
+      <div className="bg-gray-50 min-h-screen">
         {/* Header */}
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Welcome to Health Platform
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to your account or try our demo
-          </p>
+        <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-6 text-center">
+          <div className="flex items-center justify-center mb-4">
+            <Rocket className="mr-2" size={32} />
+            <h1 className="text-2xl font-bold">FILO Health</h1>
+          </div>
+          <p className="text-primary-100">Your Personal Health Journey</p>
         </div>
 
-        {/* Error Display */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">
-                  Authentication Error
-                </h3>
-                <div className="mt-2 text-sm text-red-700">
-                  {error}
+        {/* Login Form */}
+        <div className="p-6 max-w-md mx-auto">
+          <div className="flex items-center mb-6">
+            <button
+              onClick={handleBack}
+              className="text-blue-600 hover:text-blue-800 mr-3"
+            >
+              ← Back
+            </button>
+            <h2 className="text-xl font-semibold text-gray-900">
+              {loginMode === 'demo' ? `Login as ${selectedUser?.name}` : 'Login with Cognito'}
+            </h2>
+          </div>
+
+          {error && (
+            <Alert variant="error" className="mb-4" dismissible onDismiss={() => setError(null)}>
+              {error}
+            </Alert>
+          )}
+
+          {/* User Info for Demo Login */}
+          {loginMode === 'demo' && selectedUser && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="text-2xl">{selectedUser.avatar}</div>
+                <div>
+                  <p className="font-medium text-blue-900">{selectedUser.name}</p>
+                  <p className="text-sm text-blue-700">{selectedUser.protocol}</p>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="bg-white rounded-lg shadow-md p-8 space-y-6">
-          {/* Email/Password Form */}
+          {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email
               </label>
               <input
                 id="email"
-                name="email"
                 type="email"
-                autoComplete="email"
-                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your email"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter email address"
+                required
+                disabled={loginMode === 'demo'} // Pre-filled for demo users
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
               <input
                 id="password"
-                name="password"
                 type="password"
-                autoComplete="current-password"
-                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your password"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter password"
+                required
+                autoFocus
               />
             </div>
 
             <button
               type="submit"
-              disabled={isLoading || loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-300 disabled:cursor-not-allowed"
             >
-              {isLoading || loading ? 'Signing in...' : 'Sign in'}
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
-          {/* Sign up link */}
-          <div className="text-center">
-            <button
-              onClick={() => setShowSignup(true)}
-              className="text-sm text-indigo-600 hover:text-indigo-500"
-            >
-              Don't have an account? Sign up
-            </button>
-          </div>
-        </div>
-
-        {/* Demo Users Section */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Try Demo Accounts
-          </h3>
-          <p className="text-sm text-gray-600 mb-4">
-            Experience the platform with pre-populated demo data
-          </p>
-          
-          <div className="grid gap-3">
-            {demoUsers.map((user) => (
+          {/* Switch between login modes */}
+          <div className="mt-6 text-center">
+            {loginMode === 'demo' ? (
               <button
-                key={user.id}
-                onClick={() => handleDemoLogin(user)}
-                disabled={isLoading || loading}
-                className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-left"
+                onClick={handleStandardLogin}
+                className="text-sm text-blue-600 hover:text-blue-800"
               >
-                <span className="text-2xl mr-3">{user.avatar}</span>
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900">{user.name}</div>
-                  <div className="text-sm text-gray-500">{user.protocol}</div>
-                  <div className="text-xs text-gray-400">{user.entries}</div>
-                </div>
+                Login with Cognito account instead
               </button>
-            ))}
+            ) : (
+              <button
+                onClick={() => setShowLoginForm(false)}
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
+                Use a demo account instead
+              </button>
+            )}
           </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-// Simple signup component
-const SignupPage = ({ onBackToLogin }) => {
-  const { signup, error, setError } = useSimpleAuth();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: ''
-  });
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const result = await signup(
-        formData.email,
-        formData.password,
-        formData.firstName,
-        formData.lastName
-      );
-
-      if (result.success) {
-        if (result.needsConfirmation) {
-          alert('Please check your email to confirm your account, then return to sign in.');
-          onBackToLogin();
-        }
-      }
-    } catch (err) {
-      console.error('Signup error:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-        <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">
-          Create Account
+    <div className="bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-6 text-center">
+        <div className="flex items-center justify-center mb-4">
+          <Rocket className="mr-2" size={32} />
+          <h1 className="text-2xl font-bold">FILO Health</h1>
+        </div>
+        <p className="text-primary-100">Your Personal Health Journey</p>
+        <p className="text-primary-200 text-sm mt-2">Prototype Demo - Incognito Optimized</p>
+      </div>
+
+      {/* Content */}
+      <div className="p-6 max-w-md mx-auto">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4 text-center">
+          Login Options
         </h2>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
-            <div className="text-sm text-red-700">{error}</div>
-          </div>
+          <Alert variant="error" className="mb-4" dismissible onDismiss={() => setError(null)}>
+            {error}
+          </Alert>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">First Name</label>
-              <input
-                type="text"
-                required
-                value={formData.firstName}
-                onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Last Name</label>
-              <input
-                type="text"
-                required
-                value={formData.lastName}
-                onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              required
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              required
-              value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-
+        {/* Standard Login Option */}
+        <div className="mb-4">
           <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            onClick={handleStandardLogin}
+            className="w-full p-4 border border-blue-300 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
           >
-            {isLoading ? 'Creating Account...' : 'Create Account'}
+            <div className="flex items-center justify-center space-x-2">
+              <User className="w-5 h-5 text-blue-600" />
+              <span className="text-md font-medium text-blue-700">Login with Cognito Account</span>
+            </div>
           </button>
-        </form>
-
-        <div className="mt-4 text-center">
-          <button
-            onClick={onBackToLogin}
-            className="text-sm text-indigo-600 hover:text-indigo-500"
-          >
-            Back to Sign In
-          </button>
+          <p className="text-xs text-center mt-2 text-gray-500">
+            Standard authentication for registered users
+          </p>
         </div>
+
+        {/* Create Account Option */}
+        <div className="mb-6">
+          <button
+            onClick={handleShowSignup}
+            className="w-full p-4 border border-green-300 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+          >
+            <div className="flex items-center justify-center space-x-2">
+              <User className="w-5 h-5 text-green-600" />
+              <span className="text-md font-medium text-green-700">Create New Account</span>
+            </div>
+          </button>
+          <p className="text-xs text-center mt-2 text-gray-500">
+            Sign up for your personal health journey
+          </p>
+        </div>
+
+
+
+        {/* Demo Users Section */}
+        <h3 className="text-md font-semibold text-gray-700 mb-3">
+          Or try a demo account:
+        </h3>
+
+        {/* Demo Users */}
+        <div className="space-y-3">
+          {demoUsers.map((user) => (
+            <Card 
+              key={user.id} 
+              variant="outlined" 
+              padding="sm"
+              className={cn(
+                "cursor-pointer transition-all duration-200 hover:shadow-md hover:border-primary-300",
+                "focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2",
+                selectedUser === user.id && "border-primary-500 bg-primary-50",
+                isLoading && selectedUser !== user.id && "opacity-50 cursor-not-allowed"
+              )}
+              onClick={() => !isLoading && handleUserSelect(user)}
+            >
+              <div className="flex items-center space-x-3">
+                <div className="text-2xl">{user.avatar}</div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {user.name}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {user.protocol}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {user.entries}
+                  </p>
+                </div>
+                <div className="flex flex-col items-end space-y-1">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+                    Demo
+                  </span>
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success-100 text-success-800">
+                    <Shield className="w-3 h-3 mr-1" />
+                    Private
+                  </span>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Info Section */}
+        <div className="mt-8 text-center">
+          <div className="flex items-center justify-center mb-3">
+            <User className="h-4 w-4 text-gray-400 mr-2" />
+            <span className="text-sm text-gray-600">Demo Account Access</span>
+          </div>
+          
+          <div className="text-xs text-gray-500 space-y-1">
+            <p><strong>Session:</strong> Automatically cleared on browser close</p>
+            <p><strong>Data:</strong> Demo data showcasing different health protocols</p>
+          </div>
+        </div>
+
+
       </div>
     </div>
   );

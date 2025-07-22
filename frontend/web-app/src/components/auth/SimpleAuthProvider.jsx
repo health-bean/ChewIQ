@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { signIn, signOut, getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
 import safeLogger from '../../../../shared/utils/safeLogger';
-import { simpleApiClient } from '../../../../shared/services/simpleApi.js';
+import { apiClient } from '../../../../shared/services/simpleApi.js';
 
 // Amplify is already configured in amplifyInit.js
 console.log('🔧 SimpleAuthProvider loaded - using centralized Amplify config');
@@ -203,12 +203,12 @@ export const SimpleAuthProvider = ({ children }) => {
   useEffect(() => {
     if (isAuthenticated && currentUser) {
       // Set up API client with auth headers
-      simpleApiClient.setHeaderGetter(getAuthHeaders);
-      simpleApiClient.setTokenGetter(getAuthToken);
+      apiClient.setHeaderGetter(getAuthHeaders);
+      apiClient.setTokenGetter(getAuthToken);
       
       // Set user context for legacy support
       const userContext = getUserContext();
-      simpleApiClient.setUserContext(userContext);
+      apiClient.setUserContext(userContext);
       
       safeLogger.debug('API client connected to auth', { 
         userId: currentUser.id, 
@@ -217,7 +217,7 @@ export const SimpleAuthProvider = ({ children }) => {
       });
     } else {
       // Clear API client auth when logged out
-      simpleApiClient.clearUserContext();
+      apiClient.clearUserContext();
       safeLogger.debug('API client auth cleared');
     }
   }, [isAuthenticated, currentUser, authMode, getAuthHeaders, getAuthToken, getUserContext, isDemoMode]);

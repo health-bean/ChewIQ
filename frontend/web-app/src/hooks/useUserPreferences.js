@@ -1,8 +1,8 @@
 // File: frontend/web-app/src/hooks/useUserPreferences.js (FIXED)
 
 import { useState, useEffect } from 'react';
-import { simpleApiClient } from '../../../shared/services/simpleApi.js';
-import { useSimpleAuth } from '../components/auth/SimpleAuthProvider';
+import { apiClient } from '../../../shared/services/simpleApi.js';
+import { useAuth } from '../contexts/AuthProvider';
 import safeLogger from '../../../shared/utils/safeLogger';
 
 const useUserPreferences = (isAuthenticatedParam = null) => {
@@ -12,7 +12,7 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
   const [saving, setSaving] = useState(false);
   
   // Get auth context
-  const { user, isAuthenticated: authIsAuthenticated, getAuthHeaders } = useSimpleAuth();
+  const { user, isAuthenticated: authIsAuthenticated, getAuthHeaders } = useAuth();
   
   // Use parameter if provided, otherwise fall back to auth context
   const isAuthenticated = isAuthenticatedParam !== null ? isAuthenticatedParam : authIsAuthenticated;
@@ -49,7 +49,7 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
         setLoading(true);
         setError(null);
         
-        const response = await simpleApiClient.get('/api/v1/user/preferences');
+        const response = await apiClient.get('/api/v1/user/preferences');
         
         // Only update state if component is still mounted
         if (isCancelled) return;
@@ -147,7 +147,7 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
       setError(null);
       
       // Save to database
-      const response = await simpleApiClient.post('/api/v1/user/preferences', updatedPreferences);
+      const response = await apiClient.post('/api/v1/user/preferences', updatedPreferences);
       
       // Handle response
       let savedPreferences = updatedPreferences;
@@ -185,7 +185,7 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
       setLoading(true);
       setError(null);
       
-      const response = await simpleApiClient.get('/api/v1/user/preferences');
+      const response = await apiClient.get('/api/v1/user/preferences');
       
       // Handle response format
       let preferencesData = response;

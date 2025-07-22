@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { simpleApiClient } from '../services/simpleApi.js';
+import { apiClient } from '../services/simpleApi.js';
 import safeLogger from '../utils/safeLogger';
 
 const useProtocols = (isAuthenticated = false) => {
@@ -26,7 +26,7 @@ const useProtocols = (isAuthenticated = false) => {
       
       try {
         setLoading(true);
-        const data = await simpleApiClient.get('/api/v1/protocols');
+        const data = await apiClient.get('/api/v1/protocols');
         
         // Only update state if component is still mounted
         if (!isCancelled) {

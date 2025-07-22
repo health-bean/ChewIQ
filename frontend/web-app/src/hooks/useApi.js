@@ -1,37 +1,37 @@
-// File: frontend/web-app/src/hooks/useSimpleApi.js
-// Simple API hook for clean auth integration
+// File: frontend/web-app/src/hooks/useApi.js
+// API hook for clean auth integration
 
 import { useEffect } from 'react';
-import { simpleApiClient } from '../../../shared/services/simpleApi';
-import { useSimpleAuth } from '../components/auth/SimpleAuthProvider';
+import { apiClient } from '../../../shared/services/simpleApi';
+import { useAuth } from '../contexts/AuthProvider';
 import safeLogger from '../../../shared/utils/safeLogger';
 
 // Hook to automatically sync API client with auth state
-export const useSimpleApi = () => {
-  const { getUserContext, isAuthenticated } = useSimpleAuth();
+export const useApi = () => {
+  const { getUserContext, isAuthenticated } = useAuth();
 
   // Sync API client with auth state
   useEffect(() => {
     const userContext = getUserContext();
     
     if (isAuthenticated && userContext) {
-      simpleApiClient.setUserContext(userContext);
+      apiClient.setUserContext(userContext);
       safeLogger.debug('API client synced with auth', { 
         userId: userContext.userId 
       });
     } else {
-      simpleApiClient.clearUserContext();
+      apiClient.clearUserContext();
       safeLogger.debug('API client cleared - no auth');
     }
   }, [isAuthenticated, getUserContext]);
 
-  return simpleApiClient;
+  return apiClient;
 };
 
 // Hook for journal/reflection data
 export const useJournalApi = () => {
-  const api = useSimpleApi();
-  const { getUserContext } = useSimpleAuth();
+  const api = useApi();
+  const { getUserContext } = useAuth();
 
   const getJournalEntry = async (date) => {
     const userContext = getUserContext();
@@ -73,8 +73,8 @@ export const useJournalApi = () => {
 
 // Hook for timeline data
 export const useTimelineApi = () => {
-  const api = useSimpleApi();
-  const { getUserContext } = useSimpleAuth();
+  const api = useApi();
+  const { getUserContext } = useAuth();
 
   const getTimelineEntries = async (date) => {
     const userContext = getUserContext();
@@ -107,8 +107,8 @@ export const useTimelineApi = () => {
 
 // Hook for user preferences
 export const usePreferencesApi = () => {
-  const api = useSimpleApi();
-  const { getUserContext } = useSimpleAuth();
+  const api = useApi();
+  const { getUserContext } = useAuth();
 
   const getPreferences = async () => {
     const userContext = getUserContext();
@@ -141,7 +141,7 @@ export const usePreferencesApi = () => {
 
 // Hook for protocols
 export const useProtocolsApi = () => {
-  const api = useSimpleApi();
+  const api = useApi();
 
   const getProtocols = async () => {
     return api.get('/api/v1/protocols');

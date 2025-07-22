@@ -4,9 +4,9 @@ import React, { useEffect, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
 
 import HeaderDebugger from './components/debug/HeaderDebugger';// Import clean auth components (keeping existing SimpleAuth)
-import { SimpleAuthProvider, useSimpleAuth } from './components/auth/SimpleAuthProvider';
-import { simpleApiClient } from '../../shared/services/simpleApi';
-import SimpleLoginPage from './components/pages/SimpleLoginPage';
+import { AuthProvider, useAuth } from './contexts/AuthProvider';
+import { apiClient } from '../../shared/services/simpleApi';
+import LoginPage from './components/pages/LoginPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import PreferencesPage from './components/pages/PreferencesPage';
 
@@ -17,8 +17,8 @@ import DirectAuthTest from './components/auth/DirectAuthTest';
 import { Button, Alert } from '../../shared/components/ui';
 import useProtocols from '../../shared/hooks/useProtocols';
 import useUserPreferences from './hooks/useUserPreferences';
-import { useSimpleApi, useJournalApi } from './hooks/useSimpleApi';
-import useSimpleReflectionData from './hooks/useSimpleReflectionData';
+import { useApi, useJournalApi } from './hooks/useApi';
+import useReflectionData from './hooks/useReflectionData';
 import useExposureTypes from '../../shared/hooks/useExposureTypes';
 import useDetoxTypes from '../../shared/hooks/useDetoxTypes';
 
@@ -43,18 +43,18 @@ import { getProtocolDisplayText } from '../../shared/utils/entryHelpers';
 
 // Main App Component (Inside SimpleAuthProvider)
 const MainApp = () => {
-  const { isAuthenticated, user, loading: authLoading, isDemoMode, getAuthToken, getAuthHeaders } = useSimpleAuth();
+  const { isAuthenticated, user, loading: authLoading, isDemoMode, getAuthToken, getAuthHeaders } = useAuth();
   
   // Connect API client with auth provider
   useEffect(() => {
     if (getAuthToken && getAuthHeaders) {
-      simpleApiClient.setTokenGetter(getAuthToken);
-      simpleApiClient.setHeaderGetter(getAuthHeaders);
+      apiClient.setTokenGetter(getAuthToken);
+      apiClient.setHeaderGetter(getAuthHeaders);
     }
   }, [getAuthToken, getAuthHeaders]);
   
   // Initialize API client
-  useSimpleApi();
+  useApi();
   
   // App state
   const { 
@@ -77,7 +77,7 @@ const MainApp = () => {
   const { preferences, updatePreferences, refreshPreferences, loading: preferencesLoading, error: preferencesError, isReady } = useUserPreferences(isAuthenticated);
   
   // Simple reflection data using clean API
-  const { reflectionData, updateReflectionData, saveReflectionData, loading: reflectionLoading, hasUnsavedChanges } = useSimpleReflectionData(selectedDate, isAuthenticated);
+  const { reflectionData, updateReflectionData, saveReflectionData, loading: reflectionLoading, hasUnsavedChanges } = useReflectionData(selectedDate, isAuthenticated);
   
   // Timeline and entry form (only when authenticated)
   const { entries, loading: entriesLoading, addEntry, hasCriticalInsights } = useTimelineEntries(selectedDate, isAuthenticated);
@@ -125,31 +125,7 @@ const MainApp = () => {
 
   // Show login if not authenticated
   if (!isAuthenticated) {
-    return (
-      <div>
-        <SimpleLoginPage />
-        <div className="max-w-md mx-auto mt-4 text-center">
-          <button 
-            onClick={() => window.location.href = '/direct-auth-test'}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Test Direct Auth
-          </button>
-          <button 
-            onClick={() => window.location.href = '/debug'}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 ml-2"
-          >
-            Debug Auth Headers
-          </button>
-          <button 
-            onClick={() => window.location.href = '/auth-debug'}
-            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 ml-2"
-          >
-            Auth Debugger
-          </button>
-        </div>
-      </div>
-    );
+    return <LoginPage />;
   }
 
   // Special debug route
@@ -362,12 +338,12 @@ const MainApp = () => {
   );
 };
 
-// Root App Component with SimpleAuthProvider
+// Root App Component with AuthProvider
 function App() {
   return (
-    <SimpleAuthProvider>
+    <AuthProvider>
       <MainApp />
-    </SimpleAuthProvider>
+    </AuthProvider>
   );
 }
 

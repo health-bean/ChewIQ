@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Plus, X, Pill } from 'lucide-react';
 import { Input, Button, Card } from '../../../../shared/components/ui';
 import { cn } from '../../../../shared/design-system';
-import { useSimpleApi } from '../../hooks/useSimpleApi';
+import { useApi } from '../../hooks/useApi';
 
 const SmartSupplementSelector = ({ 
   selectedSupplements = [], 
@@ -15,7 +15,7 @@ const SmartSupplementSelector = ({
   const [loading, setLoading] = useState(false);
   
   // Use the proper API client that sends demo headers
-  const apiClient = useSimpleApi();
+  const apiClient = useApi();
 
   useEffect(() => {
     const loadSupplements = async () => {

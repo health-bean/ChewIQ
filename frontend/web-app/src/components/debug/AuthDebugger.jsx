@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSimpleAuth } from '../auth/SimpleAuthProvider';
-import { simpleApiClient } from '../../../../shared/services/simpleApi';
+import { apiClient } from '../../../../shared/services/simpleApi';
 
 export const AuthDebugger = () => {
   const auth = useSimpleAuth();
@@ -21,7 +21,7 @@ export const AuthDebugger = () => {
   const testEndpoint = async (endpoint) => {
     setLoading(true);
     try {
-      const result = await simpleApiClient.get(endpoint);
+      const result = await apiClient.get(endpoint);
       setTestResults(prev => ({
         ...prev,
         [endpoint]: { success: true, data: result }
@@ -45,7 +45,7 @@ export const AuthDebugger = () => {
     console.log('🔧 Current token:', storedToken ? `length: ${storedToken.length}` : 'none');
     
     // Ensure API client has the correct auth headers
-    simpleApiClient.setHeaderGetter(() => {
+    apiClient.setHeaderGetter(() => {
       const token = sessionStorage.getItem('auth_token');
       if (token) {
         console.log('🔧 Setting Authorization header with token length:', token.length);
@@ -56,7 +56,7 @@ export const AuthDebugger = () => {
     
     // Set user context
     if (auth.user) {
-      simpleApiClient.setUserContext({
+      apiClient.setUserContext({
         userId: auth.user.id,
         email: auth.user.email,
         isDemo: auth.authMode === 'demo'

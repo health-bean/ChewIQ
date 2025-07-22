@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { simpleApiClient } from '../services/simpleApi.js';
+import { apiClient } from '../services/simpleApi.js';
 
 export const useCorrelations = (confidenceThreshold = 0.6, timeframeDays = 180) => {
   const [correlations, setCorrelations] = useState([]);
@@ -17,7 +17,7 @@ export const useCorrelations = (confidenceThreshold = 0.6, timeframeDays = 180) 
         timeframe_days: timeframeDays
       });
 
-      const data = await simpleApiClient.get(`/api/v1/correlations/insights?${params}`);
+      const data = await apiClient.get(`/api/v1/correlations/insights?${params}`);
       
       setCorrelations(data.insights || []);
       setSummary(data.summary || {});

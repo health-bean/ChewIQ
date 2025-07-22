@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { simpleApiClient } from '../services/simpleApi.js';
+import { apiClient } from '../services/simpleApi.js';
 
 const useDetoxTypes = (isAuthenticated = false) => {
   const [detoxTypes, setDetoxTypes] = useState([]);
@@ -16,7 +16,7 @@ const useDetoxTypes = (isAuthenticated = false) => {
     setError(null);
     
     try {
-      const data = await simpleApiClient.get('/api/v1/detox-types/search');
+      const data = await apiClient.get('/api/v1/detox-types/search');
       setDetoxTypes(data.detox_types || []);
     } catch (err) {
       setError(err.message);

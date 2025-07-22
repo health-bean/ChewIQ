@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Plus, Check, Loader2, X, AlertCircle, Pill, Droplets } from 'lucide-react';
 import { Input, Button, Card } from '../../../../shared/components/ui';
 import { cn } from '../../../../shared/design-system';
-import { useSimpleApi } from '../../hooks/useSimpleApi';
+import { useApi } from '../../hooks/useApi';
 
 // Import the working food search hook
 import { useFoodSearch } from '../../../../shared/hooks/useProtocolFoods';
@@ -19,7 +19,7 @@ const UnifiedSmartSelector = ({
   const [loading, setLoading] = useState(false);
   
   // Use the proper API client that sends demo headers
-  const apiClient = useSimpleApi();
+  const apiClient = useApi();
 
   // Use the working food search hook for food searches
   const { 

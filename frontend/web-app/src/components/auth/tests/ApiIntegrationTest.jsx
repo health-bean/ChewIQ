@@ -1,7 +1,7 @@
 // Test for API integration with authentication
 import React, { useState, useEffect } from 'react';
 import { SimpleAuthProvider, useSimpleAuth } from '../SimpleAuthProvider';
-import { simpleApiClient } from '../../../../../shared/services/simpleApi';
+import { apiClient } from '../../../../../shared/services/simpleApi';
 
 // API test component (must be used inside SimpleAuthProvider)
 const ApiTester = () => {
@@ -44,8 +44,8 @@ const ApiTester = () => {
     try {
       console.log('Making API call to:', apiEndpoint);
       
-      // Make API call using the simpleApiClient
-      const result = await simpleApiClient.get(apiEndpoint);
+      // Make API call using the apiClient
+      const result = await apiClient.get(apiEndpoint);
       
       console.log('API result:', result);
       setApiResult(result);
@@ -60,15 +60,15 @@ const ApiTester = () => {
   // Get API client status
   const getApiClientStatus = () => {
     // Check if the API client has auth headers and token getter
-    const hasHeaderGetter = typeof simpleApiClient.getHeaders === 'function';
-    const hasTokenGetter = typeof simpleApiClient.getToken === 'function';
-    const hasUserContext = simpleApiClient.getUserContext && simpleApiClient.getUserContext() !== null;
+    const hasHeaderGetter = typeof apiClient.getHeaders === 'function';
+    const hasTokenGetter = typeof apiClient.getToken === 'function';
+    const hasUserContext = apiClient.getUserContext && apiClient.getUserContext() !== null;
     
     return {
       hasHeaderGetter,
       hasTokenGetter,
       hasUserContext,
-      userContext: simpleApiClient.getUserContext ? simpleApiClient.getUserContext() : null
+      userContext: apiClient.getUserContext ? apiClient.getUserContext() : null
     };
   };
   

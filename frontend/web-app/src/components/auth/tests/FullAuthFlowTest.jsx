@@ -1,7 +1,7 @@
 // Test for the full authentication flow
 import React, { useState, useEffect } from 'react';
 import { SimpleAuthProvider, useSimpleAuth } from '../SimpleAuthProvider';
-import { simpleApiClient } from '../../../../../shared/services/simpleApi';
+import { apiClient } from '../../../../../shared/services/simpleApi';
 
 // Protected content component
 const ProtectedContent = ({ onApiCall }) => {
@@ -15,7 +15,7 @@ const ProtectedContent = ({ onApiCall }) => {
     
     try {
       // Make an API call to a protected endpoint
-      const result = await simpleApiClient.get('/user/profile');
+      const result = await apiClient.get('/user/profile');
       setData(result);
       onApiCall && onApiCall(true, result);
     } catch (err) {

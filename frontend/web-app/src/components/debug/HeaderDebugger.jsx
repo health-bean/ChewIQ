@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSimpleAuth } from '../auth/SimpleAuthProvider';
-import { simpleApiClient } from '../../../../shared/services/simpleApi';
+import { apiClient } from '../../../../shared/services/simpleApi';
 import safeLogger from '../../../../shared/utils/safeLogger';
 
 export const HeaderDebugger = () => {
@@ -26,7 +26,7 @@ export const HeaderDebugger = () => {
   const testEndpoint = async (endpoint) => {
     setLoading(true);
     try {
-      const result = await simpleApiClient.get(endpoint);
+      const result = await apiClient.get(endpoint);
       setTestResults(prev => ({
         ...prev,
         [endpoint]: { success: true, data: result }
@@ -75,7 +75,7 @@ export const HeaderDebugger = () => {
     
     try {
       const endpoint = `/api/v1/timeline/entries?date=2025-07-20&demo_user=${auth.user.id}`;
-      const result = await simpleApiClient.get(endpoint);
+      const result = await apiClient.get(endpoint);
       setTestResults(prev => ({
         ...prev,
         demoParam: { success: true, data: result, endpoint }
@@ -93,12 +93,12 @@ export const HeaderDebugger = () => {
   // Fix auth headers
   const fixAuthHeaders = () => {
     // Ensure API client has the correct auth headers
-    simpleApiClient.setHeaderGetter(auth.getAuthHeaders);
-    simpleApiClient.setTokenGetter(auth.getAuthToken);
+    apiClient.setHeaderGetter(auth.getAuthHeaders);
+    apiClient.setTokenGetter(auth.getAuthToken);
     
     // Set user context for legacy support
     const userContext = auth.getUserContext();
-    simpleApiClient.setUserContext(userContext);
+    apiClient.setUserContext(userContext);
     
     safeLogger.debug('API client headers reset', { 
       userId: auth.user?.id, 
