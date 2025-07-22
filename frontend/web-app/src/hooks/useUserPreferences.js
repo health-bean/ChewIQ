@@ -114,13 +114,24 @@ const useUserPreferences = (isAuthenticatedParam = null) => {
       return Promise.reject(new Error('User not authenticated'));
     }
 
-    if (!preferences) {
-      return Promise.reject(new Error('Preferences not loaded'));
+    // If preferences aren't loaded yet, wait for them or use defaults
+    let basePreferences = preferences;
+    if (!basePreferences) {
+      // If still loading, wait a bit for the load to complete
+      if (loading) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        basePreferences = preferences;
+      }
+      
+      // If still no preferences, use defaults
+      if (!basePreferences) {
+        basePreferences = getDefaultPreferences();
+      }
     }
     
     // Preserve existing preferences and only update the specified ones
     const updatedPreferences = { 
-      ...preferences, 
+      ...basePreferences, 
       ...newPreferences 
     };
     
