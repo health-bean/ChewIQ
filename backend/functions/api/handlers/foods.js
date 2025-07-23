@@ -2,204 +2,63 @@ const { pool } = require('../database/connection');
 const { successResponse, errorResponse } = require('../utils/responses');
 const { handleDatabaseError } = require('../utils/errors');
 
-const handleSearchFoods = async (queryParams, event) => {
-    console.log('🔍 FOODS: Handler called with params:', queryParams);
-    
+const handleSearchFoods = async (queryParams) => {
     try {
         const client = await pool.connect();
-        console.log('🔍 FOODS: Database connected');
-        
-        const { search = '', protocol_id = null, prioritize_user_history = 'true' } = queryParams;
-        
-        // Get user ID properly - this was the issue
-        let userId = null;
-        try {
-            const { getCurrentUser } = require('../middleware/auth');
-            const user = await getCurrentUser(event);
-            userId = user?.id;
-            console.log('🔍 FOODS: User ID:', userId);
-        } catch (error) {
-            // Continue without user history if auth fails
-            console.log('🔍 FOODS: Could not get user ID, continuing without user history:', error.message);
-        }
-        
-        let foods = [];
-        
-        // Skip user history for now - just get database foods with protocol compliance
-        console.log('🔍 FOODS: Searching database with protocol compliance');
-        
+        const { search = '', protocol_id = null } = queryParams;
         const searchPattern = `%${search}%`;
-        let query;
-        let values;
         
-        // FIXED: Use window functions to deduplicate results
+        let query, values;
+        
         if (protocol_id) {
-            // Include protocol compliance when protocol_id is provided
             query = `
-                WITH ranked_foods AS (
-                    SELECT 
-                        fsv.simplified_food_id,
-                        fsv.display_name,
-                        fsv.category_name,
-                        fsv.subcategory_name,
-                        COALESCE(fsv.nightshade, false) as nightshade,
-                        COALESCE(fsv.histamine, 'unknown') as histamine,
-                        COALESCE(fsv.oxalate, 'unknown') as oxalate,
-                        COALESCE(fsv.lectin, 'unknown') as lectin,
-                        COALESCE(fsv.fodmap, 'unknown') as fodmap,
-                        COALESCE(fsv.salicylate, 'unknown') as salicylate,
-                        COALESCE(fsv.amines, 'unknown') as amines,
-                        COALESCE(fsv.glutamates, 'unknown') as glutamates,
-                        COALESCE(fsv.sulfites, 'unknown') as sulfites,
-                        COALESCE(fsv.goitrogens, 'unknown') as goitrogens,
-                        COALESCE(fsv.purines, 'unknown') as purines,
-                        COALESCE(fsv.phytoestrogens, 'unknown') as phytoestrogens,
-                        COALESCE(fsv.phytates, 'unknown') as phytates,
-                        COALESCE(fsv.tyramine, 'unknown') as tyramine,
-                        COALESCE(fsv.is_organic, false) as is_organic,
-                        COALESCE(fsv.preparation_state, 'unknown') as preparation_state,
-                        COALESCE(pfv.protocol_status, 'unknown') as protocol_status,
-                        ROW_NUMBER() OVER (PARTITION BY fsv.simplified_food_id ORDER BY 
-                            CASE 
-                                WHEN pfv.protocol_status = 'included' THEN 1
-                                WHEN pfv.protocol_status = 'try_in_moderation' THEN 2
-                                WHEN pfv.protocol_status = 'avoid_for_now' THEN 3
-                                ELSE 4
-                            END
-                        ) as row_num
-                    FROM food_search_view fsv
-                    LEFT JOIN protocol_foods_view pfv ON fsv.simplified_food_id = pfv.simplified_food_id 
-                        AND pfv.protocol_id = $2
-                    WHERE fsv.display_name ILIKE $1
-                )
                 SELECT 
-                    simplified_food_id as id,
-                    display_name as name,
-                    category_name as category,
-                    subcategory_name,
-                    nightshade,
-                    histamine,
-                    oxalate,
-                    lectin,
-                    fodmap,
-                    salicylate,
-                    amines,
-                    glutamates,
-                    sulfites,
-                    goitrogens,
-                    purines,
-                    phytoestrogens,
-                    phytates,
-                    tyramine,
-                    is_organic,
-                    preparation_state,
-                    protocol_status
-                FROM ranked_foods
-                WHERE row_num = 1
-                ORDER BY name ASC
+                    mfs.simplified_food_id as id,
+                    mfs.display_name as name,
+                    mfs.category_name as category,
+                    mfs.preparation_state,
+                    mfs.is_organic,
+                    COALESCE(pfr.status, 'unknown') as protocol_status
+                FROM mat_food_search mfs
+                LEFT JOIN protocol_food_rules pfr ON mfs.simplified_food_id = pfr.food_id AND pfr.protocol_id = $2
+                WHERE mfs.display_name ILIKE $1
+                ORDER BY mfs.display_name ASC
                 LIMIT 10
             `;
             values = [searchPattern, protocol_id];
         } else {
-            // Basic search without protocol compliance - also use window functions for consistency
             query = `
-                WITH ranked_foods AS (
-                    SELECT 
-                        fsv.simplified_food_id,
-                        fsv.display_name,
-                        fsv.category_name,
-                        fsv.subcategory_name,
-                        COALESCE(fsv.nightshade, false) as nightshade,
-                        COALESCE(fsv.histamine, 'unknown') as histamine,
-                        COALESCE(fsv.oxalate, 'unknown') as oxalate,
-                        COALESCE(fsv.lectin, 'unknown') as lectin,
-                        COALESCE(fsv.fodmap, 'unknown') as fodmap,
-                        COALESCE(fsv.salicylate, 'unknown') as salicylate,
-                        COALESCE(fsv.amines, 'unknown') as amines,
-                        COALESCE(fsv.glutamates, 'unknown') as glutamates,
-                        COALESCE(fsv.sulfites, 'unknown') as sulfites,
-                        COALESCE(fsv.goitrogens, 'unknown') as goitrogens,
-                        COALESCE(fsv.purines, 'unknown') as purines,
-                        COALESCE(fsv.phytoestrogens, 'unknown') as phytoestrogens,
-                        COALESCE(fsv.phytates, 'unknown') as phytates,
-                        COALESCE(fsv.tyramine, 'unknown') as tyramine,
-                        COALESCE(fsv.is_organic, false) as is_organic,
-                        COALESCE(fsv.preparation_state, 'unknown') as preparation_state,
-                        'unknown' as protocol_status,
-                        ROW_NUMBER() OVER (PARTITION BY fsv.simplified_food_id ORDER BY fsv.display_name) as row_num
-                    FROM food_search_view fsv
-                    WHERE fsv.display_name ILIKE $1
-                )
                 SELECT 
                     simplified_food_id as id,
                     display_name as name,
                     category_name as category,
-                    subcategory_name,
-                    nightshade,
-                    histamine,
-                    oxalate,
-                    lectin,
-                    fodmap,
-                    salicylate,
-                    amines,
-                    glutamates,
-                    sulfites,
-                    goitrogens,
-                    purines,
-                    phytoestrogens,
-                    phytates,
-                    tyramine,
-                    is_organic,
                     preparation_state,
-                    protocol_status
-                FROM ranked_foods
-                WHERE row_num = 1
-                ORDER BY name ASC
+                    is_organic,
+                    'unknown' as protocol_status
+                FROM mat_food_search
+                WHERE display_name ILIKE $1
+                ORDER BY display_name ASC
                 LIMIT 10
             `;
             values = [searchPattern];
         }
         
-        console.log('🔍 FOODS: Executing query with protocol_id:', protocol_id);
-        console.log('🔍 FOODS: Query:', query);
-        console.log('🔍 FOODS: Values:', values);
-        
         const result = await client.query(query, values);
-        console.log('🔍 FOODS: Query returned:', result.rows.length, 'results');
-        
-        foods = result.rows.map(row => ({
-            id: row.id,
-            name: row.name,
-            category: row.category || 'unknown',
-            subcategory: row.subcategory_name,
-            source: 'database',
-            compliance_status: row.protocol_status || 'unknown',
-            protocol_status: row.protocol_status || 'unknown',
-            nightshade: row.nightshade,
-            histamine: row.histamine,
-            oxalate: row.oxalate,
-            lectin: row.lectin,
-            fodmap: row.fodmap,
-            salicylate: row.salicylate,
-            amines: row.amines,
-            glutamates: row.glutamates,
-            sulfites: row.sulfites,
-            goitrogens: row.goitrogens,
-            purines: row.purines,
-            phytoestrogens: row.phytoestrogens,
-            phytates: row.phytates,
-            tyramine: row.tyramine,
-            is_organic: row.is_organic,
-            preparation_state: row.preparation_state
-        }));
-        
         client.release();
         
+        const foods = result.rows.map(row => ({
+            id: row.id,
+            name: row.name,
+            category: row.category,
+            preparation_state: row.preparation_state,
+            is_organic: row.is_organic,
+            protocol_status: row.protocol_status
+        }));
+        
         return successResponse({
-            foods: foods,
+            foods,
             total: foods.length,
-            search_term: search,
-            user_history_included: prioritize_user_history === 'true' && userId
+            search_term: search
         });
         
     } catch (error) {
@@ -208,7 +67,7 @@ const handleSearchFoods = async (queryParams, event) => {
     }
 };
 
-const handleGetProtocolFoods = async (queryParams, event) => {
+const handleGetProtocolFoods = async (queryParams) => {
     try {
         const { protocol_id } = queryParams;
         
@@ -216,185 +75,75 @@ const handleGetProtocolFoods = async (queryParams, event) => {
             return errorResponse('protocol_id parameter is required', 400);
         }
         
-        console.log('=== handleGetProtocolFoods called ===');
-        console.log('Protocol ID:', protocol_id);
-        
         const client = await pool.connect();
         
-        // First, let's check if the protocol exists
-        const protocolCheck = await client.query('SELECT id, name FROM protocols WHERE id = $1', [protocol_id]);
-        console.log('Protocol check:', protocolCheck.rows);
-        
-        if (protocolCheck.rows.length === 0) {
-            client.release();
-            return errorResponse('Protocol not found', 404);
-        }
-        
-        // Check if there are any protocol food rules
-        const rulesCheck = await client.query('SELECT COUNT(*) as count FROM protocol_food_rules WHERE protocol_id = $1', [protocol_id]);
-        console.log('Protocol food rules count:', rulesCheck.rows[0].count);
-        
-        // Use window functions to deduplicate results
+        // Use materialized view for better performance
         const query = `
-            WITH ranked_foods AS (
-                SELECT 
-                    fsv.simplified_food_id,
-                    fsv.display_name,
-                    fsv.category_name,
-                    fsv.subcategory_name,
-                    COALESCE(fsv.nightshade, false) as nightshade,
-                    COALESCE(fsv.histamine, 'unknown') as histamine,
-                    COALESCE(fsv.oxalate, 'unknown') as oxalate,
-                    COALESCE(fsv.lectin, 'unknown') as lectin,
-                    COALESCE(fsv.fodmap, 'unknown') as fodmap,
-                    COALESCE(fsv.salicylate, 'unknown') as salicylate,
-                    COALESCE(fsv.amines, 'unknown') as amines,
-                    COALESCE(fsv.glutamates, 'unknown') as glutamates,
-                    COALESCE(fsv.sulfites, 'unknown') as sulfites,
-                    COALESCE(fsv.goitrogens, 'unknown') as goitrogens,
-                    COALESCE(fsv.purines, 'unknown') as purines,
-                    COALESCE(fsv.phytoestrogens, 'unknown') as phytoestrogens,
-                    COALESCE(fsv.phytates, 'unknown') as phytates,
-                    COALESCE(fsv.tyramine, 'unknown') as tyramine,
-                    COALESCE(fsv.is_organic, false) as is_organic,
-                    COALESCE(fsv.preparation_state, 'unknown') as preparation_state,
-                    COALESCE(pfv.protocol_status, 'unknown') as protocol_status,
-                    pfv.protocol_phase,
-                    pfv.protocol_notes,
-                    ROW_NUMBER() OVER (PARTITION BY fsv.simplified_food_id ORDER BY 
-                        CASE 
-                            WHEN pfv.protocol_status = 'included' THEN 1
-                            WHEN pfv.protocol_status = 'try_in_moderation' THEN 2
-                            WHEN pfv.protocol_status = 'avoid_for_now' THEN 3
-                            ELSE 4
-                        END
-                    ) as row_num
-                FROM food_search_view fsv
-                LEFT JOIN protocol_foods_view pfv ON fsv.simplified_food_id = pfv.simplified_food_id 
-                    AND pfv.protocol_id = $1
-            )
             SELECT 
-                simplified_food_id as id,
-                display_name as name,
-                category_name as category,
-                subcategory_name,
-                nightshade,
-                histamine,
-                oxalate,
-                lectin,
-                fodmap,
-                salicylate,
-                amines,
-                glutamates,
-                sulfites,
-                goitrogens,
-                purines,
-                phytoestrogens,
-                phytates,
-                tyramine,
-                is_organic,
-                preparation_state,
-                protocol_status,
-                protocol_phase,
-                protocol_notes
-            FROM ranked_foods
-            WHERE row_num = 1
+                mfs.simplified_food_id as id,
+                mfs.display_name as name,
+                mfs.category_name as category,
+                mfs.preparation_state,
+                mfs.is_organic,
+                COALESCE(pfr.status, 'unknown') as protocol_status
+            FROM mat_food_search mfs
+            LEFT JOIN protocol_food_rules pfr ON mfs.simplified_food_id = pfr.food_id AND pfr.protocol_id = $1
             ORDER BY 
                 CASE 
-                    WHEN protocol_status = 'included' THEN 1
-                    WHEN protocol_status = 'try_in_moderation' THEN 2
-                    WHEN protocol_status = 'avoid_for_now' THEN 3
+                    WHEN pfr.status = 'included' THEN 1
+                    WHEN pfr.status = 'try_in_moderation' THEN 2
+                    WHEN pfr.status = 'avoid_for_now' THEN 3
                     ELSE 4
                 END,
-                category ASC,
-                name ASC
-            LIMIT 100
+                mfs.category_name ASC,
+                mfs.display_name ASC
+            LIMIT 200
         `;
         
-        console.log('Executing simplified query');
         const result = await client.query(query, [protocol_id]);
-        console.log('Query returned:', result.rows.length, 'rows');
-        
         client.release();
         
-        // Initialize food groups - FLAT structure for old frontend
+        // Group by category for frontend
         const foodsByCategory = {};
-        
-        // Nested structure for any new frontend features
-        const foodsByStatusCategory = {
-            included: {},
-            avoid_for_now: {},
-            try_in_moderation: {},
-            unknown: {}
+        const foodsByStatus = {
+            allowed: [],
+            avoid: [],
+            reintroduction: [],
+            unknown: []
         };
         
-        // Process each food with proper error handling
         result.rows.forEach(food => {
+            const category = food.category || 'Other';
             const status = food.protocol_status || 'unknown';
-            const category = food.category || 'other';
             
-            console.log('Processing food:', food.name, 'status:', status, 'category:', category);
-            
-            // Add compliance_status field that frontend expects
-            food.compliance_status = status;
-            
-            // Add additional fields from the new views
-            food.subcategory = food.subcategory_name;
-            food.is_organic = food.is_organic;
-            food.preparation_state = food.preparation_state;
-            
-            // Add to FLAT category structure (what old frontend expects)
+            // Group by category
             if (!foodsByCategory[category]) {
                 foodsByCategory[category] = [];
             }
             foodsByCategory[category].push(food);
             
-            // Also maintain nested structure for any future use
-            if (!foodsByStatusCategory[status]) {
-                foodsByStatusCategory[status] = {};
-            }
-            if (!foodsByStatusCategory[status][category]) {
-                foodsByStatusCategory[status][category] = [];
-            }
-            foodsByStatusCategory[status][category].push(food);
+            // Group by status
+            if (status === 'included') foodsByStatus.allowed.push(food);
+            else if (status === 'avoid_for_now') foodsByStatus.avoid.push(food);
+            else if (status === 'try_in_moderation') foodsByStatus.reintroduction.push(food);
+            else foodsByStatus.unknown.push(food);
         });
         
-        // Calculate summary stats with the names the old frontend expects
-        const foodsByStatus = {
-            allowed: result.rows.filter(f => (f.protocol_status || 'unknown') === 'included'),
-            avoid: result.rows.filter(f => (f.protocol_status || 'unknown') === 'avoid_for_now'),
-            reintroduction: result.rows.filter(f => (f.protocol_status || 'unknown') === 'try_in_moderation'),
-            unknown: result.rows.filter(f => !['included', 'avoid_for_now', 'try_in_moderation'].includes(f.protocol_status || 'unknown'))
-        };
-        
-        const summary = {
-            total: result.rows.length,
-            allowed: foodsByStatus.allowed.length,
-            avoid: foodsByStatus.avoid.length,
-            reintroduction: foodsByStatus.reintroduction.length,
-            unknown: foodsByStatus.unknown.length
-        };
-        
-        console.log('Summary:', summary);
-        console.log('Foods by category structure:', Object.keys(foodsByCategory));
-        
         return successResponse({
-            foods: result.rows, // Flat array for frontend to map over
-            foods_by_category: foodsByCategory, // FLAT structure: { "protein": [foods], "vegetable": [foods] }
-            foods_by_status: foodsByStatus, // For any status-based filtering
-            foods_by_status_category: foodsByStatusCategory, // Nested structure for future use
-            compliance_stats: summary, // Old frontend expects this name
-            total_foods: result.rows.length, // Old frontend expects this name
-            summary, // Keep this for any new frontend code
+            foods: result.rows,
+            foods_by_category: foodsByCategory,
+            foods_by_status: foodsByStatus,
+            compliance_stats: {
+                total: result.rows.length,
+                allowed: foodsByStatus.allowed.length,
+                avoid: foodsByStatus.avoid.length,
+                reintroduction: foodsByStatus.reintroduction.length,
+                unknown: foodsByStatus.unknown.length
+            },
             protocol_id
         });
         
     } catch (error) {
-        console.error('=== ERROR in handleGetProtocolFoods ===');
-        console.error('Error type:', error.constructor.name);
-        console.error('Error message:', error.message);
-        console.error('Error stack:', error.stack);
-        
         const appError = handleDatabaseError(error, 'fetch protocol foods');
         return errorResponse(appError.message, appError.statusCode);
     }
