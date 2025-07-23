@@ -32,52 +32,129 @@ const handleSearchFoods = async (queryParams, event) => {
         let query;
         let values;
         
-        // FIXED: Use the correct food_search_view with DISTINCT to avoid duplicates
+        // FIXED: Use window functions to deduplicate results
         if (protocol_id) {
             // Include protocol compliance when protocol_id is provided
             query = `
-                SELECT DISTINCT
-                    fsv.simplified_food_id as id,
-                    fsv.display_name as name,
-                    fsv.category_name as category,
-                    fsv.subcategory_name,
-                    COALESCE(fsv.nightshade, false) as nightshade,
-                    COALESCE(fsv.histamine, 'unknown') as histamine,
-                    COALESCE(fsv.oxalate, 'unknown') as oxalate,
-                    COALESCE(fsv.lectin, 'unknown') as lectin,
-                    COALESCE(fsv.fodmap, 'unknown') as fodmap,
-                    COALESCE(fsv.salicylate, 'unknown') as salicylate,
-                    COALESCE(fsv.is_organic, false) as is_organic,
-                    COALESCE(fsv.preparation_state, 'unknown') as preparation_state,
-                    COALESCE(pfv.protocol_status, 'unknown') as protocol_status
-                FROM food_search_view fsv
-                LEFT JOIN protocol_foods_view pfv ON fsv.simplified_food_id = pfv.simplified_food_id 
-                    AND pfv.protocol_id = $2
-                WHERE fsv.display_name ILIKE $1
-                ORDER BY fsv.display_name ASC
+                WITH ranked_foods AS (
+                    SELECT 
+                        fsv.simplified_food_id,
+                        fsv.display_name,
+                        fsv.category_name,
+                        fsv.subcategory_name,
+                        COALESCE(fsv.nightshade, false) as nightshade,
+                        COALESCE(fsv.histamine, 'unknown') as histamine,
+                        COALESCE(fsv.oxalate, 'unknown') as oxalate,
+                        COALESCE(fsv.lectin, 'unknown') as lectin,
+                        COALESCE(fsv.fodmap, 'unknown') as fodmap,
+                        COALESCE(fsv.salicylate, 'unknown') as salicylate,
+                        COALESCE(fsv.amines, 'unknown') as amines,
+                        COALESCE(fsv.glutamates, 'unknown') as glutamates,
+                        COALESCE(fsv.sulfites, 'unknown') as sulfites,
+                        COALESCE(fsv.goitrogens, 'unknown') as goitrogens,
+                        COALESCE(fsv.purines, 'unknown') as purines,
+                        COALESCE(fsv.phytoestrogens, 'unknown') as phytoestrogens,
+                        COALESCE(fsv.phytates, 'unknown') as phytates,
+                        COALESCE(fsv.tyramine, 'unknown') as tyramine,
+                        COALESCE(fsv.is_organic, false) as is_organic,
+                        COALESCE(fsv.preparation_state, 'unknown') as preparation_state,
+                        COALESCE(pfv.protocol_status, 'unknown') as protocol_status,
+                        ROW_NUMBER() OVER (PARTITION BY fsv.simplified_food_id ORDER BY 
+                            CASE 
+                                WHEN pfv.protocol_status = 'included' THEN 1
+                                WHEN pfv.protocol_status = 'try_in_moderation' THEN 2
+                                WHEN pfv.protocol_status = 'avoid_for_now' THEN 3
+                                ELSE 4
+                            END
+                        ) as row_num
+                    FROM food_search_view fsv
+                    LEFT JOIN protocol_foods_view pfv ON fsv.simplified_food_id = pfv.simplified_food_id 
+                        AND pfv.protocol_id = $2
+                    WHERE fsv.display_name ILIKE $1
+                )
+                SELECT 
+                    simplified_food_id as id,
+                    display_name as name,
+                    category_name as category,
+                    subcategory_name,
+                    nightshade,
+                    histamine,
+                    oxalate,
+                    lectin,
+                    fodmap,
+                    salicylate,
+                    amines,
+                    glutamates,
+                    sulfites,
+                    goitrogens,
+                    purines,
+                    phytoestrogens,
+                    phytates,
+                    tyramine,
+                    is_organic,
+                    preparation_state,
+                    protocol_status
+                FROM ranked_foods
+                WHERE row_num = 1
+                ORDER BY name ASC
                 LIMIT 10
             `;
             values = [searchPattern, protocol_id];
         } else {
-            // Basic search without protocol compliance
+            // Basic search without protocol compliance - also use window functions for consistency
             query = `
-                SELECT DISTINCT
-                    fsv.simplified_food_id as id,
-                    fsv.display_name as name,
-                    fsv.category_name as category,
-                    fsv.subcategory_name,
-                    COALESCE(fsv.nightshade, false) as nightshade,
-                    COALESCE(fsv.histamine, 'unknown') as histamine,
-                    COALESCE(fsv.oxalate, 'unknown') as oxalate,
-                    COALESCE(fsv.lectin, 'unknown') as lectin,
-                    COALESCE(fsv.fodmap, 'unknown') as fodmap,
-                    COALESCE(fsv.salicylate, 'unknown') as salicylate,
-                    COALESCE(fsv.is_organic, false) as is_organic,
-                    COALESCE(fsv.preparation_state, 'unknown') as preparation_state,
-                    'unknown' as protocol_status
-                FROM food_search_view fsv
-                WHERE fsv.display_name ILIKE $1
-                ORDER BY fsv.display_name ASC
+                WITH ranked_foods AS (
+                    SELECT 
+                        fsv.simplified_food_id,
+                        fsv.display_name,
+                        fsv.category_name,
+                        fsv.subcategory_name,
+                        COALESCE(fsv.nightshade, false) as nightshade,
+                        COALESCE(fsv.histamine, 'unknown') as histamine,
+                        COALESCE(fsv.oxalate, 'unknown') as oxalate,
+                        COALESCE(fsv.lectin, 'unknown') as lectin,
+                        COALESCE(fsv.fodmap, 'unknown') as fodmap,
+                        COALESCE(fsv.salicylate, 'unknown') as salicylate,
+                        COALESCE(fsv.amines, 'unknown') as amines,
+                        COALESCE(fsv.glutamates, 'unknown') as glutamates,
+                        COALESCE(fsv.sulfites, 'unknown') as sulfites,
+                        COALESCE(fsv.goitrogens, 'unknown') as goitrogens,
+                        COALESCE(fsv.purines, 'unknown') as purines,
+                        COALESCE(fsv.phytoestrogens, 'unknown') as phytoestrogens,
+                        COALESCE(fsv.phytates, 'unknown') as phytates,
+                        COALESCE(fsv.tyramine, 'unknown') as tyramine,
+                        COALESCE(fsv.is_organic, false) as is_organic,
+                        COALESCE(fsv.preparation_state, 'unknown') as preparation_state,
+                        'unknown' as protocol_status,
+                        ROW_NUMBER() OVER (PARTITION BY fsv.simplified_food_id ORDER BY fsv.display_name) as row_num
+                    FROM food_search_view fsv
+                    WHERE fsv.display_name ILIKE $1
+                )
+                SELECT 
+                    simplified_food_id as id,
+                    display_name as name,
+                    category_name as category,
+                    subcategory_name,
+                    nightshade,
+                    histamine,
+                    oxalate,
+                    lectin,
+                    fodmap,
+                    salicylate,
+                    amines,
+                    glutamates,
+                    sulfites,
+                    goitrogens,
+                    purines,
+                    phytoestrogens,
+                    phytates,
+                    tyramine,
+                    is_organic,
+                    preparation_state,
+                    protocol_status
+                FROM ranked_foods
+                WHERE row_num = 1
+                ORDER BY name ASC
                 LIMIT 10
             `;
             values = [searchPattern];
@@ -104,6 +181,14 @@ const handleSearchFoods = async (queryParams, event) => {
             lectin: row.lectin,
             fodmap: row.fodmap,
             salicylate: row.salicylate,
+            amines: row.amines,
+            glutamates: row.glutamates,
+            sulfites: row.sulfites,
+            goitrogens: row.goitrogens,
+            purines: row.purines,
+            phytoestrogens: row.phytoestrogens,
+            phytates: row.phytates,
+            tyramine: row.tyramine,
             is_organic: row.is_organic,
             preparation_state: row.preparation_state
         }));
@@ -149,36 +234,80 @@ const handleGetProtocolFoods = async (queryParams, event) => {
         const rulesCheck = await client.query('SELECT COUNT(*) as count FROM protocol_food_rules WHERE protocol_id = $1', [protocol_id]);
         console.log('Protocol food rules count:', rulesCheck.rows[0].count);
         
-        // Use the correct views for protocol foods with DISTINCT to avoid duplicates
+        // Use window functions to deduplicate results
         const query = `
-            SELECT DISTINCT
-                fsv.simplified_food_id as id,
-                fsv.display_name as name,
-                fsv.category_name as category,
-                fsv.subcategory_name,
-                COALESCE(fsv.nightshade, false) as nightshade,
-                COALESCE(fsv.histamine, 'unknown') as histamine,
-                COALESCE(fsv.oxalate, 'unknown') as oxalate,
-                COALESCE(fsv.lectin, 'unknown') as lectin,
-                COALESCE(fsv.fodmap, 'unknown') as fodmap,
-                COALESCE(fsv.salicylate, 'unknown') as salicylate,
-                COALESCE(fsv.is_organic, false) as is_organic,
-                COALESCE(fsv.preparation_state, 'unknown') as preparation_state,
-                COALESCE(pfv.protocol_status, 'unknown') as protocol_status,
-                pfv.protocol_phase,
-                pfv.protocol_notes
-            FROM food_search_view fsv
-            LEFT JOIN protocol_foods_view pfv ON fsv.simplified_food_id = pfv.simplified_food_id 
-                AND pfv.protocol_id = $1
+            WITH ranked_foods AS (
+                SELECT 
+                    fsv.simplified_food_id,
+                    fsv.display_name,
+                    fsv.category_name,
+                    fsv.subcategory_name,
+                    COALESCE(fsv.nightshade, false) as nightshade,
+                    COALESCE(fsv.histamine, 'unknown') as histamine,
+                    COALESCE(fsv.oxalate, 'unknown') as oxalate,
+                    COALESCE(fsv.lectin, 'unknown') as lectin,
+                    COALESCE(fsv.fodmap, 'unknown') as fodmap,
+                    COALESCE(fsv.salicylate, 'unknown') as salicylate,
+                    COALESCE(fsv.amines, 'unknown') as amines,
+                    COALESCE(fsv.glutamates, 'unknown') as glutamates,
+                    COALESCE(fsv.sulfites, 'unknown') as sulfites,
+                    COALESCE(fsv.goitrogens, 'unknown') as goitrogens,
+                    COALESCE(fsv.purines, 'unknown') as purines,
+                    COALESCE(fsv.phytoestrogens, 'unknown') as phytoestrogens,
+                    COALESCE(fsv.phytates, 'unknown') as phytates,
+                    COALESCE(fsv.tyramine, 'unknown') as tyramine,
+                    COALESCE(fsv.is_organic, false) as is_organic,
+                    COALESCE(fsv.preparation_state, 'unknown') as preparation_state,
+                    COALESCE(pfv.protocol_status, 'unknown') as protocol_status,
+                    pfv.protocol_phase,
+                    pfv.protocol_notes,
+                    ROW_NUMBER() OVER (PARTITION BY fsv.simplified_food_id ORDER BY 
+                        CASE 
+                            WHEN pfv.protocol_status = 'included' THEN 1
+                            WHEN pfv.protocol_status = 'try_in_moderation' THEN 2
+                            WHEN pfv.protocol_status = 'avoid_for_now' THEN 3
+                            ELSE 4
+                        END
+                    ) as row_num
+                FROM food_search_view fsv
+                LEFT JOIN protocol_foods_view pfv ON fsv.simplified_food_id = pfv.simplified_food_id 
+                    AND pfv.protocol_id = $1
+            )
+            SELECT 
+                simplified_food_id as id,
+                display_name as name,
+                category_name as category,
+                subcategory_name,
+                nightshade,
+                histamine,
+                oxalate,
+                lectin,
+                fodmap,
+                salicylate,
+                amines,
+                glutamates,
+                sulfites,
+                goitrogens,
+                purines,
+                phytoestrogens,
+                phytates,
+                tyramine,
+                is_organic,
+                preparation_state,
+                protocol_status,
+                protocol_phase,
+                protocol_notes
+            FROM ranked_foods
+            WHERE row_num = 1
             ORDER BY 
                 CASE 
-                    WHEN pfv.protocol_status = 'included' THEN 1
-                    WHEN pfv.protocol_status = 'avoid_for_now' THEN 2
-                    WHEN pfv.protocol_status = 'try_in_moderation' THEN 3
+                    WHEN protocol_status = 'included' THEN 1
+                    WHEN protocol_status = 'try_in_moderation' THEN 2
+                    WHEN protocol_status = 'avoid_for_now' THEN 3
                     ELSE 4
                 END,
-                fsv.category_name ASC,
-                fsv.display_name ASC
+                category ASC,
+                name ASC
             LIMIT 100
         `;
         
