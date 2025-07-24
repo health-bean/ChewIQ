@@ -25,7 +25,7 @@ const handleGetProtocols = async (queryParams, event) => {
                 phases,
                 official,
                 version
-            FROM protocols 
+            FROM dietary_protocols 
             WHERE 
                 is_global = true 
                 OR created_by = ANY($1)

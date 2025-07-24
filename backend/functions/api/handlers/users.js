@@ -99,7 +99,7 @@ const handleUpdateUser = async (body, event) => {
     }
 };
 
-const handleGetUserProtocols = async (queryParams, event) => {
+const handleGetUserDietaryProtocols = async (queryParams, event) => {
     // Require authentication
     const authError = await requireAuth(event);
     if (authError) {
@@ -113,20 +113,20 @@ const handleGetUserProtocols = async (queryParams, event) => {
         
         const query = `
             SELECT 
-                up.id,
-                up.start_date,
-                up.end_date,
-                up.active,
-                up.protocol_data,
-                p.id as protocol_id,
-                p.name as protocol_name,
-                p.description,
-                p.category,
-                p.phases
-            FROM user_protocols up
-            JOIN protocols p ON up.protocol_id = p.id
-            WHERE up.user_id = ANY($1) AND up.active = true
-            ORDER BY up.start_date DESC
+                udp.id,
+                udp.start_date,
+                udp.end_date,
+                udp.active,
+                udp.protocol_data,
+                dp.id as protocol_id,
+                dp.name as protocol_name,
+                dp.description,
+                dp.category,
+                dp.phases
+            FROM user_dietary_protocols udp
+            JOIN dietary_protocols dp ON udp.dietary_protocol_id = dp.id
+            WHERE udp.user_id = ANY($1) AND udp.active = true
+            ORDER BY udp.start_date DESC
         `;
         
         const result = await client.query(query, [accessibleUserIds]);
@@ -318,8 +318,8 @@ const handleGetProtocolHistory = async (queryParams, event) => {
           p1.name as previous_protocol_name,
           p2.name as new_protocol_name
         FROM protocol_change_events pce
-        LEFT JOIN protocols p1 ON p1.id = (pce.event_data->'previous_protocol'->>'id')::uuid
-        LEFT JOIN protocols p2 ON p2.id = (pce.event_data->'new_protocol'->>'id')::uuid
+        LEFT JOIN dietary_protocols p1 ON p1.id = (pce.event_data->'previous_protocol'->>'id')::uuid
+        LEFT JOIN dietary_protocols p2 ON p2.id = (pce.event_data->'new_protocol'->>'id')::uuid
         WHERE pce.user_id = $1
         ORDER BY pce.created_at DESC
         LIMIT 20
@@ -374,7 +374,7 @@ const handleChangeProtocol = async (body, event) => {
 
       // Verify new protocol exists
       const protocolCheck = await client.query(
-        'SELECT id, name FROM protocols WHERE id = $1',
+        'SELECT id, name FROM dietary_protocols WHERE id = $1',
         [newProtocolId]
       );
 
@@ -387,7 +387,7 @@ const handleChangeProtocol = async (body, event) => {
       // If user has a current protocol, end it
       if (currentProtocol) {
         await client.query(`
-          UPDATE user_protocols 
+          UPDATE user_dietary_protocols 
           SET 
             end_date = CURRENT_DATE,
             active = false,
@@ -395,13 +395,13 @@ const handleChangeProtocol = async (body, event) => {
               'ended_at', now()::text,
               'end_reason', $3
             )
-          WHERE user_id = $1 AND protocol_id = $2 AND active = true
+          WHERE user_id = $1 AND dietary_protocol_id = $2 AND active = true
         `, [user.id, currentProtocol.protocol_id, reason || 'protocol_change']);
       }
 
       // Create new protocol assignment
       await client.query(`
-        INSERT INTO user_protocols (user_id, protocol_id, start_date, protocol_data)
+        INSERT INTO user_dietary_protocols (user_id, dietary_protocol_id, start_date, protocol_data)
         VALUES ($1, $2, CURRENT_DATE, $3)
       `, [
         user.id, 
@@ -458,7 +458,7 @@ const handleChangeProtocol = async (body, event) => {
 module.exports = {
     handleGetUser,
     handleUpdateUser,
-    handleGetUserProtocols,
+    handleGetUserDietaryProtocols,
     handleGetUserPreferences,
     handleUpdateUserPreferences,
     handleGetCurrentProtocol,

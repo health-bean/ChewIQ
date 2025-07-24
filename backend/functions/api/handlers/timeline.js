@@ -293,13 +293,13 @@ const checkProtocolCompliance = async (selectedFoods, userId, client) => {
     try {
         const query = `
             SELECT COUNT(*) as avoid_count
-            FROM protocol_food_rules pfr
-            JOIN user_protocols up ON pfr.protocol_id = up.protocol_id
-            JOIN foods fp ON pfr.food_id = fp.id
-            WHERE up.user_id = $1 
-            AND up.active = true
+            FROM food_protocol_relationships fpr
+            JOIN user_dietary_protocols udp ON fpr.dietary_protocol_id = udp.dietary_protocol_id
+            JOIN foods fp ON fpr.food_id = fp.id
+            WHERE udp.user_id = $1 
+            AND udp.active = true
             AND fp.name = ANY($2)
-            AND pfr.status = 'avoid'
+            AND fpr.status = 'avoid'
         `;
         
         const result = await client.query(query, [userId, selectedFoods]);

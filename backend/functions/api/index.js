@@ -1,7 +1,7 @@
 // backend/functions/api/index.js (CLEAN AUTH SYSTEM)
 const { handleGetCorrelationInsights } = require('./handlers/correlations');
 const { handleCors } = require('./utils/responses');
-const { handleGetUser, handleUpdateUser, handleGetUserProtocols, handleGetUserPreferences, handleUpdateUserPreferences, handleGetCurrentProtocol, handleGetProtocolHistory, handleChangeProtocol } = require('./handlers/users');
+const { handleGetUser, handleUpdateUser, handleGetUserDietaryProtocols, handleGetUserPreferences, handleUpdateUserPreferences, handleGetCurrentProtocol, handleGetProtocolHistory, handleChangeProtocol } = require('./handlers/users');
 const { handleGetJournalEntries, handleCreateJournalEntry, handleGetJournalEntry, handleUpdateJournalEntry } = require('./handlers/journal');
 const { handleGetTimelineEntries, handleCreateTimelineEntry } = require('./handlers/timeline');
 const { handleGetProtocols } = require('./handlers/protocols');
@@ -99,7 +99,7 @@ exports.handler = async (event) => {
             response = await handleUpdateUser(body, event);
         }
         else if (path === '/api/v1/user/protocols' && method === 'GET') {
-            response = await handleGetUserProtocols(queryParams, event);
+            response = await handleGetUserDietaryProtocols(queryParams, event);
         }
         else if (path === '/api/v1/user/preferences' && method === 'GET') {
             console.log('🔍 INDEX: Matched user preferences GET route');

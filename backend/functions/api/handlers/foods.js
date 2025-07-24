@@ -5,31 +5,33 @@ const { handleDatabaseError } = require('../utils/errors');
 const handleSearchFoods = async (queryParams) => {
     try {
         const client = await pool.connect();
-        const { search = '', protocol_id = null } = queryParams;
+        // Support both old and new parameter names for backward compatibility
+        const protocol_id = queryParams.protocol_id || queryParams.dietary_protocol_id;
+        const search = queryParams.search || '';
         const searchPattern = `%${search}%`;
         
         let query, values;
         
         if (protocol_id) {
+            // Use mat_protocol_foods view which already has the protocol relationship data
             query = `
                 SELECT 
-                    mfs.simplified_food_id as id,
-                    mfs.display_name as name,
-                    mfs.category_name as category,
-                    mfs.preparation_state,
-                    mfs.is_organic,
-                    COALESCE(pfr.status, 'unknown') as protocol_status
-                FROM mat_food_search mfs
-                LEFT JOIN protocol_food_rules pfr ON mfs.simplified_food_id = pfr.food_id AND pfr.protocol_id = $2
-                WHERE mfs.display_name ILIKE $1
-                ORDER BY mfs.display_name ASC
+                    mpf.food_id as id,
+                    mpf.display_name as name,
+                    mpf.category_name as category,
+                    mpf.protocol_status
+                FROM mat_protocol_foods mpf
+                WHERE mpf.display_name ILIKE $1
+                AND mpf.dietary_protocol_id = $2
+                ORDER BY mpf.display_name ASC
                 LIMIT 10
             `;
             values = [searchPattern, protocol_id];
         } else {
+            // Use mat_food_search for general food search without protocol context
             query = `
                 SELECT 
-                    simplified_food_id as id,
+                    food_id as id,
                     display_name as name,
                     category_name as category,
                     preparation_state,
@@ -69,10 +71,11 @@ const handleSearchFoods = async (queryParams) => {
 
 const handleGetProtocolFoods = async (queryParams) => {
     try {
-        const { protocol_id } = queryParams;
+        // Support both old and new parameter names for backward compatibility
+        const protocol_id = queryParams.protocol_id || queryParams.dietary_protocol_id;
         
         if (!protocol_id) {
-            return errorResponse('protocol_id parameter is required', 400);
+            return errorResponse('protocol_id or dietary_protocol_id parameter is required', 400);
         }
         
         const client = await pool.connect();
@@ -80,23 +83,22 @@ const handleGetProtocolFoods = async (queryParams) => {
         // Use materialized view for better performance
         const query = `
             SELECT 
-                mfs.simplified_food_id as id,
-                mfs.display_name as name,
-                mfs.category_name as category,
-                mfs.preparation_state,
-                mfs.is_organic,
-                COALESCE(pfr.status, 'unknown') as protocol_status
-            FROM mat_food_search mfs
-            LEFT JOIN protocol_food_rules pfr ON mfs.simplified_food_id = pfr.food_id AND pfr.protocol_id = $1
+                mpf.food_id as id,
+                mpf.display_name as name,
+                mpf.category_name as category,
+                mpf.protocol_status,
+                mpf.protocol_phase
+            FROM mat_protocol_foods mpf
+            WHERE mpf.dietary_protocol_id = $1
             ORDER BY 
                 CASE 
-                    WHEN pfr.status = 'included' THEN 1
-                    WHEN pfr.status = 'try_in_moderation' THEN 2
-                    WHEN pfr.status = 'avoid_for_now' THEN 3
+                    WHEN mpf.protocol_status = 'included' THEN 1
+                    WHEN mpf.protocol_status = 'try_in_moderation' THEN 2
+                    WHEN mpf.protocol_status = 'avoid_for_now' THEN 3
                     ELSE 4
                 END,
-                mfs.category_name ASC,
-                mfs.display_name ASC
+                mpf.category_name ASC,
+                mpf.display_name ASC
             LIMIT 200
         `;
         
