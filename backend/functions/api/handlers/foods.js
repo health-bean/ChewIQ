@@ -9,12 +9,13 @@ const handleSearchFoods = async (queryParams) => {
         const search = queryParams.search || '';
         const searchPattern = `%${search}%`;
         
-        // For now, use only mat_food_search since mat_protocol_foods has issues
+        // Use mat_food_search with correct column names
         const query = `
             SELECT 
-                simplified_food_id as id,
+                food_id as id,
                 display_name as name,
                 category_name as category,
+                subcategory_name as subcategory,
                 preparation_state,
                 is_organic,
                 'unknown' as protocol_status
@@ -25,13 +26,19 @@ const handleSearchFoods = async (queryParams) => {
         `;
         const values = [searchPattern];
         
+        console.log('Executing food search query:', query);
+        console.log('With values:', values);
+        
         const result = await client.query(query, values);
         client.release();
+        
+        console.log(`Found ${result.rows.length} food results`);
         
         const foods = result.rows.map(row => ({
             id: row.id,
             name: row.name,
             category: row.category,
+            subcategory: row.subcategory,
             preparation_state: row.preparation_state,
             is_organic: row.is_organic,
             protocol_status: row.protocol_status
@@ -44,6 +51,7 @@ const handleSearchFoods = async (queryParams) => {
         });
         
     } catch (error) {
+        console.error('Error in handleSearchFoods:', error);
         const appError = handleDatabaseError(error, 'search foods');
         return errorResponse(appError.message, appError.statusCode);
     }
@@ -58,26 +66,61 @@ const handleGetProtocolFoods = async (queryParams) => {
         }
         
         // Since mat_protocol_foods is empty, return a placeholder response
+        // but still return foods from mat_food_search for now
+        const client = await pool.connect();
+        
+        const query = `
+            SELECT 
+                food_id as id,
+                display_name as name,
+                category_name as category,
+                subcategory_name as subcategory,
+                preparation_state,
+                is_organic,
+                'unknown' as protocol_status
+            FROM mat_food_search
+            ORDER BY category_name ASC, display_name ASC
+            LIMIT 100
+        `;
+        
+        const result = await client.query(query);
+        client.release();
+        
+        // Group by category for frontend
+        const foodsByCategory = {};
+        const foodsByStatus = {
+            allowed: [],
+            avoid: [],
+            reintroduction: [],
+            unknown: result.rows
+        };
+        
+        result.rows.forEach(food => {
+            const category = food.category || 'Other';
+            
+            // Group by category
+            if (!foodsByCategory[category]) {
+                foodsByCategory[category] = [];
+            }
+            foodsByCategory[category].push(food);
+        });
+        
         return successResponse({
-            foods: [],
-            foods_by_category: {},
-            foods_by_status: {
-                allowed: [],
-                avoid: [],
-                reintroduction: [],
-                unknown: []
-            },
+            foods: result.rows,
+            foods_by_category: foodsByCategory,
+            foods_by_status: foodsByStatus,
             compliance_stats: {
-                total: 0,
+                total: result.rows.length,
                 allowed: 0,
                 avoid: 0,
                 reintroduction: 0,
-                unknown: 0
+                unknown: result.rows.length
             },
             protocol_id
         });
         
     } catch (error) {
+        console.error('Error in handleGetProtocolFoods:', error);
         const appError = handleDatabaseError(error, 'fetch protocol foods');
         return errorResponse(appError.message, appError.statusCode);
     }
