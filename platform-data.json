@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2025-07-24T21:29:15.144Z",
+    "generated": "2025-07-24T21:56:17.832Z",
     "version": "1.0.0",
     "generator": "AutomatedProfessionalDocsGenerator"
   },
@@ -14,10 +14,10 @@
     "totalComponents": 55,
     "totalHooks": 13,
     "totalFiles": 107,
-    "workingAPIs": 5,
+    "workingAPIs": 0,
     "totalAPIs": 29,
     "totalTables": 26,
-    "totalCommits": 190,
+    "totalCommits": 191,
     "contributors": 1
   },
   "discoveredInfo": {
@@ -53,12 +53,12 @@
         "foods",
         "protocol_food_rules",
         "user_protocols",
+        "dietary_protocols",
         "user",
         "SET",
         "user_dietary_protocols",
         "user_preferences",
         "get_user_current_protocol",
-        "dietary_protocols",
         "users",
         "food_search_view",
         "reflections",
@@ -132,125 +132,10 @@
               "value": "chicken"
             }
           ],
-          "status": 200,
-          "working": true,
-          "responseTime": 887,
-          "responseData": {
-            "foods": [
-              {
-                "id": "68aada34-c3c7-434e-bd67-f35625ff5026",
-                "name": "Chicken Breast",
-                "category": "Proteins",
-                "subcategory": "Animal Proteins",
-                "preparation_state": "raw",
-                "is_organic": false,
-                "properties": {
-                  "growing": {
-                    "organic": false,
-                    "grass_fed": false,
-                    "free_range": false,
-                    "wild_caught": false
-                  },
-                  "properties": {
-                    "fodmap": "unknown",
-                    "lectin": "unknown",
-                    "oxalate": "unknown",
-                    "histamine": "unknown",
-                    "nightshade": false,
-                    "salicylate": "unknown"
-                  },
-                  "preparation": {
-                    "state": "raw"
-                  }
-                }
-              },
-              {
-                "id": "219aa6fb-d3e7-4961-ae1e-41a56792a60b",
-                "name": "Chicken Drumstick",
-                "category": "Proteins",
-                "subcategory": "Animal Proteins",
-                "preparation_state": "raw",
-                "is_organic": false,
-                "properties": {
-                  "growing": {
-                    "organic": false,
-                    "grass_fed": false,
-                    "free_range": false,
-                    "wild_caught": false
-                  },
-                  "properties": {
-                    "fodmap": "unknown",
-                    "lectin": "unknown",
-                    "oxalate": "unknown",
-                    "histamine": "unknown",
-                    "nightshade": false,
-                    "salicylate": "unknown"
-                  },
-                  "preparation": {
-                    "state": "raw"
-                  }
-                }
-              },
-              {
-                "id": "c2e7bf62-159e-4555-a034-c24e205c3e51",
-                "name": "Chicken Thigh",
-                "category": "Proteins",
-                "subcategory": "Animal Proteins",
-                "preparation_state": "raw",
-                "is_organic": false,
-                "properties": {
-                  "growing": {
-                    "organic": false,
-                    "grass_fed": false,
-                    "free_range": false,
-                    "wild_caught": false
-                  },
-                  "properties": {
-                    "fodmap": "unknown",
-                    "lectin": "unknown",
-                    "oxalate": "unknown",
-                    "histamine": "unknown",
-                    "nightshade": false,
-                    "salicylate": "unknown"
-                  },
-                  "preparation": {
-                    "state": "raw"
-                  }
-                }
-              },
-              {
-                "id": "7dd19d64-8f16-4d4a-b24f-531cc0dd2ec8",
-                "name": "Chicken Wing",
-                "category": "Proteins",
-                "subcategory": "Animal Proteins",
-                "preparation_state": "raw",
-                "is_organic": false,
-                "properties": {
-                  "growing": {
-                    "organic": false,
-                    "grass_fed": false,
-                    "free_range": false,
-                    "wild_caught": false
-                  },
-                  "properties": {
-                    "fodmap": "unknown",
-                    "lectin": "unknown",
-                    "oxalate": "unknown",
-                    "histamine": "unknown",
-                    "nightshade": false,
-                    "salicylate": "unknown"
-                  },
-                  "preparation": {
-                    "state": "raw"
-                  }
-                }
-              }
-            ],
-            "total": 4,
-            "search_term": "chicken",
-            "user_protocols": []
-          },
-          "responseSize": 1809
+          "status": 408,
+          "working": false,
+          "error": "Request timeout (15s)",
+          "responseTime": 15060
         },
         {
           "path": "/api/v1/correlations/insights",
@@ -266,7 +151,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 94,
+          "responseTime": 87,
           "responseData": {
             "error": "Authentication required"
           },
@@ -281,7 +166,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 200,
+          "responseTime": 48,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -319,7 +204,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 113,
+          "responseTime": 46,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -362,7 +247,7 @@
           ],
           "status": 500,
           "working": false,
-          "responseTime": 162,
+          "responseTime": 50,
           "responseData": {
             "error": "Failed to complete fetch protocol foods"
           },
@@ -383,7 +268,7 @@
           "status": 408,
           "working": false,
           "error": "Request timeout (15s)",
-          "responseTime": 15072
+          "responseTime": 15058
         },
         {
           "path": "/api/v1/timeline/entries",
@@ -399,7 +284,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 115,
+          "responseTime": 39,
           "responseData": {
             "error": "Authentication required"
           },
@@ -419,7 +304,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 126,
+          "responseTime": 44,
           "responseData": {
             "error": "Authentication required"
           },
@@ -439,7 +324,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 137,
+          "responseTime": 37,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -482,7 +367,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 147,
+          "responseTime": 37,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -520,7 +405,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 125,
+          "responseTime": 42,
           "responseData": {
             "error": "Authentication required"
           },
@@ -540,7 +425,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 115,
+          "responseTime": 46,
           "responseData": {
             "error": "Authentication required"
           },
@@ -560,7 +445,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 158,
+          "responseTime": 43,
           "responseData": {
             "error": "Authentication required"
           },
@@ -580,7 +465,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 159,
+          "responseTime": 61,
           "responseData": {
             "error": "Authentication required"
           },
@@ -600,7 +485,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 118,
+          "responseTime": 64,
           "responseData": {
             "error": "Authentication required"
           },
@@ -620,7 +505,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 132,
+          "responseTime": 52,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -659,7 +544,7 @@
           "status": 408,
           "working": false,
           "error": "Request timeout (15s)",
-          "responseTime": 15065
+          "responseTime": 15033
         },
         {
           "path": "/api/v1/symptoms/search",
@@ -676,7 +561,7 @@
           "status": 408,
           "working": false,
           "error": "Request timeout (15s)",
-          "responseTime": 15024
+          "responseTime": 15033
         },
         {
           "path": "/api/v1/supplements/search",
@@ -690,15 +575,10 @@
               "value": "chicken"
             }
           ],
-          "status": 200,
-          "working": true,
-          "responseTime": 295,
-          "responseData": {
-            "supplements": [],
-            "total": 0,
-            "search_term": "chicken"
-          },
-          "responseSize": 52
+          "status": 408,
+          "working": false,
+          "error": "Request timeout (15s)",
+          "responseTime": 15058
         },
         {
           "path": "/api/v1/medications/search",
@@ -712,15 +592,10 @@
               "value": "chicken"
             }
           ],
-          "status": 200,
-          "working": true,
-          "responseTime": 96,
-          "responseData": {
-            "medications": [],
-            "total": 0,
-            "search_term": "chicken"
-          },
-          "responseSize": 52
+          "status": 408,
+          "working": false,
+          "error": "Request timeout (15s)",
+          "responseTime": 15017
         },
         {
           "path": "/api/v1/detox-types/search",
@@ -734,15 +609,10 @@
               "value": "chicken"
             }
           ],
-          "status": 200,
-          "working": true,
-          "responseTime": 139,
-          "responseData": {
-            "detox_types": [],
-            "total": 0,
-            "search_term": "chicken"
-          },
-          "responseSize": 52
+          "status": 408,
+          "working": false,
+          "error": "Request timeout (15s)",
+          "responseTime": 15016
         },
         {
           "path": "/api/v1/exposures/search",
@@ -756,15 +626,10 @@
               "value": "chicken"
             }
           ],
-          "status": 200,
-          "working": true,
-          "responseTime": 107,
-          "responseData": {
-            "exposures": [],
-            "total": 0,
-            "search_term": "chicken"
-          },
-          "responseSize": 50
+          "status": 408,
+          "working": false,
+          "error": "Request timeout (15s)",
+          "responseTime": 15034
         },
         {
           "path": "/api/v1/admin/seed-demo-data",
@@ -775,7 +640,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 194,
+          "responseTime": 84,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -811,13 +676,10 @@
           "description": "Get entries",
           "source": "backend/functions/api/index.js",
           "params": [],
-          "status": 500,
+          "status": 408,
           "working": false,
-          "responseTime": 113,
-          "responseData": {
-            "error": "Failed to complete get journal entries"
-          },
-          "responseSize": 50
+          "error": "Request timeout (15s)",
+          "responseTime": 15020
         },
         {
           "path": "/api/v1/journal/entries/",
@@ -826,13 +688,10 @@
           "description": "Get resource",
           "source": "backend/functions/api/index.js",
           "params": [],
-          "status": 401,
+          "status": 408,
           "working": false,
-          "responseTime": 178,
-          "responseData": {
-            "error": "User not authenticated"
-          },
-          "responseSize": 34
+          "error": "Request timeout (15s)",
+          "responseTime": 15080
         },
         {
           "path": "/api/v1/test-auth",
@@ -843,7 +702,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 198,
+          "responseTime": 625,
           "responseData": {
             "error": "Authentication required"
           },
@@ -858,7 +717,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 357,
+          "responseTime": 39,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -896,7 +755,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 98,
+          "responseTime": 43,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -934,7 +793,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 127,
+          "responseTime": 46,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -964,11 +823,11 @@
           "responseSize": 629
         }
       ],
-      "workingCount": 5,
+      "workingCount": 0,
       "totalCount": 29,
       "categories": {
         "Foods": {
-          "working": 1,
+          "working": 0,
           "total": 2
         },
         "AI": {
@@ -976,7 +835,7 @@
           "total": 1
         },
         "Lookup Data": {
-          "working": 2,
+          "working": 0,
           "total": 4
         },
         "Protocols": {
@@ -992,7 +851,7 @@
           "total": 4
         },
         "Health Data": {
-          "working": 2,
+          "working": 0,
           "total": 6
         },
         "Other": {
@@ -1671,7 +1530,7 @@
             }
           ],
           "utilities": [],
-          "size": "207.84 KB"
+          "size": "207.86 KB"
         },
         "backend/functions": {
           "totalFiles": 28,
@@ -1688,16 +1547,16 @@
             }
           ],
           "utilities": [],
-          "size": "207.84 KB"
+          "size": "207.86 KB"
         },
         "backend": {
-          "totalFiles": 37,
+          "totalFiles": 38,
           "fileTypes": {
             ".example": 1,
             ".js": 28,
             ".sql": 5,
-            ".json": 2,
-            ".sh": 1
+            ".sh": 2,
+            ".json": 2
           },
           "components": [],
           "hooks": [
@@ -1708,7 +1567,7 @@
             }
           ],
           "utilities": [],
-          "size": "274.44 KB"
+          "size": "275.17 KB"
         }
       },
       "shared": {},
@@ -1801,18 +1660,18 @@
       "repository": "https://github.com/deebyrne26/health-platform",
       "branch": "main",
       "lastCommit": {
-        "hash": "5472130",
-        "message": "Redesign protocol compliance with smart property-based rules",
+        "hash": "ea8fcbf",
+        "message": "lambda",
         "author": "deebyrne26",
-        "date": "Thu Jul 24 17:25:25 2025 -0400"
+        "date": "Thu Jul 24 17:52:11 2025 -0400"
       },
       "contributors": [
         {
           "name": "deebyrne26",
-          "commits": 190
+          "commits": 191
         }
       ],
-      "totalCommits": 190
+      "totalCommits": 191
     }
   }
 }
