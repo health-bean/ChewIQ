@@ -4,8 +4,9 @@ const { handleDatabaseError } = require('../utils/errors');
 const { getCurrentUser } = require('../middleware/auth');
 
 const handleSearchFoods = async (queryParams, event) => {
+    let client;
     try {
-        const client = await pool.connect();
+        client = await pool.connect();
         const search = queryParams.search || '';
         
         // Use trigram search for better partial matching
@@ -26,124 +27,88 @@ const handleSearchFoods = async (queryParams, event) => {
             userProtocols = protocolResult.rows;
         }
         
-        // OPTIMIZED: Single query to get foods with protocol compliance pre-computed
-        let foodQuery, queryParams;
+        // SIMPLIFIED: Basic food search first, then add protocol info if needed
+        const foodQuery = `
+            SELECT 
+                food_id as id,
+                display_name as name,
+                category_name as category,
+                subcategory_name as subcategory,
+                preparation_state,
+                is_organic,
+                properties
+            FROM mat_food_search
+            WHERE display_name ILIKE $1
+            ORDER BY 
+                CASE 
+                    WHEN display_name ILIKE $2 THEN 1  -- Exact match first
+                    WHEN display_name ILIKE $3 THEN 2  -- Starts with search term
+                    ELSE 3                             -- Contains search term
+                END,
+                display_name ASC
+            LIMIT 20
+        `;
         
-        if (userProtocols.length > 0) {
-            // Get foods with pre-computed protocol compliance from materialized view
-            foodQuery = `
-                WITH food_search AS (
-                    SELECT DISTINCT
-                        fs.food_id as id,
-                        fs.display_name as name,
-                        fs.category_name as category,
-                        fs.subcategory_name as subcategory,
-                        fs.preparation_state,
-                        fs.is_organic,
-                        fs.properties
-                    FROM mat_food_search fs
-                    WHERE fs.display_name ILIKE $1
-                    ORDER BY 
-                        CASE 
-                            WHEN fs.display_name ILIKE $2 THEN 1  -- Exact match first
-                            WHEN fs.display_name ILIKE $3 THEN 2  -- Starts with search term
-                            ELSE 3                                -- Contains search term
-                        END,
-                        fs.display_name ASC
-                    LIMIT 20
-                ),
-                protocol_compliance AS (
-                    SELECT 
-                        pf.food_id,
-                        pf.dietary_protocol_name as protocol_name,
-                        CASE pf.protocol_status
-                            WHEN 'included' THEN 'allowed'
-                            WHEN 'avoid_for_now' THEN 'avoid'
-                            WHEN 'try_in_moderation' THEN 'moderation'
-                            ELSE pf.protocol_status
-                        END as status,
-                        pf.protocol_phase as phase,
-                        pf.protocol_notes as notes
-                    FROM mat_protocol_foods pf
-                    WHERE pf.dietary_protocol_id = ANY($4)
-                )
-                SELECT 
-                    fs.*,
-                    COALESCE(
-                        json_agg(
-                            json_build_object(
-                                'protocol_name', pc.protocol_name,
-                                'status', pc.status,
-                                'phase', pc.phase,
-                                'notes', pc.notes,
-                                'display_message', 
-                                    CASE pc.status
-                                        WHEN 'allowed' THEN '✅ Great choice for your ' || pc.protocol_name || ' protocol'
-                                        WHEN 'moderation' THEN '⚖️ Enjoy in moderation on your ' || pc.protocol_name || ' protocol'
-                                        WHEN 'avoid' THEN '❌ Best to avoid on your ' || pc.protocol_name || ' protocol'
-                                        ELSE '🔍 Not yet evaluated for your ' || pc.protocol_name || ' protocol'
-                                    END,
-                                'icon',
-                                    CASE pc.status
-                                        WHEN 'allowed' THEN '✅'
-                                        WHEN 'moderation' THEN '⚖️'
-                                        WHEN 'avoid' THEN '❌'
-                                        ELSE '🔍'
-                                    END,
-                                'rule_source', 'Pre-computed'
-                            )
-                        ) FILTER (WHERE pc.food_id IS NOT NULL),
-                        '[]'::json
-                    ) as protocol_status
-                FROM food_search fs
-                LEFT JOIN protocol_compliance pc ON fs.id = pc.food_id
-                GROUP BY fs.id, fs.name, fs.category, fs.subcategory, fs.preparation_state, fs.is_organic, fs.properties
-                ORDER BY fs.name
-            `;
-            
-            const exactMatch = search;
-            const startsWithMatch = `${search}%`;
-            const containsMatch = searchPattern;
+        const exactMatch = search;
+        const startsWithMatch = `${search}%`;
+        const containsMatch = searchPattern;
+        
+        const dbQueryParams = [containsMatch, exactMatch, startsWithMatch];
+        const foodResult = await client.query(foodQuery, dbQueryParams);
+        
+        // Add protocol status if user has protocols
+        let foodsWithProtocols = foodResult.rows;
+        if (userProtocols.length > 0 && foodResult.rows.length > 0) {
+            const foodIds = foodResult.rows.map(f => f.id);
             const protocolIds = userProtocols.map(p => p.protocol_id);
             
-            queryParams = [containsMatch, exactMatch, startsWithMatch, protocolIds];
-        } else {
-            // Simple search without protocol compliance
-            foodQuery = `
+            const protocolQuery = `
                 SELECT 
-                    food_id as id,
-                    display_name as name,
-                    category_name as category,
-                    subcategory_name as subcategory,
-                    preparation_state,
-                    is_organic,
-                    properties,
-                    '[]'::json as protocol_status
-                FROM mat_food_search
-                WHERE display_name ILIKE $1
-                ORDER BY 
-                    CASE 
-                        WHEN display_name ILIKE $2 THEN 1
-                        WHEN display_name ILIKE $3 THEN 2
-                        ELSE 3
-                    END,
-                    display_name ASC
-                LIMIT 20
+                    pf.food_id,
+                    pf.dietary_protocol_name as protocol_name,
+                    CASE pf.protocol_status
+                        WHEN 'included' THEN 'allowed'
+                        WHEN 'avoid_for_now' THEN 'avoid'
+                        WHEN 'try_in_moderation' THEN 'moderation'
+                        ELSE pf.protocol_status
+                    END as status,
+                    pf.protocol_phase as phase,
+                    pf.protocol_notes as notes
+                FROM mat_protocol_foods pf
+                WHERE pf.food_id = ANY($1) AND pf.dietary_protocol_id = ANY($2)
             `;
             
-            const exactMatch = search;
-            const startsWithMatch = `${search}%`;
-            const containsMatch = searchPattern;
+            const protocolResult = await client.query(protocolQuery, [foodIds, protocolIds]);
+            const protocolMap = {};
             
-            queryParams = [containsMatch, exactMatch, startsWithMatch];
+            protocolResult.rows.forEach(row => {
+                if (!protocolMap[row.food_id]) {
+                    protocolMap[row.food_id] = [];
+                }
+                protocolMap[row.food_id].push({
+                    protocol_name: row.protocol_name,
+                    status: row.status,
+                    phase: row.phase,
+                    notes: row.notes,
+                    display_message: getStatusMessage(row.status, row.protocol_name),
+                    icon: getStatusIcon(row.status)
+                });
+            });
+            
+            foodsWithProtocols = foodResult.rows.map(food => ({
+                ...food,
+                protocol_status: protocolMap[food.id] || []
+            }));
+        } else {
+            foodsWithProtocols = foodResult.rows.map(food => ({
+                ...food,
+                protocol_status: []
+            }));
         }
         
-        const foodResult = await client.query(foodQuery, queryParams);
-        client.release();
-        
         return successResponse({
-            foods: foodResult.rows,
-            total: foodResult.rows.length,
+            foods: foodsWithProtocols,
+            total: foodsWithProtocols.length,
             search_term: search,
             user_protocols: userProtocols.map(p => p.protocol_name)
         });
@@ -152,6 +117,37 @@ const handleSearchFoods = async (queryParams, event) => {
         console.error('Error in handleSearchFoods:', error);
         const appError = handleDatabaseError(error, 'search foods');
         return errorResponse(appError.message, appError.statusCode);
+    } finally {
+        if (client) {
+            client.release();
+        }
+    }
+};
+
+// Helper functions for protocol status
+const getStatusMessage = (status, protocolName) => {
+    switch (status) {
+        case 'allowed':
+            return `✅ Great choice for your ${protocolName} protocol`;
+        case 'moderation':
+            return `⚖️ Enjoy in moderation on your ${protocolName} protocol`;
+        case 'avoid':
+            return `❌ Best to avoid on your ${protocolName} protocol`;
+        default:
+            return `🔍 Not yet evaluated for your ${protocolName} protocol`;
+    }
+};
+
+const getStatusIcon = (status) => {
+    switch (status) {
+        case 'allowed':
+            return '✅';
+        case 'moderation':
+            return '⚖️';
+        case 'avoid':
+            return '❌';
+        default:
+            return '🔍';
     }
 };
 
