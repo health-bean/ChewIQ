@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2025-07-25T23:17:34.478Z",
+    "generated": "2025-07-26T02:55:14.994Z",
     "version": "1.0.0",
     "generator": "AutomatedProfessionalDocsGenerator"
   },
@@ -14,10 +14,10 @@
     "totalComponents": 55,
     "totalHooks": 13,
     "totalFiles": 107,
-    "workingAPIs": 4,
+    "workingAPIs": 7,
     "totalAPIs": 29,
-    "totalTables": 27,
-    "totalCommits": 197,
+    "totalTables": 25,
+    "totalCommits": 198,
     "contributors": 1
   },
   "discoveredInfo": {
@@ -46,16 +46,13 @@
         "journal_entries",
         "timeline_entries",
         "the",
-        "protocol_foods",
-        "all_foods",
-        "dietary_protocols",
-        "mat_protocol_foods",
         "journal",
         "existing",
         "food_simplification_mappings",
         "foods",
         "protocol_food_rules",
         "user_dietary_protocols",
+        "dietary_protocols",
         "user",
         "SET",
         "user_preferences",
@@ -67,6 +64,7 @@
         "correlations",
         "exposure_types",
         "detox_types",
+        "protocol_foods",
         "symptoms",
         "supplements",
         "medications"
@@ -135,7 +133,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 881,
+          "responseTime": 865,
           "responseData": {
             "foods": [
               {
@@ -144,27 +142,7 @@
                 "category": "Proteins",
                 "subcategory": "Animal Proteins",
                 "preparation_state": "cooked",
-                "is_organic": false,
-                "properties": {
-                  "growing": {
-                    "organic": false,
-                    "free_range": false
-                  },
-                  "properties": {
-                    "nightshade": false
-                  },
-                  "preparation": {
-                    "state": "cooked",
-                    "method": "baked"
-                  }
-                },
-                "histamine": "unknown",
-                "oxalate": "unknown",
-                "lectin": "unknown",
-                "fodmap": "unknown",
-                "salicylate": "unknown",
-                "nightshade": false,
-                "protocol_compliance": []
+                "is_organic": false
               },
               {
                 "id": "2db18c2c-5820-4193-ab9d-f270f8e2562e",
@@ -172,27 +150,7 @@
                 "category": "Proteins",
                 "subcategory": "Animal Proteins",
                 "preparation_state": "cooked",
-                "is_organic": false,
-                "properties": {
-                  "growing": {
-                    "organic": false,
-                    "free_range": false
-                  },
-                  "properties": {
-                    "nightshade": false
-                  },
-                  "preparation": {
-                    "state": "cooked",
-                    "method": "grilled"
-                  }
-                },
-                "histamine": "unknown",
-                "oxalate": "unknown",
-                "lectin": "unknown",
-                "fodmap": "unknown",
-                "salicylate": "unknown",
-                "nightshade": false,
-                "protocol_compliance": []
+                "is_organic": false
               },
               {
                 "id": "07da5e73-2d2a-47a1-906e-b028efcf4385",
@@ -200,27 +158,7 @@
                 "category": "Proteins",
                 "subcategory": "Animal Proteins",
                 "preparation_state": "cooked",
-                "is_organic": true,
-                "properties": {
-                  "growing": {
-                    "organic": true,
-                    "free_range": false
-                  },
-                  "properties": {
-                    "nightshade": false
-                  },
-                  "preparation": {
-                    "state": "cooked",
-                    "method": "grilled"
-                  }
-                },
-                "histamine": "unknown",
-                "oxalate": "unknown",
-                "lectin": "unknown",
-                "fodmap": "unknown",
-                "salicylate": "unknown",
-                "nightshade": false,
-                "protocol_compliance": []
+                "is_organic": true
               },
               {
                 "id": "8f862649-560d-4ff0-897a-b2ee940d96d9",
@@ -228,27 +166,7 @@
                 "category": "Proteins",
                 "subcategory": "Animal Proteins",
                 "preparation_state": "cooked",
-                "is_organic": false,
-                "properties": {
-                  "growing": {
-                    "organic": false,
-                    "free_range": false
-                  },
-                  "properties": {
-                    "nightshade": false
-                  },
-                  "preparation": {
-                    "state": "cooked",
-                    "method": "grilled"
-                  }
-                },
-                "histamine": "unknown",
-                "oxalate": "unknown",
-                "lectin": "unknown",
-                "fodmap": "unknown",
-                "salicylate": "unknown",
-                "nightshade": false,
-                "protocol_compliance": []
+                "is_organic": false
               },
               {
                 "id": "18b61900-06e6-405e-981d-569eb764f4b2",
@@ -256,27 +174,7 @@
                 "category": "Proteins",
                 "subcategory": "Animal Proteins",
                 "preparation_state": "cooked",
-                "is_organic": false,
-                "properties": {
-                  "growing": {
-                    "organic": false,
-                    "free_range": false
-                  },
-                  "properties": {
-                    "nightshade": false
-                  },
-                  "preparation": {
-                    "state": "cooked",
-                    "method": "roasted"
-                  }
-                },
-                "histamine": "unknown",
-                "oxalate": "unknown",
-                "lectin": "unknown",
-                "fodmap": "unknown",
-                "salicylate": "unknown",
-                "nightshade": false,
-                "protocol_compliance": []
+                "is_organic": false
               },
               {
                 "id": "47f8603a-af14-404d-a83f-eb62b94afea2",
@@ -284,27 +182,7 @@
                 "category": "Proteins",
                 "subcategory": "Animal Proteins",
                 "preparation_state": "cooked",
-                "is_organic": false,
-                "properties": {
-                  "growing": {
-                    "organic": false,
-                    "free_range": true
-                  },
-                  "properties": {
-                    "nightshade": false
-                  },
-                  "preparation": {
-                    "state": "cooked",
-                    "method": "roasted"
-                  }
-                },
-                "histamine": "unknown",
-                "oxalate": "unknown",
-                "lectin": "unknown",
-                "fodmap": "unknown",
-                "salicylate": "unknown",
-                "nightshade": false,
-                "protocol_compliance": []
+                "is_organic": false
               },
               {
                 "id": "16c111b5-7815-416b-a5bc-55f2c3d00a4e",
@@ -312,35 +190,18 @@
                 "category": "Proteins",
                 "subcategory": "Animal Proteins",
                 "preparation_state": "cooked",
-                "is_organic": false,
-                "properties": {
-                  "growing": {
-                    "organic": false,
-                    "free_range": false
-                  },
-                  "properties": {
-                    "nightshade": false
-                  },
-                  "preparation": {
-                    "state": "cooked",
-                    "method": "baked"
-                  }
-                },
-                "histamine": "unknown",
-                "oxalate": "unknown",
-                "lectin": "unknown",
-                "fodmap": "unknown",
-                "salicylate": "unknown",
-                "nightshade": false,
-                "protocol_compliance": []
+                "is_organic": false
               }
             ],
             "total": 7,
             "search_term": "chicken",
-            "context": "browse",
-            "user_protocols": []
+            "performance": {
+              "total_time_ms": 147,
+              "query_time_ms": 22,
+              "connection_time_ms": 147
+            }
           },
-          "responseSize": 3432
+          "responseSize": 1414
         },
         {
           "path": "/api/v1/correlations/insights",
@@ -356,7 +217,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 94,
+          "responseTime": 148,
           "responseData": {
             "error": "Authentication required"
           },
@@ -371,7 +232,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 159,
+          "responseTime": 152,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -409,7 +270,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 136,
+          "responseTime": 105,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -439,11 +300,31 @@
           "responseSize": 632
         },
         {
+          "path": "/api/v1/foods/by-protocol",
+          "method": "GET",
+          "category": "Protocols",
+          "description": "Get by-protocol",
+          "source": "backend/functions/api/handlers/old-foods_with_materialized_view.js",
+          "params": [
+            {
+              "name": "protocol_id",
+              "value": "1495844a-19de-404c-a288-7660eda0cbe1"
+            }
+          ],
+          "status": 401,
+          "working": false,
+          "responseTime": 115,
+          "responseData": {
+            "error": "Authentication required"
+          },
+          "responseSize": 35
+        },
+        {
           "path": "/api/v1/protocols",
           "method": "GET",
           "category": "Protocols",
           "description": "Get protocols",
-          "source": "backend/functions/api/handlers/foods.js",
+          "source": "backend/functions/api/handlers/protocols.js",
           "params": [
             {
               "name": "protocol_id",
@@ -452,7 +333,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 131,
+          "responseTime": 107,
           "responseData": {
             "protocols": [
               {
@@ -640,26 +521,6 @@
           "responseSize": 4535
         },
         {
-          "path": "/api/v1/foods/by-protocol",
-          "method": "GET",
-          "category": "Protocols",
-          "description": "Get by-protocol",
-          "source": "backend/functions/api/handlers/foods.js",
-          "params": [
-            {
-              "name": "protocol_id",
-              "value": "1495844a-19de-404c-a288-7660eda0cbe1"
-            }
-          ],
-          "status": 401,
-          "working": false,
-          "responseTime": 227,
-          "responseData": {
-            "error": "Authentication required"
-          },
-          "responseSize": 35
-        },
-        {
           "path": "/api/v1/timeline/entries",
           "method": "GET",
           "category": "Timeline",
@@ -673,7 +534,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 67,
+          "responseTime": 87,
           "responseData": {
             "error": "Authentication required"
           },
@@ -693,7 +554,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 90,
+          "responseTime": 201,
           "responseData": {
             "error": "Authentication required"
           },
@@ -713,7 +574,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 63,
+          "responseTime": 140,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -756,7 +617,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 121,
+          "responseTime": 93,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -794,7 +655,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 104,
+          "responseTime": 127,
           "responseData": {
             "error": "Authentication required"
           },
@@ -814,7 +675,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 67,
+          "responseTime": 141,
           "responseData": {
             "error": "Authentication required"
           },
@@ -834,7 +695,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 68,
+          "responseTime": 132,
           "responseData": {
             "error": "Authentication required"
           },
@@ -854,7 +715,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 117,
+          "responseTime": 94,
           "responseData": {
             "error": "Authentication required"
           },
@@ -874,7 +735,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 66,
+          "responseTime": 140,
           "responseData": {
             "error": "Authentication required"
           },
@@ -894,7 +755,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 62,
+          "responseTime": 99,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -932,7 +793,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 62,
+          "responseTime": 126,
           "responseData": {
             "error": "Internal server error: corsHeaders is not defined"
           },
@@ -950,10 +811,16 @@
               "value": "chicken"
             }
           ],
-          "status": 408,
-          "working": false,
-          "error": "Request timeout (15s)",
-          "responseTime": 15019
+          "status": 200,
+          "working": true,
+          "responseTime": 132,
+          "responseData": {
+            "symptoms": [],
+            "total": 0,
+            "search_term": "chicken",
+            "user_history_included": false
+          },
+          "responseSize": 79
         },
         {
           "path": "/api/v1/supplements/search",
@@ -967,10 +834,15 @@
               "value": "chicken"
             }
           ],
-          "status": 408,
-          "working": false,
-          "error": "Request timeout (15s)",
-          "responseTime": 15016
+          "status": 200,
+          "working": true,
+          "responseTime": 89,
+          "responseData": {
+            "supplements": [],
+            "total": 0,
+            "search_term": "chicken"
+          },
+          "responseSize": 52
         },
         {
           "path": "/api/v1/medications/search",
@@ -984,10 +856,15 @@
               "value": "chicken"
             }
           ],
-          "status": 408,
-          "working": false,
-          "error": "Request timeout (15s)",
-          "responseTime": 15017
+          "status": 200,
+          "working": true,
+          "responseTime": 122,
+          "responseData": {
+            "medications": [],
+            "total": 0,
+            "search_term": "chicken"
+          },
+          "responseSize": 52
         },
         {
           "path": "/api/v1/detox-types/search",
@@ -1003,7 +880,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 292,
+          "responseTime": 92,
           "responseData": {
             "detox_types": [],
             "total": 0,
@@ -1025,7 +902,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 67,
+          "responseTime": 87,
           "responseData": {
             "exposures": [],
             "total": 0,
@@ -1042,7 +919,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 111,
+          "responseTime": 90,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1080,7 +957,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 109,
+          "responseTime": 84,
           "responseData": {
             "error": "Failed to complete get journal entries"
           },
@@ -1095,7 +972,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 63,
+          "responseTime": 87,
           "responseData": {
             "error": "User not authenticated"
           },
@@ -1110,7 +987,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 147,
+          "responseTime": 94,
           "responseData": {
             "error": "Authentication required"
           },
@@ -1125,7 +1002,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 82,
+          "responseTime": 97,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1163,7 +1040,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 113,
+          "responseTime": 98,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1201,7 +1078,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 64,
+          "responseTime": 93,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1231,7 +1108,7 @@
           "responseSize": 629
         }
       ],
-      "workingCount": 4,
+      "workingCount": 7,
       "totalCount": 29,
       "categories": {
         "Foods": {
@@ -1259,7 +1136,7 @@
           "total": 4
         },
         "Health Data": {
-          "working": 0,
+          "working": 3,
           "total": 6
         },
         "Other": {
@@ -1938,7 +1815,7 @@
             }
           ],
           "utilities": [],
-          "size": "214.4 KB"
+          "size": "203.04 KB"
         },
         "backend/functions": {
           "totalFiles": 28,
@@ -1955,7 +1832,7 @@
             }
           ],
           "utilities": [],
-          "size": "214.4 KB"
+          "size": "203.04 KB"
         },
         "backend": {
           "totalFiles": 38,
@@ -1975,7 +1852,7 @@
             }
           ],
           "utilities": [],
-          "size": "281.71 KB"
+          "size": "270.34 KB"
         }
       },
       "shared": {},
@@ -2068,18 +1945,18 @@
       "repository": "https://github.com/deebyrne26/health-platform",
       "branch": "main",
       "lastCommit": {
-        "hash": "37f982b",
-        "message": "foods.js",
+        "hash": "ac32c52",
+        "message": "Working on query speed",
         "author": "deebyrne26",
-        "date": "Fri Jul 25 19:15:03 2025 -0400"
+        "date": "Fri Jul 25 22:53:39 2025 -0400"
       },
       "contributors": [
         {
           "name": "deebyrne26",
-          "commits": 197
+          "commits": 198
         }
       ],
-      "totalCommits": 197
+      "totalCommits": 198
     }
   }
 }
