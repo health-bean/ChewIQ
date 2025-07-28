@@ -35,8 +35,15 @@ class DatabaseConnectionManager {
     }
 
     loadEnvironmentConfig() {
-        // In Lambda, environment variables are already loaded
+        // In Lambda, environment variables should already be loaded
+        // But let's add some debugging to see what's available
         if (this.environment === 'lambda') {
+            console.log('🔍 Lambda environment variables check:');
+            console.log('DB_HOST:', process.env.DB_HOST ? 'SET' : 'MISSING');
+            console.log('DB_PORT:', process.env.DB_PORT ? 'SET' : 'MISSING');
+            console.log('DB_NAME:', process.env.DB_NAME ? 'SET' : 'MISSING');
+            console.log('DB_USER:', process.env.DB_USER ? 'SET' : 'MISSING');
+            console.log('DB_PASSWORD:', process.env.DB_PASSWORD ? 'SET' : 'MISSING');
             return;
         }
 
@@ -49,36 +56,72 @@ class DatabaseConnectionManager {
                 console.log('📍 Loaded .env.local configuration');
             } catch (error) {
                 // Fallback to regular .env
+                try {
+                    require('dotenv').config({ 
+                        path: path.join(__dirname, '../../.env')
+                    });
+                    console.log('📍 Loaded .env configuration');
+                } catch (envError) {
+                    console.warn('⚠️ Could not load environment file:', envError.message);
+                }
+            }
+        } else {
+            // Production - load regular .env if available
+            try {
                 require('dotenv').config({ 
                     path: path.join(__dirname, '../../.env')
                 });
-                console.log('📍 Loaded .env configuration');
+                console.log('📍 Loaded .env configuration for production');
+            } catch (error) {
+                console.warn('⚠️ Could not load .env file (this is normal in Lambda):', error.message);
             }
-        } else {
-            // Production - load regular .env
-            require('dotenv').config({ 
-                path: path.join(__dirname, '../../.env')
-            });
         }
     }
 
     initializeConnection() {
-        this.loadEnvironmentConfig();
-        const config = this.getConnectionConfig();
-        
-        console.log(`🗄️  Initializing database connection for ${this.environment} environment`);
-        console.log(`📍 Connecting to: ${config.host}:${config.port}/${config.database}`);
-        
-        this.pool = new Pool(config);
-        
-        // Test connection on initialization
-        this.testConnection();
-        
-        // Handle connection events
-        this.setupEventHandlers();
+        try {
+            this.loadEnvironmentConfig();
+            const config = this.getConnectionConfig();
+            
+            console.log(`🗄️  Initializing database connection for ${this.environment} environment`);
+            console.log(`📍 Connecting to: ${config.host}:${config.port}/${config.database}`);
+            
+            this.pool = new Pool(config);
+            
+            // Test connection on initialization (but don't fail in Lambda)
+            if (this.environment !== 'lambda') {
+                this.testConnection();
+            } else {
+                // For Lambda, test connection but don't block initialization
+                this.testConnection().catch(error => {
+                    console.warn('⚠️ Lambda connection test failed (will retry on first query):', error.message);
+                });
+            }
+            
+            // Handle connection events
+            this.setupEventHandlers();
+            
+        } catch (error) {
+            console.error('❌ Failed to initialize database connection:', error);
+            if (this.environment !== 'lambda') {
+                throw error; // Fail fast in non-Lambda environments
+            } else {
+                console.warn('⚠️ Lambda connection initialization failed, will retry on first query');
+            }
+        }
     }
 
     getConnectionConfig() {
+        // Validate required environment variables
+        const requiredVars = ['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'];
+        const missingVars = requiredVars.filter(varName => !process.env[varName]);
+        
+        if (missingVars.length > 0) {
+            const error = `Missing required environment variables: ${missingVars.join(', ')}`;
+            console.error('❌', error);
+            throw new Error(error);
+        }
+
         const baseConfig = {
             host: process.env.DB_HOST,
             port: parseInt(process.env.DB_PORT) || 5432,
