@@ -5,13 +5,7 @@
 
 const { pool, query, healthCheck, getConnectionInfo } = require('../../database/connection-manager');
 
-// Export the same interface for backward compatibility
-module.exports = {
-    pool,
-    query,
-    healthCheck,
-    getConnectionInfo
-};
+// Set up the same event handlers as the original file
 pool.on('error', (err) => {
     console.error('Database pool error:', err.message);
 });
@@ -39,4 +33,11 @@ const closePool = async () => {
     }
 };
 
-module.exports = { pool, closePool };
+// Export the same interface as the original file - handlers expect { pool }
+module.exports = { 
+    pool, 
+    closePool,
+    query,
+    healthCheck,
+    getConnectionInfo
+};
