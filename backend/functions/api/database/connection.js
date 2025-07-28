@@ -1,6 +1,6 @@
 /**
  * Lambda Database Connection - Now using Smart Connection Manager
- * Automatically detects Lambda environment and optimizes accordingly
+ * Automatically detects VPC Lambda environment and optimizes accordingly
  */
 
 const { pool, query, healthCheck, getConnectionInfo } = require('../../database/connection-manager');
