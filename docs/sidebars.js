@@ -29,7 +29,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Database',
-      items: ['database/overview'],
+      items: ['database/overview', 'database/food-database', 'database/food-filter-strategy'],
     },
     {
       type: 'category', 
@@ -54,7 +54,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Deployment',
-      items: ['deployment/overview'],
+      items: ['deployment/overview', 'deployment/vpc-setup'],
     },
   ],
 };

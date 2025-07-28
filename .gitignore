@@ -155,6 +155,12 @@ Thumbs.db
 .aws/credentials
 .aws/config
 
+# SSH Keys and Security Files (NEVER COMMIT THESE!)
+*.pem
+*.key
+*-key.pem
+health-platform-bastion-key.pem
+
 # Database files
 *.db
 *.sqlite

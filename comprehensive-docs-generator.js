@@ -8,6 +8,7 @@ const { execSync } = require('child_process');
 class AutomatedProfessionalDocsGenerator {
   constructor(rootPath = process.cwd()) {
     this.rootPath = rootPath;
+    this.timestamps = {};
     this.discoveredInfo = {
       urls: {},
       architecture: {},
@@ -42,8 +43,48 @@ class AutomatedProfessionalDocsGenerator {
     this.printSummary();
   }
 
+  recordTimestamp(section, success = true) {
+    this.timestamps[section] = {
+      lastUpdated: new Date().toISOString(),
+      success: success,
+      humanReadable: new Date().toLocaleString()
+    };
+  }
+
+  getTimestampInfo(section) {
+    const timestamp = this.timestamps[section];
+    if (!timestamp) return { display: 'Never updated', class: 'stale', indicator: '⚠️' };
+    
+    const now = new Date();
+    const updated = new Date(timestamp.lastUpdated);
+    const hoursDiff = (now - updated) / (1000 * 60 * 60);
+    
+    let indicator = '✅';
+    let className = 'fresh';
+    
+    if (!timestamp.success) {
+      indicator = '❌';
+      className = 'error';
+    } else if (hoursDiff > 24) {
+      indicator = '⚠️';
+      className = 'stale';
+    } else if (hoursDiff <= 1) {
+      indicator = '🟢';
+      className = 'fresh';
+    }
+    
+    return {
+      display: timestamp.humanReadable,
+      class: className,
+      indicator: indicator,
+      success: timestamp.success
+    };
+  }
+
   async discoverProjectStructure() {
     console.log('📁 Discovering project structure...');
+    
+    try {
     
     const structure = {
       frontend: {},
@@ -103,6 +144,11 @@ class AutomatedProfessionalDocsGenerator {
     }
 
     this.discoveredInfo.fileStructure = structure;
+    this.recordTimestamp('projectStructure', true);
+    } catch (error) {
+      console.log(`⚠️ Error discovering project structure: ${error.message}`);
+      this.recordTimestamp('projectStructure', false);
+    }
   }
 
   async analyzeDirectory(dirPath) {

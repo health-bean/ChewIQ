@@ -17,6 +17,8 @@ The Health Platform uses **PostgreSQL 14+** with **JSONB** for flexible, structu
 
 ### Core Tables
 
+> **📋 Food Database**: For comprehensive food database documentation including USDA integration, see [Food Database Architecture](./food-database.md)
+
 #### **users**
 ```sql
 CREATE TABLE users (

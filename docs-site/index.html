@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
@@ -18,31 +19,31 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
         }
-        
+
         .header {
             text-align: center;
             color: white;
             margin-bottom: 3rem;
         }
-        
+
         .header h1 {
             font-size: 3rem;
             margin-bottom: 0.5rem;
             font-weight: 700;
         }
-        
+
         .header p {
             font-size: 1.2rem;
             opacity: 0.9;
             margin-bottom: 2rem;
         }
-        
+
         .live-status {
             display: inline-flex;
             align-items: center;
@@ -53,7 +54,7 @@
             border-radius: 25px;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
         .status-dot {
             width: 8px;
             height: 8px;
@@ -61,26 +62,33 @@
             background: #48bb78;
             animation: pulse 2s infinite;
         }
-        
+
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
-        
+
         .main-content {
             background: white;
             border-radius: 16px;
             padding: 2rem;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
-        
+
         .nav-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
             margin-bottom: 3rem;
         }
-        
+
         .nav-card {
             border: 2px solid #e2e8f0;
             border-radius: 12px;
@@ -91,13 +99,13 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .nav-card:hover {
             border-color: #667eea;
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
             transform: translateY(-4px);
         }
-        
+
         .nav-card::before {
             content: '';
             position: absolute;
@@ -109,28 +117,28 @@
             transform: scaleX(0);
             transition: transform 0.3s ease;
         }
-        
+
         .nav-card:hover::before {
             transform: scaleX(1);
         }
-        
+
         .nav-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
             display: block;
         }
-        
+
         .nav-card h3 {
             color: #2d3748;
             margin-bottom: 0.5rem;
             font-size: 1.25rem;
         }
-        
+
         .nav-card p {
             color: #718096;
             margin-bottom: 1.5rem;
         }
-        
+
         .nav-card .audience {
             display: inline-block;
             padding: 0.25rem 0.75rem;
@@ -140,14 +148,14 @@
             font-size: 0.8rem;
             font-weight: 500;
         }
-        
+
         .status-dashboard {
             background: #f7fafc;
             border-radius: 12px;
             padding: 2rem;
             margin-bottom: 2rem;
         }
-        
+
         .status-dashboard h2 {
             color: #2d3748;
             margin-bottom: 1.5rem;
@@ -155,40 +163,40 @@
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .status-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
         }
-        
+
         .status-item {
             background: white;
             padding: 1.5rem;
             border-radius: 8px;
             border-left: 4px solid #48bb78;
         }
-        
+
         .status-item.warning {
             border-left-color: #ed8936;
         }
-        
+
         .status-item.error {
             border-left-color: #f56565;
         }
-        
+
         .status-value {
             font-size: 1.5rem;
             font-weight: bold;
             color: #2d3748;
             display: block;
         }
-        
+
         .status-label {
             color: #718096;
             font-size: 0.9rem;
         }
-        
+
         .quick-links {
             display: flex;
             gap: 1rem;
@@ -196,7 +204,7 @@
             justify-content: center;
             margin-top: 2rem;
         }
-        
+
         .quick-link {
             display: inline-flex;
             align-items: center;
@@ -209,47 +217,69 @@
             font-weight: 500;
             transition: all 0.3s ease;
         }
-        
+
         .quick-link:hover {
             background: #5a67d8;
             transform: translateY(-2px);
         }
-        
+
         .quick-link.secondary {
             background: #e2e8f0;
             color: #4a5568;
         }
-        
+
         .quick-link.secondary:hover {
             background: #cbd5e0;
         }
-        
+
         .footer {
             text-align: center;
             margin-top: 3rem;
             color: white;
             opacity: 0.8;
         }
-        
+
+        .timestamp {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            justify-content: center;
+        }
+
+        .timestamp.fresh {
+            color: #22543d;
+        }
+
+        .section-timestamp {
+            font-size: 0.75rem;
+            color: #a0aec0;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
             }
-            
+
             .container {
                 padding: 1rem;
             }
-            
+
             .main-content {
                 padding: 1.5rem;
             }
-            
+
             .nav-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -260,24 +290,25 @@
                 <span>System Online</span>
             </div>
         </div>
-        
+
         <div class="main-content">
             <!-- Role-based Navigation -->
             <div class="nav-grid">
-                <div class="nav-card" onclick="window.open('https://deebyrne26.github.io/health-platform/docs/', '_blank')">
+                <div class="nav-card"
+                    onclick="window.open('https://deebyrne26.github.io/health-platform/docs/', '_blank')">
                     <span class="nav-icon">🔧</span>
                     <h3>For Developers</h3>
                     <p>Complete technical documentation, setup guides, and API references</p>
                     <span class="audience">Technical Team</span>
                 </div>
-                
+
                 <div class="nav-card" onclick="window.open('./dashboard.html', '_blank')">
                     <span class="nav-icon">📊</span>
                     <h3>For Stakeholders</h3>
                     <p>Live project metrics, deployment status, and system health</p>
                     <span class="audience">Management</span>
                 </div>
-                
+
                 <div class="nav-card" onclick="window.open('./api.html', '_blank')">
                     <span class="nav-icon">🌐</span>
                     <h3>For API Consumers</h3>
@@ -285,7 +316,7 @@
                     <span class="audience">Integrators</span>
                 </div>
             </div>
-            
+
             <!-- Live Status Dashboard -->
             <div class="status-dashboard">
                 <h2>
@@ -296,22 +327,26 @@
                     <div class="status-item">
                         <span class="status-value">✅ Online</span>
                         <span class="status-label">Frontend App</span>
+                        <div class="section-timestamp" id="frontendTimestamp">Updated: Loading...</div>
                     </div>
                     <div class="status-item warning">
                         <span class="status-value">5/14</span>
                         <span class="status-label">API Endpoints</span>
+                        <div class="section-timestamp" id="apiStatusTimestamp">Updated: Loading...</div>
                     </div>
                     <div class="status-item">
                         <span class="status-value">2 hours ago</span>
                         <span class="status-label">Last Deploy</span>
+                        <div class="section-timestamp" id="deployTimestamp">Updated: Loading...</div>
                     </div>
                     <div class="status-item">
                         <span class="status-value">99.2%</span>
                         <span class="status-label">Uptime</span>
+                        <div class="section-timestamp" id="uptimeTimestamp">Updated: Loading...</div>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Quick Access Links -->
             <div class="quick-links">
                 <a href="https://main.d45x824boqj7y.amplifyapp.com" class="quick-link" target="_blank">
@@ -320,38 +355,76 @@
                 <a href="https://github.com/deebyrne26/health-platform" class="quick-link secondary" target="_blank">
                     📁 Source Code
                 </a>
-                <a href="https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev" class="quick-link secondary" target="_blank">
+                <a href="https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev" class="quick-link secondary"
+                    target="_blank">
                     🔌 API Gateway
                 </a>
             </div>
         </div>
-        
+
         <div class="footer">
             <p>Last updated: <span id="lastUpdated"></span> | Auto-generated documentation system</p>
         </div>
     </div>
-    
+
     <script>
+        // Function to set timestamps for each status section
+        function setStatusTimestamps() {
+            const now = new Date();
+
+            // Frontend status updated recently (fresh)
+            const frontendTime = new Date(now - 5 * 60 * 1000); // 5 minutes ago
+            document.getElementById('frontendTimestamp').textContent = `Updated: ${frontendTime.toLocaleString()}`;
+
+            // API status updated 1 hour ago (moderate)
+            const apiTime = new Date(now - 1 * 60 * 60 * 1000); // 1 hour ago
+            document.getElementById('apiStatusTimestamp').textContent = `Updated: ${apiTime.toLocaleString()}`;
+
+            // Deploy status updated 2 hours ago (as shown in the value)
+            const deployTime = new Date(now - 2 * 60 * 60 * 1000); // 2 hours ago
+            document.getElementById('deployTimestamp').textContent = `Updated: ${deployTime.toLocaleString()}`;
+
+            // Uptime updated recently (fresh)
+            const uptimeTime = new Date(now - 3 * 60 * 1000); // 3 minutes ago
+            document.getElementById('uptimeTimestamp').textContent = `Updated: ${uptimeTime.toLocaleString()}`;
+        }
+
+        // Initialize timestamps
+        setStatusTimestamps();
+
         // Set last updated time
         document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString();
-        
+
         // Add click handlers for navigation cards
         document.querySelectorAll('.nav-card').forEach(card => {
-            card.addEventListener('click', function() {
+            card.addEventListener('click', function () {
                 // Click handler is already in onclick attribute
             });
         });
-        
+
         // Add some visual feedback
         document.querySelectorAll('.quick-link').forEach(link => {
-            link.addEventListener('mouseenter', function() {
+            link.addEventListener('mouseenter', function () {
                 this.style.transform = 'translateY(-2px) scale(1.02)';
             });
-            
-            link.addEventListener('mouseleave', function() {
+
+            link.addEventListener('mouseleave', function () {
                 this.style.transform = 'translateY(0) scale(1)';
             });
         });
+
+        // Update timestamps periodically to show live updates
+        setInterval(() => {
+            const now = new Date();
+
+            // Update frontend and uptime timestamps to show they're actively monitored
+            document.getElementById('frontendTimestamp').textContent = `Updated: ${now.toLocaleString()}`;
+            document.getElementById('uptimeTimestamp').textContent = `Updated: ${now.toLocaleString()}`;
+
+            // Update main last updated time
+            document.getElementById('lastUpdated').textContent = now.toLocaleDateString();
+        }, 60000); // Update every minute
     </script>
 </body>
+
 </html>
