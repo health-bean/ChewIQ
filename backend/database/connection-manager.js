@@ -52,30 +52,34 @@ class DatabaseConnectionManager {
         // For local development, try to load .env.local first
         if (this.environment === 'local') {
             try {
-                require('dotenv').config({ 
+                // Try to require dotenv, but handle gracefully if not available
+                const dotenv = require('dotenv');
+                dotenv.config({ 
                     path: path.join(__dirname, '../../.env.local')
                 });
                 console.log('📍 Loaded .env.local configuration');
             } catch (error) {
                 // Fallback to regular .env
                 try {
-                    require('dotenv').config({ 
+                    const dotenv = require('dotenv');
+                    dotenv.config({ 
                         path: path.join(__dirname, '../../.env')
                     });
                     console.log('📍 Loaded .env configuration');
                 } catch (envError) {
-                    console.warn('⚠️ Could not load environment file:', envError.message);
+                    console.warn('⚠️ Could not load environment file (dotenv might not be available):', envError.message);
                 }
             }
         } else {
-            // Production - load regular .env if available
+            // Production - load regular .env if available, but don't fail if dotenv is missing
             try {
-                require('dotenv').config({ 
+                const dotenv = require('dotenv');
+                dotenv.config({ 
                     path: path.join(__dirname, '../../.env')
                 });
                 console.log('📍 Loaded .env configuration for production');
             } catch (error) {
-                console.warn('⚠️ Could not load .env file (this is normal in Lambda):', error.message);
+                console.warn('⚠️ Could not load .env file (this is normal in Lambda - environment variables should be set directly):', error.message);
             }
         }
     }
