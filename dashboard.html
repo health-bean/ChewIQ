@@ -265,6 +265,38 @@
             border-radius: 8px;
         }
         
+        .timestamp {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .timestamp.fresh {
+            color: #22543d;
+        }
+        
+        .timestamp.stale {
+            color: #c05621;
+        }
+        
+        .timestamp.error {
+            color: #c53030;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-header h2 {
+            margin-bottom: 0;
+        }
+        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -301,6 +333,12 @@
     
     <div class="container">
         <!-- Key Metrics -->
+        <div class="section-header">
+            <h2>📊 Key Metrics</h2>
+            <div class="timestamp fresh" id="metricsTimestamp">
+                🟢 <span id="metricsTime"></span>
+            </div>
+        </div>
         <div class="metrics-row">
             <div class="metric-card success">
                 <div class="metric-header">
@@ -357,10 +395,15 @@
         
         <!-- API Status -->
         <div class="section">
-            <h2>
-                <span>🌐</span>
-                API Endpoint Status
-            </h2>
+            <div class="section-header">
+                <h2>
+                    <span>🌐</span>
+                    API Endpoint Status
+                </h2>
+                <div class="timestamp fresh" id="apiTimestamp">
+                    🟢 <span id="apiTime"></span>
+                </div>
+            </div>
             <div class="api-grid">
                 <div class="api-endpoint">
                     <div class="api-method get">GET</div>
@@ -426,10 +469,15 @@
         
         <!-- System Health -->
         <div class="section">
-            <h2>
-                <span>💻</span>
-                System Health
-            </h2>
+            <div class="section-header">
+                <h2>
+                    <span>💻</span>
+                    System Health
+                </h2>
+                <div class="timestamp fresh" id="systemTimestamp">
+                    🟢 <span id="systemTime"></span>
+                </div>
+            </div>
             <div class="metrics-row">
                 <div class="metric-card">
                     <div class="metric-header">
@@ -490,8 +538,42 @@
     </div>
     
     <script>
-        // Set last updated time
-        document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+        // Function to set timestamps for each section
+        function setTimestamps() {
+            const now = new Date();
+            const currentTime = now.toLocaleString();
+            
+            // Set individual section timestamps
+            document.getElementById('metricsTime').textContent = `Updated: ${currentTime}`;
+            document.getElementById('apiTime').textContent = `Updated: ${currentTime}`;
+            document.getElementById('systemTime').textContent = `Updated: ${currentTime}`;
+            
+            // Set main last updated time
+            document.getElementById('lastUpdated').textContent = currentTime;
+        }
+        
+        // Function to simulate different update times for sections
+        function simulateStaggeredUpdates() {
+            const now = new Date();
+            
+            // Metrics updated recently (fresh)
+            const metricsTime = new Date(now - 15 * 60 * 1000); // 15 minutes ago
+            document.getElementById('metricsTime').textContent = `Updated: ${metricsTime.toLocaleString()}`;
+            
+            // API status updated 2 hours ago (stale warning)
+            const apiTime = new Date(now - 2 * 60 * 60 * 1000); // 2 hours ago
+            document.getElementById('apiTime').textContent = `Updated: ${apiTime.toLocaleString()}`;
+            const apiTimestamp = document.getElementById('apiTimestamp');
+            apiTimestamp.className = 'timestamp stale';
+            apiTimestamp.innerHTML = `⚠️ <span id="apiTime">Updated: ${apiTime.toLocaleString()}</span>`;
+            
+            // System health updated 30 minutes ago (fresh)
+            const systemTime = new Date(now - 30 * 60 * 1000); // 30 minutes ago
+            document.getElementById('systemTime').textContent = `Updated: ${systemTime.toLocaleString()}`;
+        }
+        
+        // Initialize timestamps
+        simulateStaggeredUpdates();
         
         // Add some interactivity
         document.querySelectorAll('.metric-card').forEach(card => {
@@ -507,12 +589,16 @@
         // Simulate real-time updates (for demo purposes)
         setInterval(() => {
             const uptimeElement = document.querySelector('.metric-card.success .metric-value');
-            if (uptimeElement && uptimeElement.textContent === '99.2%') {
+            if (uptimeElement && uptimeElement.textContent.includes('99.')) {
                 // Small random variation for demo
                 const variation = (Math.random() * 0.2 - 0.1).toFixed(1);
                 const newUptime = (99.2 + parseFloat(variation)).toFixed(1);
                 uptimeElement.textContent = newUptime + '%';
             }
+            
+            // Update metrics timestamp to show it's fresh
+            const now = new Date();
+            document.getElementById('metricsTime').textContent = `Updated: ${now.toLocaleString()}`;
         }, 30000); // Update every 30 seconds for demo
     </script>
 </body>

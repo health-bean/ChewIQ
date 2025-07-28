@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2025-07-26T18:30:36.113Z",
+    "generated": "2025-07-28T00:52:03.396Z",
     "version": "1.0.0",
     "generator": "AutomatedProfessionalDocsGenerator"
   },
@@ -17,7 +17,7 @@
     "workingAPIs": 7,
     "totalAPIs": 29,
     "totalTables": 25,
-    "totalCommits": 199,
+    "totalCommits": 200,
     "contributors": 1
   },
   "discoveredInfo": {
@@ -133,15 +133,47 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 912,
+          "responseTime": 227,
           "responseData": {
             "foods": [
+              {
+                "id": "68aada34-c3c7-434e-bd67-f35625ff5026",
+                "name": "Chicken Breast",
+                "category": "Proteins",
+                "subcategory": "Animal Proteins",
+                "preparation_state": "raw",
+                "is_organic": false
+              },
               {
                 "id": "28ed2ee8-40c9-41ce-a562-dcbabf677d67",
                 "name": "Chicken Breast (Baked)",
                 "category": "Proteins",
                 "subcategory": "Animal Proteins",
                 "preparation_state": "cooked",
+                "is_organic": false
+              },
+              {
+                "id": "b6dcfe71-aede-49ee-9c9a-73e404b96147",
+                "name": "Chicken Breast, Boneless",
+                "category": "Proteins",
+                "subcategory": "Animal Proteins",
+                "preparation_state": "raw",
+                "is_organic": false
+              },
+              {
+                "id": "6f683ba4-3708-4427-adb4-2dfd6b492cf8",
+                "name": "Chicken Breast, Boneless",
+                "category": "Proteins",
+                "subcategory": "Animal Proteins",
+                "preparation_state": "raw",
+                "is_organic": false
+              },
+              {
+                "id": "9945ddd8-3fe0-4d27-a537-b3e2655b6172",
+                "name": "Chicken Breast, Boneless Skinless",
+                "category": "Proteins",
+                "subcategory": "Animal Proteins",
+                "preparation_state": "raw",
                 "is_organic": false
               },
               {
@@ -161,11 +193,83 @@
                 "is_organic": true
               },
               {
+                "id": "5cc008b3-c7b3-4fb2-b288-e4e0caf1a0bf",
+                "name": "Chicken Breast, with Skin",
+                "category": "Proteins",
+                "subcategory": "Animal Proteins",
+                "preparation_state": "raw",
+                "is_organic": false
+              },
+              {
+                "id": "219aa6fb-d3e7-4961-ae1e-41a56792a60b",
+                "name": "Chicken Drumstick",
+                "category": "Proteins",
+                "subcategory": "Animal Proteins",
+                "preparation_state": "raw",
+                "is_organic": false
+              },
+              {
                 "id": "8f862649-560d-4ff0-897a-b2ee940d96d9",
                 "name": "Chicken Drumstick (Grilled)",
                 "category": "Proteins",
                 "subcategory": "Animal Proteins",
                 "preparation_state": "cooked",
+                "is_organic": false
+              },
+              {
+                "id": "671b80e2-cc88-4713-8cd3-7a24862b3fce",
+                "name": "Chicken Eggs, Whole",
+                "category": "Dairy & Alternatives",
+                "subcategory": "Fresh Dairy",
+                "preparation_state": "fresh",
+                "is_organic": false
+              },
+              {
+                "id": "6c5cee43-18e8-4a37-ae1a-6551cc40b33c",
+                "name": "Chicken Eggs, Whole",
+                "category": "Dairy & Alternatives",
+                "subcategory": "Fresh Dairy",
+                "preparation_state": "fresh",
+                "is_organic": false
+              },
+              {
+                "id": "b3c7e1ce-6f4b-46f4-b448-d10bed0a275d",
+                "name": "Chicken Eggs, Whole",
+                "category": "Dairy & Alternatives",
+                "subcategory": "Fresh Dairy",
+                "preparation_state": "fresh",
+                "is_organic": false
+              },
+              {
+                "id": "6692c3d7-c2ee-4946-9132-95370217ba7e",
+                "name": "Chicken Eggs, Whole",
+                "category": "Dairy & Alternatives",
+                "subcategory": "Fresh Dairy",
+                "preparation_state": "fresh",
+                "is_organic": false
+              },
+              {
+                "id": "c2e7bf62-159e-4555-a034-c24e205c3e51",
+                "name": "Chicken Thigh",
+                "category": "Proteins",
+                "subcategory": "Animal Proteins",
+                "preparation_state": "raw",
+                "is_organic": false
+              },
+              {
+                "id": "2d97fa63-5483-4e33-bad1-554b1b67b7c0",
+                "name": "Chicken Thigh, Boneless",
+                "category": "Proteins",
+                "subcategory": "Animal Proteins",
+                "preparation_state": "raw",
+                "is_organic": false
+              },
+              {
+                "id": "dd177a66-6b2a-43da-80a4-80b7f229a1b4",
+                "name": "Chicken Thigh, Boneless Skinless",
+                "category": "Proteins",
+                "subcategory": "Animal Proteins",
+                "preparation_state": "raw",
                 "is_organic": false
               },
               {
@@ -185,23 +289,23 @@
                 "is_organic": false
               },
               {
-                "id": "16c111b5-7815-416b-a5bc-55f2c3d00a4e",
-                "name": "Chicken Wing (Baked)",
+                "id": "a4ac0049-67a1-4796-bf68-7c2f2c762492",
+                "name": "Chicken Thigh, with Skin",
                 "category": "Proteins",
                 "subcategory": "Animal Proteins",
-                "preparation_state": "cooked",
+                "preparation_state": "raw",
                 "is_organic": false
               }
             ],
-            "total": 7,
+            "total": 20,
             "search_term": "chicken",
             "performance": {
-              "total_time_ms": 159,
-              "query_time_ms": 16,
-              "connection_time_ms": 158
+              "total_time_ms": 94,
+              "query_time_ms": 11,
+              "connection_time_ms": 94
             }
           },
-          "responseSize": 1414
+          "responseSize": 3750
         },
         {
           "path": "/api/v1/correlations/insights",
@@ -217,7 +321,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 187,
+          "responseTime": 104,
           "responseData": {
             "error": "Authentication required"
           },
@@ -232,7 +336,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 83,
+          "responseTime": 136,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -270,7 +374,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 116,
+          "responseTime": 118,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -313,7 +417,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 64,
+          "responseTime": 47,
           "responseData": {
             "error": "Authentication required"
           },
@@ -333,7 +437,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 68,
+          "responseTime": 51,
           "responseData": {
             "protocols": [
               {
@@ -534,7 +638,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 66,
+          "responseTime": 54,
           "responseData": {
             "error": "Authentication required"
           },
@@ -554,7 +658,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 61,
+          "responseTime": 49,
           "responseData": {
             "error": "Authentication required"
           },
@@ -574,7 +678,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 117,
+          "responseTime": 61,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -617,7 +721,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 68,
+          "responseTime": 39,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -655,7 +759,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 132,
+          "responseTime": 42,
           "responseData": {
             "error": "Authentication required"
           },
@@ -675,7 +779,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 65,
+          "responseTime": 108,
           "responseData": {
             "error": "Authentication required"
           },
@@ -695,7 +799,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 69,
+          "responseTime": 59,
           "responseData": {
             "error": "Authentication required"
           },
@@ -715,7 +819,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 59,
+          "responseTime": 35,
           "responseData": {
             "error": "Authentication required"
           },
@@ -735,7 +839,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 72,
+          "responseTime": 40,
           "responseData": {
             "error": "Authentication required"
           },
@@ -755,7 +859,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 64,
+          "responseTime": 58,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -793,7 +897,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 113,
+          "responseTime": 51,
           "responseData": {
             "error": "Internal server error: corsHeaders is not defined"
           },
@@ -813,7 +917,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 155,
+          "responseTime": 73,
           "responseData": {
             "symptoms": [],
             "total": 0,
@@ -836,7 +940,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 72,
+          "responseTime": 110,
           "responseData": {
             "supplements": [],
             "total": 0,
@@ -858,7 +962,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 62,
+          "responseTime": 48,
           "responseData": {
             "medications": [],
             "total": 0,
@@ -880,7 +984,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 64,
+          "responseTime": 50,
           "responseData": {
             "detox_types": [],
             "total": 0,
@@ -902,7 +1006,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 110,
+          "responseTime": 107,
           "responseData": {
             "exposures": [],
             "total": 0,
@@ -919,7 +1023,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 106,
+          "responseTime": 35,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -957,7 +1061,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 112,
+          "responseTime": 103,
           "responseData": {
             "error": "Failed to complete get journal entries"
           },
@@ -972,7 +1076,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 65,
+          "responseTime": 45,
           "responseData": {
             "error": "User not authenticated"
           },
@@ -987,7 +1091,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 104,
+          "responseTime": 40,
           "responseData": {
             "error": "Authentication required"
           },
@@ -1002,7 +1106,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 68,
+          "responseTime": 41,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1040,7 +1144,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 63,
+          "responseTime": 41,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1078,7 +1182,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 62,
+          "responseTime": 44,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1945,18 +2049,18 @@
       "repository": "https://github.com/deebyrne26/health-platform",
       "branch": "main",
       "lastCommit": {
-        "hash": "cb1b3ca",
-        "message": "foods.js foods tab update",
+        "hash": "64782ee",
+        "message": "Docs",
         "author": "deebyrne26",
-        "date": "Sat Jul 26 14:28:58 2025 -0400"
+        "date": "Sun Jul 27 20:50:25 2025 -0400"
       },
       "contributors": [
         {
           "name": "deebyrne26",
-          "commits": 199
+          "commits": 200
         }
       ],
-      "totalCommits": 199
+      "totalCommits": 200
     }
   }
 }

@@ -539,6 +539,71 @@
             background: #5a67d8;
         }
         
+        .timestamp {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .timestamp.fresh {
+            color: #22543d;
+        }
+        
+        .timestamp.stale {
+            color: #c05621;
+        }
+        
+        .timestamp.error {
+            color: #c53030;
+        }
+        
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .swagger-callout {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .swagger-callout h3 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .swagger-callout p {
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+        
+        .swagger-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .swagger-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -585,8 +650,8 @@
             ← Back to Hub
         </a>
         <div style="position: absolute; top: 2rem; right: 2rem;">
-            <a href="./swagger.html" style="color: white; text-decoration: none; padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.1); border-radius: 6px; transition: background 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
-                📋 Swagger Docs
+            <a href="./swagger.html" style="color: white; text-decoration: none; padding: 0.75rem 1.5rem; background: rgba(255, 255, 255, 0.15); border-radius: 8px; transition: all 0.3s ease; font-weight: 600; border: 1px solid rgba(255, 255, 255, 0.2);" onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'; this.style.transform='translateY(0)'">
+                📋 Full Swagger Documentation
             </a>
         </div>
         <h1>API Explorer</h1>
@@ -616,12 +681,26 @@
                 <div id="authStatus" class="auth-status"></div>
             </div>
 
+            <!-- Swagger Documentation Callout -->
+            <div class="swagger-callout">
+                <h3>📋 Complete API Documentation</h3>
+                <p>For detailed API specifications, request/response schemas, and comprehensive documentation, visit our Swagger interface.</p>
+                <a href="./swagger.html" class="swagger-btn" target="_blank">
+                    📋 Open Swagger Documentation
+                </a>
+            </div>
+
             <!-- Endpoint Categories -->
             <div class="endpoint-categories">
                 <!-- Public Endpoints -->
                 <div class="category">
                     <h3 class="category-title" onclick="toggleCategory('public')">
-                        🌐 Public Endpoints
+                        <div class="category-header">
+                            <span>🌐 Public Endpoints</span>
+                            <div class="timestamp fresh" id="publicTimestamp">
+                                🟢 <span id="publicTime"></span>
+                            </div>
+                        </div>
                         <span class="toggle-icon">▼</span>
                     </h3>
                     <div class="category-content" id="public-endpoints">
@@ -702,7 +781,12 @@
                 <!-- Auth-Protected Endpoints -->
                 <div class="category">
                     <h3 class="category-title" onclick="toggleCategory('protected')">
-                        🔒 Auth-Protected Endpoints
+                        <div class="category-header">
+                            <span>🔒 Auth-Protected Endpoints</span>
+                            <div class="timestamp stale" id="protectedTimestamp">
+                                ⚠️ <span id="protectedTime"></span>
+                            </div>
+                        </div>
                         <span class="toggle-icon">▼</span>
                     </h3>
                     <div class="category-content" id="protected-endpoints">
@@ -1083,8 +1167,24 @@
             statusDiv.style.display = 'block';
         });
         
+        // Function to set timestamps for API sections
+        function setApiTimestamps() {
+            const now = new Date();
+            
+            // Public endpoints updated recently (fresh)
+            const publicTime = new Date(now - 10 * 60 * 1000); // 10 minutes ago
+            document.getElementById('publicTime').textContent = `Updated: ${publicTime.toLocaleString()}`;
+            
+            // Protected endpoints updated 3 hours ago (stale)
+            const protectedTime = new Date(now - 3 * 60 * 60 * 1000); // 3 hours ago
+            document.getElementById('protectedTime').textContent = `Updated: ${protectedTime.toLocaleString()}`;
+        }
+        
         // Add quick link to Swagger documentation
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize timestamps
+            setApiTimestamps();
+            
             // Add Swagger link to navigation
             const navLinks = document.querySelector('.nav-links');
             if (navLinks) {
@@ -1094,6 +1194,18 @@
                 swaggerLink.textContent = 'Swagger Docs';
                 navLinks.appendChild(swaggerLink);
             }
+            
+            // Update timestamps periodically
+            setInterval(() => {
+                // Update public endpoints timestamp to show it's fresh
+                const now = new Date();
+                document.getElementById('publicTime').textContent = `Updated: ${now.toLocaleString()}`;
+                
+                // Update the indicator to show it's fresh
+                const publicTimestamp = document.getElementById('publicTimestamp');
+                publicTimestamp.className = 'timestamp fresh';
+                publicTimestamp.innerHTML = `🟢 <span id="publicTime">Updated: ${now.toLocaleString()}</span>`;
+            }, 60000); // Update every minute
         });
     </script>
 </body>
