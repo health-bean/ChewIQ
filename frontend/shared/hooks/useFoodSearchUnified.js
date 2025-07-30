@@ -113,7 +113,9 @@ export const useFoodSearch = (options = {}) => {
     enableCache = true,
     debounceMs = 300,
     maxCacheSize = 100,
-    cacheTtlMs = 300000 // 5 minutes
+    cacheTtlMs = 300000, // 5 minutes
+    limit = 50,
+    includeProperties = true
   } = options;
   
   // State
