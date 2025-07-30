@@ -4,8 +4,8 @@ import { Input, Button, Card } from '../../../../shared/components/ui';
 import { cn } from '../../../../shared/design-system';
 import { useApi } from '../../hooks/useApi';
 
-// Import the working food search hook
-import { useFoodSearch } from '../../../../shared/hooks/useProtocolFoods';
+// Import the unified food search hook
+import { useFoodSearch } from '../../../../shared/hooks/useFoodSearchUnified';
 
 const UnifiedSmartSelector = ({ 
   type, // 'food', 'symptom', 'supplement', 'medication', 'exposure', 'detox'
@@ -21,12 +21,21 @@ const UnifiedSmartSelector = ({
   // Use the proper API client that sends demo headers
   const apiClient = useApi();
 
-  // Use the working food search hook for food searches
+  // Use the unified food search hook for food searches
+  const protocolId = selectedProtocols.length > 0 && selectedProtocols[0] !== 'no_protocol' 
+    ? selectedProtocols[0] 
+    : null;
+    
   const { 
     foods: foodSearchResults, 
     loading: foodSearchLoading, 
+    error: foodSearchError,
     searchFoods 
-  } = useFoodSearch();
+  } = useFoodSearch({ 
+    protocolId,
+    enableCache: true,
+    debounceMs: 300
+  });
 
   // Type-specific configuration
   const typeConfig = {
@@ -76,7 +85,7 @@ const UnifiedSmartSelector = ({
 
   const config = typeConfig[type] || typeConfig.food;
 
-  // Use the working food search pattern from Foods tab
+  // Handle search for different item types
   useEffect(() => {
     if (!searchTerm.trim()) {
       setItems([]);
@@ -85,28 +94,13 @@ const UnifiedSmartSelector = ({
     }
 
     if (type === 'food') {
-      // Use the working food search hook for foods
-      // Use the working food search hook for foods
-      
-      const timer = setTimeout(() => {
-        const protocolId = selectedProtocols.length > 0 && selectedProtocols[0] !== 'no_protocol' 
-          ? selectedProtocols[0] 
-          : null;
-          
-        // Call searchFoods with search term and protocol
-        
-        searchFoods({ 
-          search: searchTerm, 
-          protocol_id: protocolId 
-        });
-      }, 300);
-      
-      return () => clearTimeout(timer);
+      // Use the unified food search hook (handles debouncing internally)
+      searchFoods(searchTerm);
     } else {
-      // For non-food types, use the old fetch method (for now)
+      // For non-food types, use the existing API method
       loadNonFoodItems();
     }
-  }, [searchTerm, selectedProtocols, type]);
+  }, [searchTerm, selectedProtocols, type, searchFoods]);
 
   // Update items when food search results change
   useEffect(() => {

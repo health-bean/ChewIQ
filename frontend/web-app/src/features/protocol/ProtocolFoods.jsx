@@ -1,52 +1,46 @@
 import React, { useState } from 'react';
 import { Search, Filter, Eye, EyeOff, AlertCircle, TrendingUp, Loader2, Info, AlertTriangle } from 'lucide-react';
 
-// Import hooks from shared folder
-import { useProtocolFoods, useFoodSearch } from '../../../../shared/hooks/useProtocolFoods';
+// Import unified food search hook
+import { useFoodSearch } from '../../../../shared/hooks/useFoodSearchUnified';
 
 const ProtocolFoods = ({ protocolId }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showStats, setShowStats] = useState(false);
   
-  // Only call useProtocolFoods hook if we have a valid protocol
+  // Use unified food search hook for all functionality
   const hasValidProtocol = protocolId && protocolId !== 'no_protocol';
   
   const { 
-    foodsByCategory, 
-    complianceStats, 
-    totalFoods, 
-    loading, 
-    error 
-  } = useProtocolFoods(hasValidProtocol ? protocolId : null);
-
-  const { 
     foods: searchResults, 
     loading: searchLoading, 
-    searchFoods 
-  } = useFoodSearch();
+    error: searchError,
+    searchFoods,
+    clearResults
+  } = useFoodSearch({ 
+    protocolId: hasValidProtocol ? protocolId : null,
+    enableCache: true,
+    debounceMs: 300
+  });
 
-  // Handle search - works even without protocol
+  // Simplified approach: Focus on search functionality
+  // TODO: Add protocol food browsing functionality back
+  const loading = searchLoading;
+  const error = searchError;
+  
+  // Temporary: Empty protocol foods data for browsing view
+  const foodsByCategory = {};
+  const complianceStats = { allowed: 0, avoid: 0, reintroduction: 0 };
+  const totalFoods = 0;
+
+  // Handle search using unified hook (debouncing handled internally)
   React.useEffect(() => {
     if (searchTerm.trim()) {
-      console.log('🔍 SEARCH DEBUG:', {
-        searchTerm,
-        protocolId,
-        hasValidProtocol,
-        searchParams: { 
-          search: searchTerm, 
-          protocol_id: hasValidProtocol ? protocolId : null 
-        }
-      });
-      
-      const timer = setTimeout(() => {
-        searchFoods({ 
-          search: searchTerm, 
-          protocol_id: hasValidProtocol ? protocolId : null 
-        });
-      }, 300);
-      return () => clearTimeout(timer);
+      searchFoods(searchTerm);
+    } else {
+      clearResults();
     }
-  }, [searchTerm, protocolId, hasValidProtocol]);
+  }, [searchTerm, searchFoods, clearResults]);
 
   const getComplianceColor = (status) => {
     switch (status) {
