@@ -30,7 +30,9 @@ const ProtocolFoods = ({ protocolId }) => {
 
   // Load protocol foods on mount and when protocol changes
   React.useEffect(() => {
+    console.log('🔍 ProtocolFoods useEffect:', { hasValidProtocol, protocolId, searchTerm: searchTerm.trim() });
     if (hasValidProtocol && !searchTerm.trim()) {
+      console.log('🔍 Calling loadProtocolFoods for protocol:', protocolId);
       loadProtocolFoods();
     }
   }, [hasValidProtocol, protocolId, loadProtocolFoods, searchTerm]);

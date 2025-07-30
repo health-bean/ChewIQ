@@ -170,7 +170,7 @@ export const useFoodSearch = (options = {}) => {
       return;
     }
 
-    const cacheKey = generateCacheKey('', { protocolId, limit: 50, includeProperties: true });
+    const cacheKey = generateCacheKey('', { protocolId, limit, includeProperties });
     
     // Check cache first
     const cachedResult = globalFoodCache.get(cacheKey);
@@ -188,8 +188,8 @@ export const useFoodSearch = (options = {}) => {
     try {
       const params = new URLSearchParams({
         protocol_id: protocolId,
-        limit: '50',
-        include_properties: 'true'
+        limit: limit.toString(),
+        include_properties: includeProperties.toString()
       });
 
       console.log('🔍 Loading protocol foods:', protocolId);
