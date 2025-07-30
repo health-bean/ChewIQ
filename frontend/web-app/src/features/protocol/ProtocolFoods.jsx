@@ -176,9 +176,12 @@ const ProtocolFoods = ({ protocolId }) => {
     return 'bg-blue-100 text-blue-800';
   };
 
-  // Filter to only show included foods for default view
+  // Filter to only show allowed foods for default view (allowed + caution)
   const filterAllowedFoods = (foods) => {
-    return foods.filter(food => food.compliance_status === 'included');
+    return foods.filter(food => 
+      food.compliance_status === 'allowed' || 
+      food.compliance_status === 'caution'
+    );
   };
 
   // Smart search result analysis
