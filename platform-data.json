@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2025-07-30T20:56:31.339Z",
+    "generated": "2025-07-30T21:26:10.422Z",
     "version": "1.0.0",
     "generator": "AutomatedProfessionalDocsGenerator"
   },
@@ -12,12 +12,12 @@
   },
   "statistics": {
     "totalComponents": 55,
-    "totalHooks": 16,
-    "totalFiles": 110,
+    "totalHooks": 15,
+    "totalFiles": 109,
     "workingAPIs": 19,
     "totalAPIs": 29,
     "totalTables": 24,
-    "totalCommits": 223,
+    "totalCommits": 224,
     "contributors": 1
   },
   "discoveredInfo": {
@@ -147,7 +147,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 868,
+          "responseTime": 899,
           "responseData": {
             "foods": [
               {
@@ -495,15 +495,15 @@
             "search_term": "chicken",
             "protocol_id": null,
             "performance": {
-              "request_id": "search_1753908989421_6w4exo9be",
-              "total_time_ms": 146,
-              "query_time_ms": 23,
-              "connection_time_ms": 145,
+              "request_id": "search_1753910767637_iwjyyx0ds",
+              "total_time_ms": 139,
+              "query_time_ms": 16,
+              "connection_time_ms": 139,
               "result_count": 20,
               "search_term": "chicken",
               "protocol_id": null,
               "cache_hit": false,
-              "timestamp": "2025-07-30T20:56:29.567Z"
+              "timestamp": "2025-07-30T21:26:07.777Z"
             },
             "cache_info": {
               "ttl_seconds": 300,
@@ -526,7 +526,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 83,
+          "responseTime": 137,
           "responseData": {
             "error": "Authentication required"
           },
@@ -541,7 +541,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 69,
+          "responseTime": 126,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -578,7 +578,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 61,
+          "responseTime": 112,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -620,7 +620,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 54,
+          "responseTime": 107,
           "responseData": {
             "foods": [],
             "total": 0,
@@ -651,7 +651,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 64,
+          "responseTime": 140,
           "responseData": {
             "protocols": [
               {
@@ -852,7 +852,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 63,
+          "responseTime": 60,
           "responseData": {
             "error": "Authentication required"
           },
@@ -892,7 +892,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 56,
+          "responseTime": 120,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -934,7 +934,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 49,
+          "responseTime": 61,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -971,7 +971,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 50,
+          "responseTime": 108,
           "responseData": {
             "error": "Authentication required"
           },
@@ -991,7 +991,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 52,
+          "responseTime": 110,
           "responseData": {
             "error": "Authentication required"
           },
@@ -1011,7 +1011,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 53,
+          "responseTime": 70,
           "responseData": {
             "error": "Authentication required"
           },
@@ -1031,7 +1031,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 60,
+          "responseTime": 118,
           "responseData": {
             "error": "Authentication required"
           },
@@ -1051,7 +1051,7 @@
           ],
           "status": 401,
           "working": false,
-          "responseTime": 123,
+          "responseTime": 62,
           "responseData": {
             "error": "Authentication required"
           },
@@ -1071,7 +1071,7 @@
           ],
           "status": 404,
           "working": false,
-          "responseTime": 65,
+          "responseTime": 116,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1108,12 +1108,12 @@
           "params": [],
           "status": 200,
           "working": true,
-          "responseTime": 58,
+          "responseTime": 63,
           "responseData": {
             "success": true,
             "message": "Database connection successful",
             "count": "351",
-            "timestamp": "2025-07-30T20:56:30.603Z"
+            "timestamp": "2025-07-30T21:26:09.357Z"
           },
           "responseSize": 112
         },
@@ -1126,7 +1126,7 @@
           "params": [],
           "status": 200,
           "working": true,
-          "responseTime": 50,
+          "responseTime": 59,
           "responseData": {
             "cache_stats": {
               "size": 1,
@@ -1139,12 +1139,12 @@
             "sample_entries": [
               {
                 "key": "search:anonymous:none:chicken:20:true",
-                "expiry": "2025-07-30T21:01:29.568Z",
-                "lastAccessed": "2025-07-30T20:56:29.568Z",
+                "expiry": "2025-07-30T21:31:07.777Z",
+                "lastAccessed": "2025-07-30T21:26:07.777Z",
                 "resultCount": 20
               }
             ],
-            "timestamp": "2025-07-30T20:56:30.655Z"
+            "timestamp": "2025-07-30T21:26:09.416Z"
           },
           "responseSize": 299
         },
@@ -1162,7 +1162,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 50,
+          "responseTime": 107,
           "responseData": {
             "symptoms": [],
             "total": 0,
@@ -1185,7 +1185,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 121,
+          "responseTime": 111,
           "responseData": {
             "supplements": [],
             "total": 0,
@@ -1207,7 +1207,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 80,
+          "responseTime": 104,
           "responseData": {
             "medications": [],
             "total": 0,
@@ -1229,7 +1229,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 68,
+          "responseTime": 63,
           "responseData": {
             "detox_types": [],
             "total": 0,
@@ -1251,7 +1251,7 @@
           ],
           "status": 200,
           "working": true,
-          "responseTime": 46,
+          "responseTime": 108,
           "responseData": {
             "exposures": [],
             "total": 0,
@@ -1268,7 +1268,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 53,
+          "responseTime": 89,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1305,7 +1305,7 @@
           "params": [],
           "status": 500,
           "working": false,
-          "responseTime": 46,
+          "responseTime": 108,
           "responseData": {
             "error": "Failed to complete get journal entries"
           },
@@ -1320,7 +1320,7 @@
           "params": [],
           "status": 401,
           "working": false,
-          "responseTime": 47,
+          "responseTime": 64,
           "responseData": {
             "error": "User not authenticated"
           },
@@ -1335,7 +1335,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 64,
+          "responseTime": 63,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1372,7 +1372,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 50,
+          "responseTime": 60,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -1409,7 +1409,7 @@
           "params": [],
           "status": 404,
           "working": false,
-          "responseTime": 49,
+          "responseTime": 105,
           "responseData": {
             "error": "Endpoint not found",
             "details": {
@@ -2010,11 +2010,11 @@
           "size": "679.11 KB"
         },
         "frontend/shared": {
-          "totalFiles": 38,
+          "totalFiles": 37,
           "fileTypes": {
             "": 1,
             ".jsx": 13,
-            ".js": 22,
+            ".js": 21,
             ".json": 2
           },
           "components": [
@@ -2132,11 +2132,6 @@
               "size": 9293
             },
             {
-              "name": "useProtocolFoods",
-              "path": "frontend/shared/hooks/useProtocolFoods.js",
-              "size": 1803
-            },
-            {
               "name": "useProtocols",
               "path": "frontend/shared/hooks/useProtocols.js",
               "size": 1903
@@ -2148,7 +2143,7 @@
             }
           ],
           "utilities": [],
-          "size": "113.19 KB"
+          "size": "111.42 KB"
         }
       },
       "backend": {
@@ -2300,18 +2295,18 @@
       "repository": "https://github.com/deebyrne26/health-platform",
       "branch": "main",
       "lastCommit": {
-        "hash": "d307672",
-        "message": "Phase 3: Complete component migration to unified food search",
+        "hash": "ffeb731",
+        "message": "Cleanup: Archive unified food search project files",
         "author": "deebyrne26",
-        "date": "Wed Jul 30 16:43:35 2025 -0400"
+        "date": "Wed Jul 30 17:21:50 2025 -0400"
       },
       "contributors": [
         {
           "name": "deebyrne26",
-          "commits": 223
+          "commits": 224
         }
       ],
-      "totalCommits": 223
+      "totalCommits": 224
     }
   }
 }
