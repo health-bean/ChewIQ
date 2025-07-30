@@ -338,9 +338,9 @@ const handleSearchFoods = async (queryParams, event) => {
         const search = queryParams.search?.trim() || '';
         const limit = Math.min(parseInt(queryParams.limit) || 20, 50);
         
-        // Early return for empty search
-        if (!searchParams.search) {
-            console.log(`🔍 [${requestId}] Empty search, returning early`);
+        // Early return for empty search ONLY if no protocol_id (general search needs a search term)
+        if (!searchParams.search && !searchParams.protocol_id) {
+            console.log(`🔍 [${requestId}] Empty search without protocol, returning early`);
             return successResponse({
                 foods: [],
                 total: 0,
