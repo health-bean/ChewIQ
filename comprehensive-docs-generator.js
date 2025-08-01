@@ -1193,7 +1193,7 @@ class AutomatedProfessionalDocsGenerator {
       const handlerMethods = [
         { pattern: /getProtocols|protocols.*get/i, path: '/api/v1/protocols', method: 'GET' },
         { pattern: /searchFood|food.*search/i, path: '/api/v1/foods/search', method: 'GET' },
-        { pattern: /getFoodsByProtocol|foods.*protocol/i, path: '/api/v1/foods/by-protocol', method: 'GET' },
+
         { pattern: /getUserPreferences|user.*preferences.*get/i, path: '/api/v1/users/preferences', method: 'GET' },
         { pattern: /updateUserPreferences|user.*preferences.*update/i, path: '/api/v1/users/preferences', method: 'PUT' },
         { pattern: /getTimelineEntries|timeline.*entries.*get/i, path: '/api/v1/timeline/entries', method: 'GET' },
@@ -1246,7 +1246,7 @@ class AutomatedProfessionalDocsGenerator {
     const mappings = {
       'getProtocols': { method: 'GET', path: '/api/v1/protocols' },
       'searchFood': { method: 'GET', path: '/api/v1/foods/search' },
-      'getFoodsByProtocol': { method: 'GET', path: '/api/v1/foods/by-protocol' },
+
       'getUserPreferences': { method: 'GET', path: '/api/v1/users/preferences' },
       'updateUserPreferences': { method: 'PUT', path: '/api/v1/users/preferences' },
       'getTimelineEntries': { method: 'GET', path: '/api/v1/timeline/entries' },

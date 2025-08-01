@@ -349,7 +349,6 @@
               "availableEndpoints": [
                 "GET /api/v1/protocols",
                 "GET /api/v1/foods/search",
-                "GET /api/v1/foods/by-protocol",
                 "GET /api/v1/symptoms/search",
                 "GET /api/v1/supplements/search",
                 "GET /api/v1/medications/search",
@@ -387,7 +386,6 @@
               "availableEndpoints": [
                 "GET /api/v1/protocols",
                 "GET /api/v1/foods/search",
-                "GET /api/v1/foods/by-protocol",
                 "GET /api/v1/symptoms/search",
                 "GET /api/v1/supplements/search",
                 "GET /api/v1/medications/search",
@@ -407,26 +405,7 @@
           },
           "responseSize": 632
         },
-        {
-          "path": "/api/v1/foods/by-protocol",
-          "method": "GET",
-          "category": "Protocols",
-          "description": "Get by-protocol",
-          "source": "backend/functions/api/handlers/foods.js",
-          "params": [
-            {
-              "name": "protocol_id",
-              "value": "1495844a-19de-404c-a288-7660eda0cbe1"
-            }
-          ],
-          "status": 401,
-          "working": false,
-          "responseTime": 64,
-          "responseData": {
-            "error": "Authentication required"
-          },
-          "responseSize": 35
-        },
+
         {
           "path": "/api/v1/protocols",
           "method": "GET",
@@ -691,7 +670,6 @@
               "availableEndpoints": [
                 "GET /api/v1/protocols",
                 "GET /api/v1/foods/search",
-                "GET /api/v1/foods/by-protocol",
                 "GET /api/v1/symptoms/search",
                 "GET /api/v1/supplements/search",
                 "GET /api/v1/medications/search",
@@ -734,7 +712,6 @@
               "availableEndpoints": [
                 "GET /api/v1/protocols",
                 "GET /api/v1/foods/search",
-                "GET /api/v1/foods/by-protocol",
                 "GET /api/v1/symptoms/search",
                 "GET /api/v1/supplements/search",
                 "GET /api/v1/medications/search",
@@ -872,7 +849,6 @@
               "availableEndpoints": [
                 "GET /api/v1/protocols",
                 "GET /api/v1/foods/search",
-                "GET /api/v1/foods/by-protocol",
                 "GET /api/v1/symptoms/search",
                 "GET /api/v1/supplements/search",
                 "GET /api/v1/medications/search",
@@ -1036,7 +1012,6 @@
               "availableEndpoints": [
                 "GET /api/v1/protocols",
                 "GET /api/v1/foods/search",
-                "GET /api/v1/foods/by-protocol",
                 "GET /api/v1/symptoms/search",
                 "GET /api/v1/supplements/search",
                 "GET /api/v1/medications/search",
@@ -1119,7 +1094,6 @@
               "availableEndpoints": [
                 "GET /api/v1/protocols",
                 "GET /api/v1/foods/search",
-                "GET /api/v1/foods/by-protocol",
                 "GET /api/v1/symptoms/search",
                 "GET /api/v1/supplements/search",
                 "GET /api/v1/medications/search",
@@ -1157,7 +1131,6 @@
               "availableEndpoints": [
                 "GET /api/v1/protocols",
                 "GET /api/v1/foods/search",
-                "GET /api/v1/foods/by-protocol",
                 "GET /api/v1/symptoms/search",
                 "GET /api/v1/supplements/search",
                 "GET /api/v1/medications/search",
@@ -1195,7 +1168,6 @@
               "availableEndpoints": [
                 "GET /api/v1/protocols",
                 "GET /api/v1/foods/search",
-                "GET /api/v1/foods/by-protocol",
                 "GET /api/v1/symptoms/search",
                 "GET /api/v1/supplements/search",
                 "GET /api/v1/medications/search",
@@ -1548,8 +1520,7 @@
                 "useState",
                 "useEffect",
                 "useApi",
-                "useFoodSearch",
-                "useProtocolFoods"
+                "useFoodSearchUnified"
               ]
             },
             {
@@ -1655,8 +1626,7 @@
               "size": 19679,
               "hooks": [
                 "useState",
-                "useProtocolFoods",
-                "useFoodSearch",
+                "useFoodSearchUnified",
                 "useEffect",
                 "useMemo"
               ]
@@ -1891,11 +1861,6 @@
               "name": "useExposureTypes",
               "path": "frontend/shared/hooks/useExposureTypes.js",
               "size": 1135
-            },
-            {
-              "name": "useProtocolFoods",
-              "path": "frontend/shared/hooks/useProtocolFoods.js",
-              "size": 1803
             },
             {
               "name": "useProtocols",

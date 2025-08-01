@@ -147,12 +147,10 @@ export const useProtocolsApi = () => {
     return api.get('/api/v1/protocols');
   };
 
-  const getProtocolFoods = async (protocolId) => {
-    return api.get(`/api/v1/foods/by-protocol?protocol_id=${protocolId}`);
-  };
+  // Note: getProtocolFoods removed - use useFoodSearchUnified hook instead
+  // Protocol foods are now handled by the unified food search system
 
   return {
-    getProtocols,
-    getProtocolFoods
+    getProtocols
   };
 };

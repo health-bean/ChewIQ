@@ -239,7 +239,7 @@ const trackSearchAnalytics = async (analyticsData) => {
             timestamp: new Date().toISOString()
         });
         
-        // TODO: Store in analytics table for insights dashboard
+        // Note: Analytics storage can be added later if needed
     } catch (error) {
         console.error('Analytics tracking error:', error);
         // Don't fail the request if analytics fails

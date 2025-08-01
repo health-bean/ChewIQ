@@ -410,7 +410,7 @@ const ProtocolFoods = ({ protocolId }) => {
                 onClick={() => {
                   // This would integrate with the entry form to add custom food
                   console.log('🍎 Adding custom food to be categorized:', searchTerm);
-                  // TODO: Integrate with entry form or show modal
+                  // Note: Custom food integration can be added later
                 }}
                 className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
