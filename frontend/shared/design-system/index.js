@@ -10,6 +10,8 @@ export {
   cn,
   getColor,
   getHealthColor,
+  getSemanticColor,
+  getProtocolColor,
   focusRing,
   transition,
   shadow,

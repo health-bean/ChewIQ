@@ -7,14 +7,15 @@ export const getEntryIcon = (type) => ({
   detox: '🧘'
 }[type] || '📝');
 
+// FILO semantic colors for entry types - chronic illness friendly
 export const getEntryColor = (type) => ({
-  food: 'bg-green-50 border-green-200',
-  symptom: 'bg-red-50 border-red-200',
-  supplement: 'bg-blue-50 border-blue-200',
-  medication: 'bg-purple-50 border-purple-200',
-  exposure: 'bg-orange-50 border-orange-200',
-  detox: 'bg-purple-50 border-purple-200'
-}[type] || 'bg-gray-50 border-gray-200');
+  food: 'health-food',           // FILO terracotta
+  symptom: 'health-symptom',     // Soft coral
+  supplement: 'health-supplement', // FILO teal
+  medication: 'health-medication', // Gentle lavender
+  exposure: 'health-food',       // FILO terracotta (similar to food)
+  detox: 'health-improvement'    // Sage green (positive action)
+}[type] || 'health-neutral');
 
 export const getProtocolDisplayText = (selectedProtocols, protocols) => {
   if (!selectedProtocols || selectedProtocols.length === 0) return 'No protocols selected';

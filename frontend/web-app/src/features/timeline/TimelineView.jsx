@@ -1,6 +1,7 @@
 import React from 'react';
-import { Plus, Clock, Loader2 } from 'lucide-react';
+import { Plus, Clock } from 'lucide-react';
 import { Button, Card } from '../../../../shared/components/ui';
+import { SectionHeader, ContentSection, LoadingState, EmptyState } from '../../../../shared/components/layout';
 import TimelineEntry from './TimelineEntry';
 import AddEntryForm from './AddEntryForm';
 import { getProtocolDisplayText } from '../../../../shared/utils/entryHelpers';
@@ -22,76 +23,63 @@ const TimelineView = ({
   detoxTypes
 }) => {
   return (
-    <div className="space-y-6">
-      {/* Add Entry Section */}
-      <Card variant="outlined" className="border-blue-200">
-        <div className="p-4">
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={onToggleAddEntry}
-            icon={Plus}
-            className="w-full"
-          >
-            Add Entry
-          </Button>
-        </div>
+    <ContentSection spacing="comfortable">
+      {/* Add Entry Section - Simplified */}
+      <Card variant="feature" padding="default">
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={onToggleAddEntry}
+          icon={Plus}
+          className="w-full"
+        >
+          Add Entry
+        </Button>
       </Card>
 
+      {/* Add Entry Form - No nested cards */}
       {showAddEntry && (
-        <Card variant="outlined" className="border-green-200">
-          <div className="p-4">
-            <AddEntryForm
-              formData={formData}
-              updateFormData={updateFormData}
-              toggleSelectedFood={toggleSelectedFood}
-              handleQuickSelect={handleQuickSelect}
-              onSubmit={onSubmitEntry}
-              onCancel={onCancelEntry}
-              preferences={preferences}
-              exposureTypes={exposureTypes}
-              detoxTypes={detoxTypes}
-            />
-          </div>
-        </Card>
+        <AddEntryForm
+          formData={formData}
+          updateFormData={updateFormData}
+          toggleSelectedFood={toggleSelectedFood}
+          handleQuickSelect={handleQuickSelect}
+          onSubmit={onSubmitEntry}
+          onCancel={onCancelEntry}
+          preferences={preferences}
+          exposureTypes={exposureTypes}
+          detoxTypes={detoxTypes}
+        />
       )}
 
-      {/* Timeline Entries Section */}
-      <Card variant="outlined" className="border-gray-200">
-        <div className="p-4 border-b border-gray-100 bg-gray-50">
-          <h3 className="font-semibold text-gray-800 flex items-center space-x-2">
-            <Clock size={18} />
-            <span>Today's Timeline</span>
-            {preferences.protocols.length > 0 && (
-              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                {getProtocolDisplayText(preferences.protocols, protocols)}
-              </span>
-            )}
-          </h3>
-        </div>
+      {/* Timeline Entries - Simplified structure */}
+      <Card variant="section">
+        <SectionHeader
+          icon={Clock}
+          title="Today's Timeline"
+          subtitle={preferences.protocols.length > 0 ? getProtocolDisplayText(preferences.protocols, protocols) : undefined}
+          variant="default"
+        />
         
         <div className="p-4">
           {loading ? (
-            <div className="text-center py-8 text-gray-500">
-              <Loader2 size={32} className="animate-spin mx-auto mb-2" />
-              <p>Loading entries...</p>
-            </div>
+            <LoadingState message="Loading entries..." />
           ) : entries.length > 0 ? (
-            <div className="space-y-3">
+            <ContentSection spacing="default">
               {entries.map((entry) => (
                 <TimelineEntry key={entry.id} entry={entry} />
               ))}
-            </div>
+            </ContentSection>
           ) : (
-            <div className="text-center py-8 text-gray-500">
-              <Clock size={48} className="mx-auto mb-4 text-gray-300" />
-              <p className="text-lg font-medium mb-2">No entries yet today</p>
-              <p className="text-sm">Add your first entry to start tracking!</p>
-            </div>
+            <EmptyState 
+              icon={Clock}
+              title="No entries yet today"
+              message="Add your first entry to start tracking!"
+            />
           )}
         </div>
       </Card>
-    </div>
+    </ContentSection>
   );
 };
 

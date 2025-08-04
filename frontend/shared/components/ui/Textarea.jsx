@@ -28,7 +28,7 @@ const Textarea = React.forwardRef(({
       disabled={disabled}
       className={cn(
         inputVariants(textareaVariant),
-        'min-h-[80px] py-2',
+        'min-h-[80px] py-2 text-readable reduced-motion', // Enhanced readability
         resizeClasses[resize],
         className
       )}

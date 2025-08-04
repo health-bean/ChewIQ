@@ -12,11 +12,11 @@ const Button = React.forwardRef(({
   className,
   ...props
 }, ref) => {
-  // Size classes
+  // Size classes - all meet 44px minimum touch target for chronic illness accessibility
   const sizeClasses = {
-    sm: 'h-8 px-3 text-sm',
-    md: 'h-10 px-4',
-    lg: 'h-12 px-6 text-lg',
+    sm: 'h-11 px-3 text-sm',  // 44px minimum
+    md: 'h-11 px-4',         // 44px minimum
+    lg: 'h-12 px-6 text-lg', // 48px for larger buttons
   };
 
   return (
@@ -26,12 +26,13 @@ const Button = React.forwardRef(({
       className={cn(
         buttonVariants(variant),
         sizeClasses[size],
+        'reduced-motion', // Support for reduced motion preferences
         className
       )}
       {...props}
     >
       {loading && (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        <Loader2 className="mr-2 h-4 w-4 animate-spin reduced-motion" />
       )}
       {Icon && !loading && (
         <Icon className="mr-2 h-4 w-4" />

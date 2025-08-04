@@ -11,22 +11,22 @@ const FormField = ({
   ...props
 }) => {
   return (
-    <div className={cn('space-y-2', className)} {...props}>
+    <div className={cn('form-spacing', className)} {...props}>
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="form-label">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-coral-500 ml-1">*</span>}
         </label>
       )}
       
       {children}
       
       {hint && !error && (
-        <p className="text-sm text-gray-500">{hint}</p>
+        <p className="form-hint">{hint}</p>
       )}
       
       {error && (
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="form-error">{error}</p>
       )}
     </div>
   );

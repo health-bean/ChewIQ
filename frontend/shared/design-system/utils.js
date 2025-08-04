@@ -44,18 +44,112 @@ export const responsive = (values) => {
   return classes.trim();
 };
 
-// Health-specific color utilities
+// FILO semantic color utilities for chronic illness accessibility
+export const getSemanticColor = (category, type, variant = 'container') => {
+  const semanticColors = {
+    // Status colors using FILO palette
+    status: {
+      info: {
+        container: 'border-primary-200 bg-primary-50',
+        text: 'text-primary-800',
+        accent: 'text-primary-600'
+      },
+      success: {
+        container: 'border-sage-200 bg-sage-50',
+        text: 'text-sage-800',
+        accent: 'text-sage-600'
+      },
+      warning: {
+        container: 'border-amber-200 bg-amber-50',
+        text: 'text-amber-800',
+        accent: 'text-amber-600'
+      },
+      error: {
+        container: 'border-coral-200 bg-coral-50',
+        text: 'text-coral-800',
+        accent: 'text-coral-600'
+      }
+    },
+    
+    // Health-specific colors - gentle but meaningful
+    health: {
+      symptom: {
+        container: 'border-coral-200 bg-coral-50',
+        text: 'text-coral-800',
+        accent: 'text-coral-600'
+      },
+      improvement: {
+        container: 'border-sage-200 bg-sage-50',
+        text: 'text-sage-800',
+        accent: 'text-sage-600'
+      },
+      medication: {
+        container: 'border-lavender-200 bg-lavender-50',
+        text: 'text-lavender-800',
+        accent: 'text-lavender-600'
+      },
+      supplement: {
+        container: 'border-primary-200 bg-primary-50',
+        text: 'text-primary-800',
+        accent: 'text-primary-600'
+      },
+      food: {
+        container: 'border-accent-200 bg-accent-50',
+        text: 'text-accent-800',
+        accent: 'text-accent-600'
+      },
+      neutral: {
+        container: 'border-neutral-200 bg-neutral-100',
+        text: 'text-neutral-800',
+        accent: 'text-neutral-600'
+      }
+    },
+    
+    // Protocol compliance colors - intuitive but gentle
+    protocol: {
+      allowed: {
+        container: 'border-sage-200 bg-sage-50',
+        text: 'text-sage-800',
+        accent: 'text-sage-600'
+      },
+      avoid: {
+        container: 'border-coral-200 bg-coral-50',
+        text: 'text-coral-800',
+        accent: 'text-coral-600'
+      },
+      reintroduction: {
+        container: 'border-amber-200 bg-amber-50',
+        text: 'text-amber-800',
+        accent: 'text-amber-600'
+      },
+      unknown: {
+        container: 'border-neutral-200 bg-neutral-100',
+        text: 'text-neutral-800',
+        accent: 'text-neutral-600'
+      }
+    }
+  };
+  
+  return semanticColors[category]?.[type]?.[variant] || semanticColors.status.info.container;
+};
+
+// Legacy health color function - updated for FILO colors
 export const getHealthColor = (type, shade = 500) => {
   const healthColors = {
-    symptom: designTokens.colors.error[shade],
-    improvement: designTokens.colors.success[shade],
-    medication: '#8b5cf6',
-    supplement: '#06b6d4',
+    symptom: designTokens.colors.coral[shade],
+    improvement: designTokens.colors.sage[shade],
+    medication: designTokens.colors.lavender[shade],
+    supplement: designTokens.colors.primary[shade],
     food: designTokens.colors.accent[shade],
-    neutral: designTokens.colors.gray[shade],
+    neutral: designTokens.colors.neutral[shade],
   };
   
   return healthColors[type] || healthColors.neutral;
+};
+
+// Protocol compliance color utility
+export const getProtocolColor = (status, variant = 'container') => {
+  return getSemanticColor('protocol', status, variant);
 };
 
 // Component size utilities
@@ -125,42 +219,63 @@ export const getValidationColor = (state) => {
   return validationColors[state] || validationColors.default;
 };
 
-// Button variant generator
+// FILO button variant generator - chronic illness friendly
 export const buttonVariants = createVariants(
-  'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+  'inline-flex items-center justify-center rounded-md font-medium transition-standard focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none touch-target',
   {
-    primary: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500',
-    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500',
-    success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
-    warning: 'bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-yellow-500',
-    error: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-    outline: 'border border-gray-300 bg-transparent hover:bg-gray-50 focus:ring-gray-500',
-    ghost: 'hover:bg-gray-100 focus:ring-gray-500',
-    link: 'text-primary-600 underline-offset-4 hover:underline focus:ring-primary-500',
+    primary: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-400',
+    secondary: 'bg-neutral-200 text-neutral-900 hover:bg-neutral-300 focus:ring-neutral-400',
+    success: 'bg-sage-600 text-white hover:bg-sage-700 focus:ring-sage-400',
+    warning: 'bg-amber-600 text-white hover:bg-amber-700 focus:ring-amber-400',
+    error: 'bg-coral-600 text-white hover:bg-coral-700 focus:ring-coral-400',
+    outline: 'border border-neutral-300 bg-transparent hover:bg-neutral-50 focus:ring-neutral-400',
+    ghost: 'hover:bg-neutral-100 focus:ring-neutral-400',
+    link: 'text-primary-600 underline-offset-4 hover:underline focus:ring-primary-400',
   }
 );
 
-// Input variant generator
+// FILO input variant generator - chronic illness friendly
 export const inputVariants = createVariants(
-  'flex w-full rounded-md border px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+  'flex w-full rounded-md border px-3 py-2 text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 touch-target bg-neutral-50',
   {
-    default: 'border-gray-300 focus:ring-primary-500',
-    success: 'border-green-500 focus:ring-green-500',
-    error: 'border-red-500 focus:ring-red-500',
-    warning: 'border-yellow-500 focus:ring-yellow-500',
+    default: 'border-neutral-300 focus:ring-primary-400',
+    success: 'border-sage-300 focus:ring-sage-400',
+    error: 'border-coral-300 focus:ring-coral-400',
+    warning: 'border-amber-300 focus:ring-amber-400',
   }
 );
 
-// Card variant generator
+// FILO card variant generator - chronic illness friendly
 export const cardVariants = createVariants(
-  'rounded-lg border bg-white shadow-sm',
+  'rounded-lg border shadow-sm',
   {
-    default: 'border-gray-200',
-    elevated: 'border-gray-200 shadow-md',
-    outlined: 'border-gray-300 shadow-none',
-    success: 'border-green-200 bg-green-50',
-    warning: 'border-yellow-200 bg-yellow-50',
-    error: 'border-red-200 bg-red-50',
+    // Base variants with FILO cream background
+    default: 'border-neutral-200 bg-neutral-50',
+    elevated: 'border-neutral-200 bg-neutral-50 shadow-md',
+    outlined: 'border-neutral-300 bg-neutral-50 shadow-none',
+    
+    // Semantic variants using FILO-derived colors
+    section: 'border-neutral-200 bg-neutral-50 shadow-sm',
+    feature: 'border-primary-200 bg-primary-50',
+    success: 'border-sage-200 bg-sage-50',
+    warning: 'border-amber-200 bg-amber-50',
+    error: 'border-coral-200 bg-coral-50',
+    
+    // Health-specific variants
+    symptom: 'border-coral-200 bg-coral-50',
+    improvement: 'border-sage-200 bg-sage-50',
+    medication: 'border-lavender-200 bg-lavender-50',
+    supplement: 'border-primary-200 bg-primary-50',
+    food: 'border-accent-200 bg-accent-50',
+    
+    // Interactive variants with gentle hover states
+    interactive: 'border-neutral-200 bg-neutral-50 hover:border-primary-300 hover:shadow-md transition-gentle cursor-pointer',
+    selected: 'border-primary-300 bg-primary-50 shadow-sm',
+    
+    // Protocol compliance variants
+    allowed: 'border-sage-200 bg-sage-50',
+    avoid: 'border-coral-200 bg-coral-50',
+    reintroduction: 'border-amber-200 bg-amber-50',
   }
 );
 
@@ -170,6 +285,8 @@ export default {
   createVariants,
   responsive,
   getHealthColor,
+  getSemanticColor,
+  getProtocolColor,
   getComponentSize,
   focusRing,
   transition,

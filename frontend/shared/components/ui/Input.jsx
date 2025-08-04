@@ -10,11 +10,11 @@ const Input = React.forwardRef(({
   className,
   ...props
 }, ref) => {
-  // Size classes
+  // Size classes - all meet 44px minimum touch target for chronic illness accessibility
   const sizeClasses = {
-    sm: 'h-8 px-2 text-sm',
-    md: 'h-10 px-3',
-    lg: 'h-12 px-4 text-lg',
+    sm: 'h-11 px-2 text-sm',  // 44px minimum
+    md: 'h-11 px-3',         // 44px minimum
+    lg: 'h-12 px-4 text-lg', // 48px for larger inputs
   };
 
   // Determine variant based on error state
@@ -28,6 +28,7 @@ const Input = React.forwardRef(({
       className={cn(
         inputVariants(inputVariant),
         sizeClasses[size],
+        'reduced-motion text-comfortable', // Chronic illness accessibility
         className
       )}
       {...props}

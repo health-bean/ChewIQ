@@ -12,11 +12,11 @@ const Select = React.forwardRef(({
   className,
   ...props
 }, ref) => {
-  // Size classes
+  // Size classes - all meet 44px minimum touch target for chronic illness accessibility
   const sizeClasses = {
-    sm: 'h-8 px-2 text-sm',
-    md: 'h-10 px-3',
-    lg: 'h-12 px-4 text-lg',
+    sm: 'h-11 px-2 text-sm',  // 44px minimum
+    md: 'h-11 px-3',         // 44px minimum
+    lg: 'h-12 px-4 text-lg', // 48px for larger selects
   };
 
   // Determine variant based on error state
@@ -30,7 +30,7 @@ const Select = React.forwardRef(({
         className={cn(
           inputVariants(selectVariant),
           sizeClasses[size],
-          'appearance-none bg-white pr-8 cursor-pointer',
+          'appearance-none pr-8 cursor-pointer reduced-motion text-comfortable',
           disabled && 'cursor-not-allowed',
           className
         )}
@@ -45,10 +45,10 @@ const Select = React.forwardRef(({
       </select>
       
       {/* Custom dropdown arrow */}
-      <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+      <div className="absolute inset-y-0 right-0 flex-center pr-2 pointer-events-none">
         <ChevronDown 
           className={cn(
-            'h-4 w-4 text-gray-400',
+            'h-4 w-4 text-neutral-400',
             disabled && 'opacity-50'
           )} 
         />
