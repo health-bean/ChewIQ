@@ -53,13 +53,13 @@ npm run dev
 ## API Status
 
 - **Base URL:** https://suhoxvn8ik.execute-api.us-east-1.amazonaws.com/dev
-- **Working Endpoints:** 17/28
-- **Categories:** Foods, AI, Lookup Data, Protocols, Timeline, Users, Health Data, Other
+- **Working Endpoints:** 17/31
+- **Categories:** Foods, AI, Lookup Data, Protocols, Timeline, Users, Other, Health Data
 
 ## Database
 
 - **Type:** PostgreSQL
-- **Tables:** 25 discovered
+- **Tables:** 29 discovered
 - **Connection:** Configured via environment
 
 ---
