@@ -59,7 +59,7 @@ npm run dev
 ## Database
 
 - **Type:** PostgreSQL
-- **Tables:** 24 discovered
+- **Tables:** 25 discovered
 - **Connection:** Configured via environment
 
 ---
