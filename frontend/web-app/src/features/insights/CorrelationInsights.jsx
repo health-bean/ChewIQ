@@ -48,7 +48,7 @@ const CorrelationInsights = () => {
       }
 
       // Determine if positive or negative
-      const isPositive = correlation.type === 'supplement-improvement' || 
+      const isPositive = (correlation.type === 'supplement-effect' && correlation.effect.includes('reduced')) || 
                         correlation.type === 'sleep-quality' ||
                         (correlation.type === 'exercise-energy' && correlation.effect.includes('increased'));
 
