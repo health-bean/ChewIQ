@@ -18,7 +18,8 @@ export const useCorrelations = (timeframeDays = 180) => {
 
       const data = await apiClient.get(`/api/v1/correlations/insights?${params}`);
       
-      setCorrelations(data.insights || []);
+      // Backend now returns insights as {triggers: [], helpers: [], trends: []}
+      setCorrelations(data.insights || {});
       setSummary(data.summary || {});
     } catch (err) {
       setError(err.message);
