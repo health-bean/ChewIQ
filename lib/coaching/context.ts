@@ -14,26 +14,26 @@ import { eq, and, desc, sql } from "drizzle-orm";
  * Returns formatted text (~500 tokens max) summarizing user state.
  */
 export async function buildCoachingContext(userId: string): Promise<string> {
+  // Run all independent DB queries in parallel
+  const [
+    protocolSection,   // 1. Protocol state (phase, days remaining, guidance)
+    patternsSection,   // 2. Recent logging patterns (last 7 days)
+    journalSection,    // 3. Journal trends
+    gapSection,        // 4. Logging gaps
+    trialSection,      // 5. Active reintroduction trials
+  ] = await Promise.all([
+    getProtocolSection(userId),
+    getRecentPatterns(userId),
+    getJournalTrends(userId),
+    getLoggingGaps(userId),
+    getActiveTrialSection(userId),
+  ]);
+
   const sections: string[] = [];
-
-  // 1. Protocol state (phase, days remaining, guidance)
-  const protocolSection = await getProtocolSection(userId);
   if (protocolSection) sections.push(protocolSection);
-
-  // 2. Recent logging patterns (last 7 days)
-  const patternsSection = await getRecentPatterns(userId);
   if (patternsSection) sections.push(patternsSection);
-
-  // 3. Journal trends
-  const journalSection = await getJournalTrends(userId);
   if (journalSection) sections.push(journalSection);
-
-  // 4. Logging gaps
-  const gapSection = await getLoggingGaps(userId);
   if (gapSection) sections.push(gapSection);
-
-  // 5. Active reintroduction trials
-  const trialSection = await getActiveTrialSection(userId);
   if (trialSection) sections.push(trialSection);
 
   if (sections.length === 0) return "";
@@ -122,37 +122,37 @@ async function getRecentPatterns(userId: string): Promise<string | null> {
 }
 
 async function getJournalTrends(userId: string): Promise<string | null> {
-  // Last 7 days
-  const recent = await db
-    .select({
-      sleepScore: sql<number>`avg(${journalEntries.sleepScore})::numeric(3,1)`,
-      energyScore: sql<number>`avg(${journalEntries.energyScore})::numeric(3,1)`,
-      moodScore: sql<number>`avg(${journalEntries.moodScore})::numeric(3,1)`,
-      stressScore: sql<number>`avg(${journalEntries.stressScore})::numeric(3,1)`,
-      painScore: sql<number>`avg(${journalEntries.painScore})::numeric(3,1)`,
-      count: sql<number>`count(*)::int`,
-    })
-    .from(journalEntries)
-    .where(
-      sql`${journalEntries.userId} = ${userId}
-      AND ${journalEntries.entryDate} >= CURRENT_DATE - 7`
-    );
-
-  // Prior 7 days
-  const prior = await db
-    .select({
-      sleepScore: sql<number>`avg(${journalEntries.sleepScore})::numeric(3,1)`,
-      energyScore: sql<number>`avg(${journalEntries.energyScore})::numeric(3,1)`,
-      moodScore: sql<number>`avg(${journalEntries.moodScore})::numeric(3,1)`,
-      stressScore: sql<number>`avg(${journalEntries.stressScore})::numeric(3,1)`,
-      painScore: sql<number>`avg(${journalEntries.painScore})::numeric(3,1)`,
-    })
-    .from(journalEntries)
-    .where(
-      sql`${journalEntries.userId} = ${userId}
-      AND ${journalEntries.entryDate} >= CURRENT_DATE - 14
-      AND ${journalEntries.entryDate} < CURRENT_DATE - 7`
-    );
+  // Fetch last 7 days and prior 7 days in parallel
+  const [recent, prior] = await Promise.all([
+    db
+      .select({
+        sleepScore: sql<number>`avg(${journalEntries.sleepScore})::numeric(3,1)`,
+        energyScore: sql<number>`avg(${journalEntries.energyScore})::numeric(3,1)`,
+        moodScore: sql<number>`avg(${journalEntries.moodScore})::numeric(3,1)`,
+        stressScore: sql<number>`avg(${journalEntries.stressScore})::numeric(3,1)`,
+        painScore: sql<number>`avg(${journalEntries.painScore})::numeric(3,1)`,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(journalEntries)
+      .where(
+        sql`${journalEntries.userId} = ${userId}
+        AND ${journalEntries.entryDate} >= CURRENT_DATE - 7`
+      ),
+    db
+      .select({
+        sleepScore: sql<number>`avg(${journalEntries.sleepScore})::numeric(3,1)`,
+        energyScore: sql<number>`avg(${journalEntries.energyScore})::numeric(3,1)`,
+        moodScore: sql<number>`avg(${journalEntries.moodScore})::numeric(3,1)`,
+        stressScore: sql<number>`avg(${journalEntries.stressScore})::numeric(3,1)`,
+        painScore: sql<number>`avg(${journalEntries.painScore})::numeric(3,1)`,
+      })
+      .from(journalEntries)
+      .where(
+        sql`${journalEntries.userId} = ${userId}
+        AND ${journalEntries.entryDate} >= CURRENT_DATE - 14
+        AND ${journalEntries.entryDate} < CURRENT_DATE - 7`
+      ),
+  ]);
 
   const r = recent[0];
   if (!r || r.count === 0) return null;
@@ -183,21 +183,21 @@ async function getJournalTrends(userId: string): Promise<string | null> {
 }
 
 async function getLoggingGaps(userId: string): Promise<string | null> {
-  // Days since last timeline entry
-  const [lastEntry] = await db
-    .select({
-      lastDate: sql<string>`max(${timelineEntries.entryDate})`,
-    })
-    .from(timelineEntries)
-    .where(eq(timelineEntries.userId, userId));
-
-  // Days since last journal
-  const [lastJournal] = await db
-    .select({
-      lastDate: sql<string>`max(${journalEntries.entryDate})`,
-    })
-    .from(journalEntries)
-    .where(eq(journalEntries.userId, userId));
+  // Fetch last timeline entry and last journal in parallel
+  const [[lastEntry], [lastJournal]] = await Promise.all([
+    db
+      .select({
+        lastDate: sql<string>`max(${timelineEntries.entryDate})`,
+      })
+      .from(timelineEntries)
+      .where(eq(timelineEntries.userId, userId)),
+    db
+      .select({
+        lastDate: sql<string>`max(${journalEntries.entryDate})`,
+      })
+      .from(journalEntries)
+      .where(eq(journalEntries.userId, userId)),
+  ]);
 
   const today = new Date();
   const lines: string[] = [];

@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { userProtocolState } from "@/lib/db/schema";
 import { getSessionFromCookies } from "@/lib/auth/session";
 import { searchFoods } from "@/lib/db/queries/foods";
-import { checkCompliance } from "@/lib/protocols/compliance";
+import { loadProtocolContext, checkComplianceSync } from "@/lib/protocols/compliance";
 
 // Note: Using Node.js runtime (not edge) due to postgres package requirements
 // Edge runtime doesn't support Node.js APIs (stream, perf_hooks) needed by postgres
@@ -62,27 +62,27 @@ export async function GET(request: Request) {
         phaseId = null;
       }
 
-      // Check compliance for each food using the compliance module
-      const resultsWithStatus = await Promise.all(
-        results.map(async (food) => {
-          const complianceResult = await checkCompliance(
-            food.properties,
-            protocolId,
-            phaseId,
-            food.id,
-            food.category
-          );
+      // Load protocol context once, then check all foods in-memory
+      const foodIds = results.map((f) => f.id).filter(Boolean);
+      const protocolCtx = await loadProtocolContext(protocolId, phaseId, foodIds);
 
-          return {
-            ...food,
-            protocolStatus: complianceResult.status,
-            protocolViolations: complianceResult.violations,
-            categoryName: food.category,
-            subcategoryName: food.subcategory,
-            triggerProperties: food.properties,
-          };
-        })
-      );
+      const resultsWithStatus = results.map((food) => {
+        const complianceResult = checkComplianceSync(
+          protocolCtx,
+          food.properties,
+          food.id,
+          food.category
+        );
+
+        return {
+          ...food,
+          protocolStatus: complianceResult.status,
+          protocolViolations: complianceResult.violations,
+          categoryName: food.category,
+          subcategoryName: food.subcategory,
+          triggerProperties: food.properties,
+        };
+      });
 
       return NextResponse.json({ foods: resultsWithStatus });
     }

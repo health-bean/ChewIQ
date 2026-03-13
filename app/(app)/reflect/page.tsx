@@ -94,15 +94,35 @@ export default function ReflectPage() {
 
   const isToday = date === formatDate(new Date());
 
-  // Fetch entry for current date
+  // Fetch week streak data
+  const fetchWeek = useCallback(async () => {
+    try {
+      const res = await fetch("/api/journal?days=7");
+      if (res.ok) {
+        const data = await res.json();
+        const map: Record<string, boolean> = {};
+        for (const e of data.entries ?? []) {
+          map[e.entryDate] = true;
+        }
+        setWeekEntries(map);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // Fetch entry for current date and week streak in parallel
   const fetchEntry = useCallback(async (d: string) => {
     setLoading(true);
     setSaved(false);
     setHasChanges(false);
     try {
-      const res = await fetch(`/api/journal?date=${d}`);
-      if (res.ok) {
-        const data = await res.json();
+      const [entryRes] = await Promise.all([
+        fetch(`/api/journal?date=${d}`),
+        fetchWeek(),
+      ]);
+      if (entryRes.ok) {
+        const data = await entryRes.json();
         const e = data.entry ?? null;
         setEntry(e);
         if (e) {
@@ -124,27 +144,14 @@ export default function ReflectPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fetchWeek]);
 
-  // Fetch week streak
+  // Re-fetch week streak when an entry is saved
   useEffect(() => {
-    async function fetchWeek() {
-      try {
-        const res = await fetch("/api/journal?days=7");
-        if (res.ok) {
-          const data = await res.json();
-          const map: Record<string, boolean> = {};
-          for (const e of data.entries ?? []) {
-            map[e.entryDate] = true;
-          }
-          setWeekEntries(map);
-        }
-      } catch {
-        // ignore
-      }
+    if (saved) {
+      fetchWeek();
     }
-    fetchWeek();
-  }, [saved]);
+  }, [saved, fetchWeek]);
 
   useEffect(() => {
     fetchEntry(date);

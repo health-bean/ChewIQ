@@ -134,8 +134,12 @@ export default function InsightsPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch insights
-        const insightsRes = await fetch("/api/insights?days=90");
+        const [insightsRes, userRes, reintroRes] = await Promise.all([
+          fetch("/api/insights?days=90"),
+          fetch("/api/users/me"),
+          fetch("/api/reintroductions"),
+        ]);
+
         if (insightsRes.ok) {
           const data: InsightResult = await insightsRes.json();
           setResult(data);
@@ -143,15 +147,11 @@ export default function InsightsPage() {
           setError("Failed to load insights");
         }
 
-        // Fetch user protocol
-        const userRes = await fetch("/api/users/me");
         if (userRes.ok) {
           const userData = await userRes.json();
           setProtocolId(userData.user?.currentProtocolId || null);
         }
 
-        // Fetch active reintroduction
-        const reintroRes = await fetch("/api/reintroductions");
         if (reintroRes.ok) {
           const reintroData = await reintroRes.json();
           const active = reintroData.reintroductions?.find(

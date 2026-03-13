@@ -13,7 +13,7 @@ import {
   users,
 } from "@/lib/db/schema";
 import { getSessionFromCookies } from "@/lib/auth/session";
-import { checkCompliance } from "@/lib/protocols/compliance";
+import { loadProtocolContext, checkComplianceSync } from "@/lib/protocols/compliance";
 import { trackReintroductionEntry } from "@/lib/reintroductions/tracking";
 import { insightsCache } from "@/lib/cache/insights";
 
@@ -147,68 +147,73 @@ export async function GET(request: Request) {
       .orderBy(desc(timelineEntries.entryDate), desc(timelineEntries.entryTime))
       .limit(200);
 
-    // Transform entries to include food details and protocol compliance
-    const transformedEntries = await Promise.all(
-      entries.map(async (entry) => {
-        const baseEntry = {
-          id: entry.id,
-          entryType: entry.entryType,
-          name: entry.name,
-          severity: entry.severity,
-          structuredContent: entry.structuredContent,
-          entryDate: entry.entryDate,
-          entryTime: entry.entryTime,
-          exerciseType: entry.exerciseType,
-          durationMinutes: entry.durationMinutes,
-          intensityLevel: entry.intensityLevel,
-          energyLevel: entry.energyLevel,
-          foodId: entry.foodId,
-          portion: entry.portion,
-          mealType: entry.mealType,
-          createdAt: entry.createdAt,
-        };
+    // Pre-load protocol context once for batch compliance checking (0 or 1 query instead of N)
+    const foodEntryIds = entries
+      .filter((e) => e.foodId)
+      .map((e) => e.foodId!);
 
-        // Add food details if available
-        if (entry.foodId) {
-          const isCustomFood = entry.customFoodDisplayName != null;
-          const properties = isCustomFood ? entry.customFoodProperties : entry.foodProperties;
-          const category = isCustomFood ? entry.customFoodCategory : entry.foodCategory;
+    const protocolCtx =
+      currentProtocolId && foodEntryIds.length > 0
+        ? await loadProtocolContext(currentProtocolId, null, foodEntryIds)
+        : null;
 
-          // Check protocol compliance if user has an active protocol
-          let protocolViolations: string[] = [];
-          if (currentProtocolId && properties) {
-            try {
-              const compliance = await checkCompliance(
-                properties as Record<string, string | boolean | null | undefined>,
-                currentProtocolId,
-                null,
-                entry.foodId,
-                category
-              );
-              if (compliance.status === "avoid" || compliance.status === "moderation") {
-                protocolViolations = compliance.violations;
-              }
-            } catch (error) {
-              console.error("Error checking compliance:", error);
+    // Transform entries — compliance is now pure in-memory, no DB calls
+    const transformedEntries = entries.map((entry) => {
+      const baseEntry = {
+        id: entry.id,
+        entryType: entry.entryType,
+        name: entry.name,
+        severity: entry.severity,
+        structuredContent: entry.structuredContent,
+        entryDate: entry.entryDate,
+        entryTime: entry.entryTime,
+        exerciseType: entry.exerciseType,
+        durationMinutes: entry.durationMinutes,
+        intensityLevel: entry.intensityLevel,
+        energyLevel: entry.energyLevel,
+        foodId: entry.foodId,
+        portion: entry.portion,
+        mealType: entry.mealType,
+        createdAt: entry.createdAt,
+      };
+
+      if (entry.foodId) {
+        const isCustomFood = entry.customFoodDisplayName != null;
+        const properties = isCustomFood ? entry.customFoodProperties : entry.foodProperties;
+        const category = isCustomFood ? entry.customFoodCategory : entry.foodCategory;
+
+        let protocolViolations: string[] = [];
+        if (protocolCtx && properties) {
+          try {
+            const compliance = checkComplianceSync(
+              protocolCtx,
+              properties as Record<string, string | boolean | null | undefined>,
+              entry.foodId,
+              category
+            );
+            if (compliance.status === "avoid" || compliance.status === "moderation") {
+              protocolViolations = compliance.violations;
             }
+          } catch (error) {
+            console.error("Error checking compliance:", error);
           }
-
-          return {
-            ...baseEntry,
-            food: {
-              displayName: isCustomFood ? entry.customFoodDisplayName : entry.foodDisplayName,
-              category: category,
-              subcategory: isCustomFood ? entry.customFoodSubcategory : entry.foodSubcategory,
-              properties: properties,
-              isCustom: isCustomFood,
-            },
-            protocolViolations,
-          };
         }
 
-        return baseEntry;
-      })
-    );
+        return {
+          ...baseEntry,
+          food: {
+            displayName: isCustomFood ? entry.customFoodDisplayName : entry.foodDisplayName,
+            category: category,
+            subcategory: isCustomFood ? entry.customFoodSubcategory : entry.foodSubcategory,
+            properties: properties,
+            isCustom: isCustomFood,
+          },
+          protocolViolations,
+        };
+      }
+
+      return baseEntry;
+    });
 
     return NextResponse.json({ entries: transformedEntries });
   } catch (error) {

@@ -11,6 +11,7 @@ import {
   time,
   serial,
   uniqueIndex,
+  index,
 } from "drizzle-orm/pg-core";
 
 // ─── Domain Data Tables (seeded from existing DB) ───────────────────────
@@ -105,7 +106,11 @@ export const protocolRules = pgTable("protocol_rules", {
   status: varchar("status", { length: 20 }).notNull(),
   ruleOrder: integer("rule_order").default(0),
   notes: text("notes"),
-});
+},
+  (table) => [
+    index("protocol_rules_protocol_id_idx").on(table.protocolId),
+  ]
+);
 
 export const protocolFoodOverrides = pgTable(
   "protocol_food_overrides",
@@ -182,15 +187,24 @@ export const profiles = pgTable("profiles", {
 /** @deprecated Use `profiles` instead. Alias for backward compatibility during migration. */
 export const users = profiles;
 
-export const conversations = pgTable("conversations", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  title: varchar("title", { length: 255 }).default("New conversation"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const conversations = pgTable(
+  "conversations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: varchar("title", { length: 255 }).default("New conversation"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    index("conversations_user_id_updated_at_idx").on(
+      table.userId,
+      table.updatedAt
+    ),
+  ]
+);
 
 export const messages = pgTable("messages", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -227,7 +241,18 @@ export const timelineEntries = pgTable("timeline_entries", {
   // Sample data tracking
   isSample: boolean("is_sample").default(false),
   createdAt: timestamp("created_at").defaultNow(),
-});
+},
+  (table) => [
+    index("timeline_entries_user_id_entry_date_idx").on(
+      table.userId,
+      table.entryDate
+    ),
+    index("timeline_entries_user_id_entry_type_idx").on(
+      table.userId,
+      table.entryType
+    ),
+  ]
+);
 
 export const journalEntries = pgTable(
   "journal_entries",
@@ -297,7 +322,18 @@ export const reintroductionLog = pgTable("reintroduction_log", {
   cancellationDate: date("cancellation_date"),
   cancellationReason: text("cancellation_reason"),
   createdAt: timestamp("created_at").defaultNow(),
-});
+},
+  (table) => [
+    index("reintroduction_log_user_id_status_idx").on(
+      table.userId,
+      table.status
+    ),
+    index("reintroduction_log_food_id_user_id_idx").on(
+      table.foodId,
+      table.userId
+    ),
+  ]
+);
 
 // ─── Reintroduction Tracking ────────────────────────────────────────────
 

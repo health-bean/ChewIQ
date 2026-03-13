@@ -7,7 +7,7 @@ import {
   foodSubcategories,
   foodCategories,
 } from "@/lib/db/schema";
-import { eq, and, or, isNull } from "drizzle-orm";
+import { eq, and, or, isNull, inArray } from "drizzle-orm";
 import type { ProtocolStatus } from "@/types";
 
 export interface ComplianceResult {
@@ -32,114 +32,138 @@ export interface FoodProperties {
   tyramine?: string | null;
 }
 
+interface ProtocolRule {
+  ruleType: string;
+  propertyName: string | null;
+  propertyValues: string[] | null;
+  status: string;
+  notes: string | null;
+}
+
+interface FoodOverride {
+  foodId: string;
+  status: string;
+  overrideReason: string | null;
+}
+
 /**
- * Check if a food complies with a protocol's rules.
- * 
- * @param foodProperties - The trigger properties of the food
- * @param protocolId - The protocol to check against
- * @param phaseId - Optional phase ID for phase-specific rules
- * @param foodId - Optional food ID to check for overrides
- * @param categoryName - Optional category name for category-based rules
- * @returns ComplianceResult with status and violations
+ * Pre-loaded protocol context for batch compliance checking.
+ * Load once, check many foods — eliminates N+1 queries.
  */
-export async function checkCompliance(
-  foodProperties: FoodProperties,
+export interface ProtocolContext {
+  rules: ProtocolRule[];
+  overrides: Map<string, FoodOverride>;
+}
+
+/**
+ * Load protocol rules and overrides in bulk. Call once per request,
+ * then pass the context to checkComplianceSync for each food.
+ */
+export async function loadProtocolContext(
   protocolId: string,
   phaseId?: string | null,
-  foodId?: string | null,
-  categoryName?: string | null
-): Promise<ComplianceResult> {
-  const violations: string[] = [];
-
-  // Check for protocol-specific food override first
-  if (foodId) {
-    const [override] = await db
-      .select({ 
-        status: protocolFoodOverrides.status,
-        overrideReason: protocolFoodOverrides.overrideReason 
-      })
-      .from(protocolFoodOverrides)
-      .where(
-        and(
-          eq(protocolFoodOverrides.protocolId, protocolId),
-          eq(protocolFoodOverrides.foodId, foodId)
-        )
-      )
-      .limit(1);
-
-    if (override) {
-      // Override exists - return the override status
-      if (override.overrideReason) {
-        if (override.status === "avoid") {
-          violations.push(override.overrideReason);
-        }
-      }
-      return {
-        status: override.status as ProtocolStatus,
-        violations,
-      };
-    }
-  }
-
-  // Get applicable rules for this protocol and phase
-  const conditions = [eq(protocolRules.protocolId, protocolId)];
-
+  foodIds?: string[]
+): Promise<ProtocolContext> {
+  // Build rule conditions
+  const ruleConditions = [eq(protocolRules.protocolId, protocolId)];
   if (phaseId) {
-    // Include both protocol-wide rules (phaseId IS NULL) and phase-specific rules
-    conditions.push(
+    ruleConditions.push(
       or(isNull(protocolRules.phaseId), eq(protocolRules.phaseId, phaseId))!
     );
   } else {
-    // Only protocol-wide rules
-    conditions.push(isNull(protocolRules.phaseId));
+    ruleConditions.push(isNull(protocolRules.phaseId));
   }
 
-  const rules = await db
-    .select({
-      ruleType: protocolRules.ruleType,
-      propertyName: protocolRules.propertyName,
-      propertyValues: protocolRules.propertyValues,
-      status: protocolRules.status,
-      notes: protocolRules.notes,
-    })
-    .from(protocolRules)
-    .where(and(...conditions));
+  // Load rules and overrides in parallel
+  const [rules, overrideRows] = await Promise.all([
+    db
+      .select({
+        ruleType: protocolRules.ruleType,
+        propertyName: protocolRules.propertyName,
+        propertyValues: protocolRules.propertyValues,
+        status: protocolRules.status,
+        notes: protocolRules.notes,
+      })
+      .from(protocolRules)
+      .where(and(...ruleConditions)),
+    foodIds && foodIds.length > 0
+      ? db
+          .select({
+            foodId: protocolFoodOverrides.foodId,
+            status: protocolFoodOverrides.status,
+            overrideReason: protocolFoodOverrides.overrideReason,
+          })
+          .from(protocolFoodOverrides)
+          .where(
+            and(
+              eq(protocolFoodOverrides.protocolId, protocolId),
+              inArray(protocolFoodOverrides.foodId, foodIds)
+            )
+          )
+      : Promise.resolve([]),
+  ]);
 
-  // Default status is allowed
+  const overrides = new Map<string, FoodOverride>();
+  for (const o of overrideRows) {
+    overrides.set(o.foodId, o);
+  }
+
+  return { rules, overrides };
+}
+
+/**
+ * Check compliance synchronously using a pre-loaded protocol context.
+ * No database queries — pure in-memory evaluation.
+ */
+export function checkComplianceSync(
+  ctx: ProtocolContext,
+  foodProperties: FoodProperties,
+  foodId?: string | null,
+  categoryName?: string | null
+): ComplianceResult {
+  const violations: string[] = [];
+
+  // Check for food-specific override first
+  if (foodId) {
+    const override = ctx.overrides.get(foodId);
+    if (override) {
+      if (override.overrideReason && override.status === "avoid") {
+        violations.push(override.overrideReason);
+      }
+      return { status: override.status as ProtocolStatus, violations };
+    }
+  }
+
   let finalStatus: ProtocolStatus = "allowed";
 
-  // Check each rule against the food properties
-  for (const rule of rules) {
+  for (const rule of ctx.rules) {
     if (rule.ruleType === "property" && rule.propertyName && rule.propertyValues) {
-      // Check if the food has this property
       const propertyValue = foodProperties[rule.propertyName as keyof FoodProperties];
-      
       if (propertyValue !== undefined && propertyValue !== null) {
         const strValue = String(propertyValue);
-        
-        // Check if the property value matches any of the rule's restricted values
         if (rule.propertyValues.includes(strValue)) {
           if (rule.status === "avoid") {
             finalStatus = "avoid";
             const propertyLabel = formatPropertyName(rule.propertyName);
             const valueLabel = formatPropertyValue(rule.propertyName, strValue);
-            const message = valueLabel 
-              ? `${propertyLabel} ${valueLabel} not allowed`
-              : `${propertyLabel} not allowed`;
-            violations.push(message);
+            violations.push(
+              valueLabel
+                ? `${propertyLabel} ${valueLabel} not allowed`
+                : `${propertyLabel} not allowed`
+            );
           } else if (rule.status === "moderation" && finalStatus !== "avoid") {
             finalStatus = "moderation";
             const propertyLabel = formatPropertyName(rule.propertyName);
             const valueLabel = formatPropertyValue(rule.propertyName, strValue);
-            const message = valueLabel
-              ? `${propertyLabel} ${valueLabel} should be limited`
-              : `${propertyLabel} should be limited`;
-            violations.push(message);
+            violations.push(
+              valueLabel
+                ? `${propertyLabel} ${valueLabel} should be limited`
+                : `${propertyLabel} should be limited`
+            );
           }
         }
       }
     } else if (rule.ruleType === "category" && rule.propertyValues && categoryName) {
-      // Check if the food's category matches any restricted categories
       if (rule.propertyValues.includes(categoryName)) {
         if (rule.status === "avoid") {
           finalStatus = "avoid";
@@ -152,27 +176,38 @@ export async function checkCompliance(
     }
   }
 
-  return {
-    status: finalStatus,
-    violations,
-  };
+  return { status: finalStatus, violations };
+}
+
+/**
+ * Check if a food complies with a protocol's rules.
+ * Makes 2 DB queries per call — use loadProtocolContext + checkComplianceSync
+ * for batch checking instead.
+ */
+export async function checkCompliance(
+  foodProperties: FoodProperties,
+  protocolId: string,
+  phaseId?: string | null,
+  foodId?: string | null,
+  categoryName?: string | null
+): Promise<ComplianceResult> {
+  const ctx = await loadProtocolContext(
+    protocolId,
+    phaseId,
+    foodId ? [foodId] : undefined
+  );
+  return checkComplianceSync(ctx, foodProperties, foodId, categoryName);
 }
 
 /**
  * Check compliance for a food by ID.
  * Fetches the food's properties and category from the database.
- * 
- * @param foodId - The food ID to check
- * @param protocolId - The protocol to check against
- * @param phaseId - Optional phase ID for phase-specific rules
- * @returns ComplianceResult with status and violations
  */
 export async function checkFoodCompliance(
   foodId: string,
   protocolId: string,
   phaseId?: string | null
 ): Promise<ComplianceResult> {
-  // Fetch food with properties and category
   const [food] = await db
     .select({
       id: foods.id,
@@ -205,31 +240,16 @@ export async function checkFoodCompliance(
     .limit(1);
 
   if (!food) {
-    return {
-      status: "unknown",
-      violations: ["Food not found"],
-    };
+    return { status: "unknown", violations: ["Food not found"] };
   }
 
   if (!food.properties) {
-    return {
-      status: "unknown",
-      violations: ["Food properties not available"],
-    };
+    return { status: "unknown", violations: ["Food properties not available"] };
   }
 
-  return checkCompliance(
-    food.properties,
-    protocolId,
-    phaseId,
-    foodId,
-    food.categoryName
-  );
+  return checkCompliance(food.properties, protocolId, phaseId, foodId, food.categoryName);
 }
 
-/**
- * Format property name for display in violation messages.
- */
 function formatPropertyName(propertyName: string): string {
   const labels: Record<string, string> = {
     oxalate: "Oxalate",
@@ -250,19 +270,8 @@ function formatPropertyName(propertyName: string): string {
   return labels[propertyName] || propertyName;
 }
 
-/**
- * Format property value for display in violation messages.
- */
 function formatPropertyValue(propertyName: string, value: string): string {
-  // For boolean properties like nightshade
-  if (value === "true") {
-    return ""; // Don't show value for boolean properties
-  }
-  
-  // For level-based properties
-  if (["high", "moderate", "low", "very_high"].includes(value)) {
-    return `(${value})`;
-  }
-  
+  if (value === "true") return "";
+  if (["high", "moderate", "low", "very_high"].includes(value)) return `(${value})`;
   return value;
 }
