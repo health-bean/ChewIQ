@@ -9,19 +9,19 @@ const features = [
     icon: MessageSquare,
     title: "Conversational Tracking",
     description:
-      "Just tell FILO what you ate, how you feel, or what supplements you took. No forms, no friction.",
+      "Just tell ChewIQ what you ate, how you feel, or what supplements you took. No forms, no friction.",
   },
   {
     icon: Shield,
     title: "Protocol-Aware",
     description:
-      "FILO knows your elimination protocol and flags foods that may not be compliant.",
+      "ChewIQ knows your elimination protocol and flags foods that may not be compliant.",
   },
   {
     icon: LineChart,
     title: "Correlation Insights",
     description:
-      "Over time, FILO identifies patterns between what you eat and how you feel.",
+      "Over time, ChewIQ identifies patterns between what you eat and how you feel.",
   },
 ];
 
@@ -31,7 +31,7 @@ export default function LandingPage() {
       {/* Hero */}
       <header className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
         <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-          FILO Health
+          ChewIQ
         </h1>
         <p className="mt-4 max-w-md text-lg text-slate-600">
           Track your health through conversation
@@ -72,7 +72,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-slate-200 px-6 py-6 text-center text-xs text-slate-400">
-        FILO Health &mdash; Built for people healing through food.
+        ChewIQ &mdash; Built for people healing through food.
       </footer>
     </div>
   );

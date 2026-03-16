@@ -1,7 +1,7 @@
-# FILO Health: Comprehensive Development Plan
+# ChewIQ Health: Comprehensive Development Plan
 
 ## Vision
-FILO is a holistic health tracking platform that helps people with chronic illness understand how **everything** affects **everything else**: food, sleep, supplements, stress, exercise, medications, and environmental exposures.
+ChewIQ is a holistic health tracking platform that helps people with chronic illness understand how **everything** affects **everything else**: food, sleep, supplements, stress, exercise, medications, and environmental exposures.
 
 ---
 
@@ -149,7 +149,7 @@ FILO is a holistic health tracking platform that helps people with chronic illne
 
 **Tasks**:
 - [ ] Create onboarding flow (multi-step)
-  - Step 1: Welcome + explain FILO
+  - Step 1: Welcome + explain ChewIQ
   - Step 2: Select protocol (or skip)
   - Step 3: Set goals (optional)
   - Step 4: Quick tutorial (how to log, where to find insights)
@@ -469,8 +469,8 @@ FILO is a holistic health tracking platform that helps people with chronic illne
 
 1. **Target user**: Who is the primary user? (e.g., people with histamine intolerance, AIP followers, general chronic illness)
 2. **Business model**: Free? Subscription? One-time purchase?
-3. **Competitive advantage**: What makes FILO better than MySymptoms, Cara, or other health trackers?
-4. **Distribution**: How will users find FILO? (SEO, social media, healthcare provider referrals)
+3. **Competitive advantage**: What makes ChewIQ better than MySymptoms, Cara, or other health trackers?
+4. **Distribution**: How will users find ChewIQ? (SEO, social media, healthcare provider referrals)
 5. **Validation**: Have you talked to potential users? What do they need most?
 
 ---

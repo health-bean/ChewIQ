@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "FILO Health",
+  title: "ChewIQ",
   description: "AI-powered health tracking",
 };
 

@@ -15,7 +15,7 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
         </div>
       </div>
       
-      <h1 className="text-3xl font-bold mb-4">Welcome to FILO Health</h1>
+      <h1 className="text-3xl font-bold mb-4">Welcome to ChewIQ</h1>
       
       <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
         Your personal health tracking companion for understanding how food, lifestyle, and symptoms connect.

@@ -29,7 +29,7 @@ export function Header() {
       <div className="flex h-14 items-center justify-between px-4">
         {/* Logo */}
         <span className="text-lg font-bold tracking-tight text-indigo-600">
-          FILO
+          ChewIQ
         </span>
 
         {/* Desktop nav — hidden on mobile (mobile nav handles it) */}

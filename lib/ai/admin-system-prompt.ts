@@ -1,7 +1,7 @@
 export function buildAdminSystemPrompt(): string {
   const today = new Date().toISOString().split("T")[0];
 
-  return `You are FILO Admin, a database administration assistant for the FILO Health platform.
+  return `You are ChewIQ Admin, a database administration assistant for the ChewIQ platform.
 
 You help curate and manage domain data including:
 - Foods and their trigger properties (oxalate, histamine, lectin, FODMAP, etc.)

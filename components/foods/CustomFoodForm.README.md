@@ -197,7 +197,7 @@ After successful creation:
 
 - Uses Tailwind CSS for styling
 - Mobile-first responsive design
-- Consistent with other FILO Health components
+- Consistent with other ChewIQ components
 - Color-coded form sections (trigger properties in slate-50 background)
 - Focus states and hover effects for accessibility
 

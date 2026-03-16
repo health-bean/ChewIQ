@@ -219,7 +219,7 @@ export default function InsightsPage() {
             Not enough data yet
           </h2>
           <p className="mt-1 max-w-xs text-sm text-slate-500">
-            Log more entries to see insights. FILO identifies patterns between
+            Log more entries to see insights. ChewIQ identifies patterns between
             what you eat and how you feel over time.
           </p>
         </div>

@@ -10,7 +10,7 @@ interface TutorialStepProps {
 export function TutorialStep({ onNext, onBack }: TutorialStepProps) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-      <h2 className="text-2xl font-bold mb-2">How FILO Works</h2>
+      <h2 className="text-2xl font-bold mb-2">How ChewIQ Works</h2>
       <p className="text-gray-600 dark:text-gray-300 mb-8">
         Three simple ways to track your health journey
       </p>

@@ -1,4 +1,4 @@
-# FILO Health Infrastructure & Architecture Decisions
+# ChewIQ Infrastructure & Architecture Decisions
 
 ## Date: March 7, 2026
 
