@@ -9,6 +9,7 @@ export interface SessionData {
   email: string;
   firstName: string;
   isAdmin: boolean;
+  timezone: string;
 }
 
 const emptySession: SessionData = {
@@ -16,6 +17,7 @@ const emptySession: SessionData = {
   email: "",
   firstName: "",
   isAdmin: false,
+  timezone: "America/New_York",
 };
 
 /**
@@ -41,6 +43,7 @@ export const getSessionFromCookies = cache(
       .select({
         firstName: profiles.firstName,
         isAdmin: profiles.isAdmin,
+        timezone: profiles.timezone,
       })
       .from(profiles)
       .where(eq(profiles.id, session.user.id))
@@ -51,6 +54,7 @@ export const getSessionFromCookies = cache(
       email: session.user.email ?? "",
       firstName: profile?.firstName ?? session.user.user_metadata?.firstName ?? "",
       isAdmin: profile?.isAdmin ?? false,
+      timezone: profile?.timezone ?? "America/New_York",
     };
   }
 );

@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getSessionFromCookies } from "@/lib/auth/session";
+import { log } from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -20,6 +21,7 @@ export async function GET() {
         currentProtocolId: profiles.currentProtocolId,
         onboardingCompleted: profiles.onboardingCompleted,
         healthGoals: profiles.healthGoals,
+        timezone: profiles.timezone,
       })
       .from(profiles)
       .where(eq(profiles.id, session.userId))
@@ -31,7 +33,7 @@ export async function GET() {
 
     return NextResponse.json({ user: profile });
   } catch (error) {
-    console.error("GET /api/users/me error:", error);
+    log.error("GET /api/users/me failed", { error: error as Error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -47,7 +49,7 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json();
-    const { firstName, currentProtocolId, healthGoals } = body;
+    const { firstName, currentProtocolId, healthGoals, timezone } = body;
 
     await db
       .update(profiles)
@@ -55,13 +57,14 @@ export async function PATCH(request: Request) {
         ...(firstName !== undefined && { firstName }),
         ...(currentProtocolId !== undefined && { currentProtocolId }),
         ...(healthGoals !== undefined && { healthGoals }),
+        ...(timezone !== undefined && { timezone }),
         updatedAt: new Date(),
       })
       .where(eq(profiles.id, session.userId));
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("PATCH /api/users/me error:", error);
+    log.error("PATCH /api/users/me failed", { error: error as Error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

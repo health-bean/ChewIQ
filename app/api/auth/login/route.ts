@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { rateLimit, getClientIp, AUTH_RATE_LIMIT } from "@/lib/rate-limit";
+import { log } from "@/lib/logger";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
+    log.error("login failed", { error: error as Error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

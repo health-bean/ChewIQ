@@ -179,6 +179,7 @@ export const profiles = pgTable("profiles", {
   // Onboarding tracking
   onboardingCompleted: boolean("onboarding_completed").default(false),
   onboardingStep: varchar("onboarding_step", { length: 50 }).default("welcome"),
+  timezone: varchar("timezone", { length: 50 }).default("America/New_York"),
   healthGoals: text("health_goals").array(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -227,6 +228,7 @@ export const timelineEntries = pgTable("timeline_entries", {
   structuredContent: jsonb("structured_content").$type<Record<string, unknown>>(),
   entryDate: date("entry_date").notNull(),
   entryTime: time("entry_time"),
+  timezone: varchar("timezone", { length: 50 }),
   // Exercise tracking fields
   exerciseType: varchar("exercise_type", { length: 50 }),
   durationMinutes: integer("duration_minutes"),

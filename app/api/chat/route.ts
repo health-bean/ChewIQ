@@ -16,6 +16,7 @@ import { tools } from "@/lib/ai/tools";
 import { processToolCall } from "@/lib/ai/extract";
 import { buildCoachingContext } from "@/lib/coaching/context";
 import type { AIMessage } from "@/lib/ai/providers/types";
+import { log } from "@/lib/logger";
 
 const chatSchema = z.object({
   message: z.string().min(1).max(10_000),
@@ -160,7 +161,7 @@ export async function POST(request: Request) {
       const ctx = await buildCoachingContext(session.userId);
       if (ctx) coachingContext = ctx;
     } catch (err) {
-      console.error("Failed to build coaching context:", err);
+      log.warn("failed to build coaching context", { error: err as Error });
     }
 
     const systemPrompt = buildSystemPrompt(protocolName, protocolRulesText, coachingContext);
@@ -231,7 +232,7 @@ export async function POST(request: Request) {
 
           controller.close();
         } catch (error) {
-          console.error("AI API error:", error);
+          log.error("AI API error", { error: error as Error });
           send({
             type: "error",
             message: "Something went wrong generating a response.",
@@ -249,7 +250,7 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Chat route error:", error);
+    log.error("chat route error", { error: error as Error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

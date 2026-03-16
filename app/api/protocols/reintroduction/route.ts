@@ -6,6 +6,7 @@ import {
   getActiveTrials,
   getTrialHistory,
 } from "@/lib/protocols/reintroduction";
+import { log } from "@/lib/logger";
 
 // ── GET /api/protocols/reintroduction?protocolId=uuid ────────────────
 
@@ -28,7 +29,7 @@ export async function GET(request: Request) {
     const trials = await getActiveTrials(session.userId);
     return NextResponse.json({ trials });
   } catch (error) {
-    console.error("GET /api/protocols/reintroduction error:", error);
+    log.error("GET /api/protocols/reintroduction error", { error: error as Error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ trial }, { status: 201 });
   } catch (error) {
-    console.error("POST /api/protocols/reintroduction error:", error);
+    log.error("POST /api/protocols/reintroduction error", { error: error as Error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -118,7 +119,7 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ trial });
   } catch (error) {
-    console.error("PATCH /api/protocols/reintroduction error:", error);
+    log.error("PATCH /api/protocols/reintroduction error", { error: error as Error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

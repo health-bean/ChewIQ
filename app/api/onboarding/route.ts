@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getSessionFromCookies } from "@/lib/auth/session";
+import { log } from "@/lib/logger";
 
 // GET /api/onboarding - Get onboarding status
 export async function GET() {
@@ -30,7 +31,7 @@ export async function GET() {
       hasProtocol: !!user.currentProtocolId,
     });
   } catch (error) {
-    console.error("GET /api/onboarding error:", error);
+    log.error("GET /api/onboarding error", { error: error as Error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
       message: "Onboarding completed",
     });
   } catch (error) {
-    console.error("POST /api/onboarding error:", error);
+    log.error("POST /api/onboarding error", { error: error as Error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

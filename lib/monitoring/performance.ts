@@ -3,6 +3,8 @@
  * Logs slow operations and tracks metrics.
  */
 
+import { log } from "@/lib/logger";
+
 interface PerformanceMetric {
   operation: string;
   duration: number;
@@ -21,10 +23,11 @@ class PerformanceMonitor {
 
     // Log slow operations
     if (metric.duration > this.slowThreshold) {
-      console.warn(
-        `[SLOW] ${metric.operation} took ${metric.duration}ms`,
-        metric.metadata
-      );
+      log.warn("slow operation", {
+        operation: metric.operation,
+        duration: metric.duration,
+        ...metric.metadata,
+      });
     }
 
     // Keep only recent metrics

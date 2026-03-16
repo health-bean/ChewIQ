@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema";
 import { rateLimit, getClientIp, SIGNUP_RATE_LIMIT } from "@/lib/rate-limit";
+import { log } from "@/lib/logger";
 
 const signupSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
           { status: 409 }
         );
       }
-      console.error("Signup error:", error);
+      log.error("signup error", { error: error as Error });
       return NextResponse.json(
         { error: "Failed to create account" },
         { status: 500 }

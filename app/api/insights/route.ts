@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { getSessionFromCookies } from "@/lib/auth/session";
 import { analyzeInsights } from "@/lib/correlations/engine";
-import { insightsCache, getCacheKey } from "@/lib/cache/insights";
+import { cacheGet, cacheSet, getCacheKey } from "@/lib/cache/insights";
 import { measureAsync } from "@/lib/monitoring/performance";
+import { log } from "@/lib/logger";
 
 // ── GET /api/insights?days=90 ───────────────────────────────────────────
 
@@ -24,9 +25,9 @@ export async function GET(request: Request) {
       );
     }
 
-    // Check cache first
+    // Check cache first (Redis if configured, else in-memory)
     const cacheKey = getCacheKey(session.userId, "insights", { days });
-    const cached = insightsCache.get(cacheKey);
+    const cached = await cacheGet(cacheKey);
     if (cached) {
       return NextResponse.json(cached);
     }
@@ -39,11 +40,11 @@ export async function GET(request: Request) {
     );
 
     // Cache for 5 minutes
-    insightsCache.set(cacheKey, result, 5 * 60 * 1000);
+    await cacheSet(cacheKey, result, 300);
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("GET /api/insights error:", error);
+    log.error("GET /api/insights failed", { error: error as Error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

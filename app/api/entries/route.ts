@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { eq, and, desc, gte, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { log } from "@/lib/logger";
 import { 
   timelineEntries, 
   foods, 
@@ -217,7 +218,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ entries: transformedEntries });
   } catch (error) {
-    console.error("GET /api/entries error:", error);
+    log.error("GET /api/entries failed", { error: error as Error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -264,6 +265,7 @@ const createEntrySchema = z.object({
   foodId: z.string().uuid().optional(),
   portion: z.string().max(100).optional(),
   mealType: z.enum(["breakfast", "lunch", "dinner", "snack"]).optional(),
+  timezone: z.string().max(50).optional(),
 });
 
 export async function POST(request: Request) {
@@ -297,6 +299,7 @@ export async function POST(request: Request) {
       foodId,
       portion,
       mealType,
+      timezone: clientTimezone,
     } = parsed.data;
 
     // Validate exercise-specific fields when entryType is "exercise"
@@ -360,6 +363,7 @@ export async function POST(request: Request) {
         foodId: foodId ?? null,
         portion: finalPortion ?? null,
         mealType: mealType ?? null,
+        timezone: clientTimezone ?? session.timezone ?? null,
       })
       .returning();
 
@@ -382,7 +386,7 @@ export async function POST(request: Request) {
       reintroductionTracking,
     }, { status: 201 });
   } catch (error) {
-    console.error("POST /api/entries error:", error);
+    log.error("POST /api/entries failed", { error: error as Error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

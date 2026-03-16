@@ -8,6 +8,7 @@ import { buildAdminSystemPrompt } from "@/lib/ai/admin-system-prompt";
 import { adminTools } from "@/lib/ai/admin-tools";
 import { processAdminToolCall } from "@/lib/ai/admin-extract";
 import type { AIMessage } from "@/lib/ai/providers/types";
+import { log } from "@/lib/logger";
 
 export async function POST(request: Request) {
   try {
@@ -159,7 +160,7 @@ export async function POST(request: Request) {
 
           controller.close();
         } catch (error) {
-          console.error("Admin AI API error:", error);
+          log.error("admin AI API error", { error: error as Error });
           send({
             type: "error",
             message: "Something went wrong generating a response.",
@@ -177,7 +178,7 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Admin chat route error:", error);
+    log.error("admin chat route error", { error: error as Error });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

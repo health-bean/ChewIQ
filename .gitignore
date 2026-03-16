@@ -191,6 +191,7 @@ docs/.docusaurus/
 # Migration and utility scripts
 scripts/
 *.sql
+!lib/db/migrations/*.sql
 
 # Next.js generated types
 next-env.d.ts
