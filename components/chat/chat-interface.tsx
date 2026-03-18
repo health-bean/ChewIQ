@@ -46,13 +46,13 @@ export function ChatInterface() {
   return (
     <div className="flex h-[calc(100dvh-3.5rem-5rem)] flex-col md:h-[calc(100dvh-3.5rem)]">
       {/* Mode toggle */}
-      <div className="flex items-center justify-center border-b border-warm-200 bg-white px-4 py-2">
+      <div className="flex items-center justify-center border-b border-warm-200 bg-[var(--color-surface-card)] px-4 py-2">
         <div className="inline-flex rounded-lg bg-warm-100 p-0.5">
           <button
             onClick={() => setMode("chat")}
             className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
               mode === "chat"
-                ? "bg-white text-warm-900 shadow-sm"
+                ? "bg-[var(--color-surface-card)] text-warm-900 shadow-sm"
                 : "text-warm-500 hover:text-warm-700"
             }`}
           >
@@ -63,7 +63,7 @@ export function ChatInterface() {
             onClick={() => setMode("quick-log")}
             className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
               mode === "quick-log"
-                ? "bg-white text-warm-900 shadow-sm"
+                ? "bg-[var(--color-surface-card)] text-warm-900 shadow-sm"
                 : "text-warm-500 hover:text-warm-700"
             }`}
           >
@@ -127,7 +127,7 @@ export function ChatInterface() {
           </div>
 
           {/* Input area */}
-          <div className="border-t border-warm-200 bg-white px-4 py-3">
+          <div className="border-t border-warm-200 bg-[var(--color-surface-card)] px-4 py-3">
             <div className="mx-auto max-w-2xl">
               <MessageInput onSend={sendMessage} disabled={loading} />
             </div>

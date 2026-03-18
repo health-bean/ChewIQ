@@ -56,11 +56,11 @@ export function FoodTimelineCard({
   const hasProperties = food?.properties && Object.keys(food.properties).length > 0;
 
   return (
-    <div className="flex flex-col rounded-xl border border-warm-200 bg-white">
+    <div className="flex flex-col rounded-xl border border-warm-200 bg-[var(--color-surface-card)]">
       {/* Main card content */}
       <div className="flex items-start gap-3 px-4 py-3">
         {/* Icon */}
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-50 text-green-600">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
           <Apple className="h-4 w-4" />
         </div>
 

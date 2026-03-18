@@ -1,6 +1,6 @@
 "use client";
-
-import { Sparkles } from "lucide-react";
+import { Leaf } from "lucide-react";
+import { Button } from "@/components/ui";
 
 interface WelcomeStepProps {
   onNext: () => void;
@@ -8,63 +8,25 @@ interface WelcomeStepProps {
 
 export function WelcomeStep({ onNext }: WelcomeStepProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
-      <div className="flex justify-center mb-6">
-        <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-          <Sparkles className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-        </div>
+    <div className="flex flex-col items-center text-center py-8">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-6">
+        <Leaf className="h-8 w-8" />
       </div>
-      
-      <h1 className="text-3xl font-bold mb-4">Welcome to ChewIQ</h1>
-      
-      <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-        Your personal health tracking companion for understanding how food, lifestyle, and symptoms connect.
+
+      <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--color-text-primary)] mb-2">
+        Welcome to{" "}
+        <span className="text-teal-800">Chew</span>
+        <span className="text-teal-500 italic">IQ</span>
+      </h1>
+
+      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed max-w-xs mb-8">
+        Your intelligent protocol coach. Track food, symptoms, and lifestyle
+        through simple conversation — and discover the patterns that matter.
       </p>
-      
-      <div className="space-y-4 text-left mb-8">
-        <div className="flex items-start gap-3">
-          <div className="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-            <span className="text-green-600 dark:text-green-400 text-sm">✓</span>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-1">Track Everything</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Log food, symptoms, supplements, exercise, and more through natural conversation
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-start gap-3">
-          <div className="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-            <span className="text-green-600 dark:text-green-400 text-sm">✓</span>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-1">Discover Patterns</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              AI-powered insights reveal correlations between your choices and how you feel
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-start gap-3">
-          <div className="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-            <span className="text-green-600 dark:text-green-400 text-sm">✓</span>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-1">Follow Protocols</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Get guidance on elimination diets like AIP, Low Histamine, and more
-            </p>
-          </div>
-        </div>
-      </div>
-      
-      <button
-        onClick={onNext}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-      >
-        Get Started
-      </button>
+
+      <Button onClick={onNext} size="lg" className="w-full">
+        Let&apos;s Get Started
+      </Button>
     </div>
   );
 }

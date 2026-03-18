@@ -53,13 +53,13 @@ export function ReintroductionRecommendations({
   const getPriorityBadge = (priority: number) => {
     if (priority >= 8) {
       return (
-        <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-800">
           High Priority
         </span>
       );
     } else if (priority >= 5) {
       return (
-        <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+        <span className="inline-flex items-center rounded-full bg-teal-100 px-2 py-0.5 text-xs font-medium text-teal-800">
           Medium Priority
         </span>
       );
@@ -112,12 +112,12 @@ export function ReintroductionRecommendations({
   return (
     <div className="space-y-4">
       {/* Info Banner */}
-      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+      <div className="rounded-lg border border-teal-200 bg-teal-50 p-4">
         <div className="flex items-start gap-3">
-          <Info className="h-5 w-5 shrink-0 text-blue-600" />
-          <div className="text-sm text-blue-900">
+          <Info className="h-5 w-5 shrink-0 text-teal-600" />
+          <div className="text-sm text-teal-900">
             <p className="font-medium">Recommended Foods for Reintroduction</p>
-            <p className="mt-1 text-blue-700">
+            <p className="mt-1 text-teal-700">
               These foods are prioritized based on your elimination history, symptom patterns, and protocol guidelines.
             </p>
           </div>
@@ -129,7 +129,7 @@ export function ReintroductionRecommendations({
         {foods.map((food) => (
           <div
             key={food.id}
-            className="rounded-xl border border-warm-200 bg-white p-5 transition-all hover:border-teal-300 hover:shadow-md"
+            className="rounded-xl border border-warm-200 bg-[var(--color-surface-card)] p-5 transition-all hover:border-teal-300 hover:shadow-md"
           >
             {/* Header */}
             <div className="flex items-start justify-between gap-3">

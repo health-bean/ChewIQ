@@ -19,7 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Chat panel */}
         {chatOpen && (
-          <div className="border-t border-warm-200 bg-white">
+          <div className="border-t border-warm-200 bg-[var(--color-surface-card)]">
             <div className="flex items-center justify-between border-b border-warm-100 px-4 py-2">
               <span className="text-sm font-medium text-warm-700">AI Assistant</span>
               <button

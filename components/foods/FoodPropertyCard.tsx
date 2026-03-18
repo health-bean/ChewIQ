@@ -59,9 +59,9 @@ function getLevelColor(level: TriggerLevel): {
     case "none":
     case "low":
       return {
-        bg: "bg-green-50",
-        text: "text-green-700",
-        ring: "ring-green-600/20",
+        bg: "bg-emerald-50",
+        text: "text-emerald-700",
+        ring: "ring-emerald-600/20",
       };
     case "moderate":
       return {
@@ -99,9 +99,9 @@ function getBooleanColor(value: boolean): {
     };
   }
   return {
-    bg: "bg-green-50",
-    text: "text-green-700",
-    ring: "ring-green-600/20",
+    bg: "bg-emerald-50",
+    text: "text-emerald-700",
+    ring: "ring-emerald-600/20",
   };
 }
 
@@ -142,8 +142,8 @@ function Tooltip({
         {children}
       </div>
       {isVisible && (
-        <div className="absolute bottom-full left-1/2 z-50 mb-2 w-64 -tranwarm-x-1/2 rounded-lg border border-warm-200 bg-white p-3 text-xs text-warm-700 shadow-lg">
-          <div className="absolute -bottom-1 left-1/2 h-2 w-2 -tranwarm-x-1/2 rotate-45 border-b border-r border-warm-200 bg-white" />
+        <div className="absolute bottom-full left-1/2 z-50 mb-2 w-64 -tranwarm-x-1/2 rounded-lg border border-warm-200 bg-[var(--color-surface-card)] p-3 text-xs text-warm-700 shadow-lg">
+          <div className="absolute -bottom-1 left-1/2 h-2 w-2 -tranwarm-x-1/2 rotate-45 border-b border-r border-warm-200 bg-[var(--color-surface-card)]" />
           {content}
         </div>
       )}
@@ -245,7 +245,7 @@ export function FoodPropertyCard({
 
   return (
     <div
-      className={`rounded-lg border border-warm-200 bg-white p-4 ${className}`}
+      className={`rounded-lg border border-warm-200 bg-[var(--color-surface-card)] p-4 ${className}`}
     >
       <h3 className="mb-3 text-sm font-semibold text-warm-900">
         Trigger Properties

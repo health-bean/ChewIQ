@@ -9,9 +9,10 @@
       "Bash(wc:*)",
       "Bash(grep:*)",
       "Bash(npx drizzle-kit:*)",
-      "Bash(ls -la /Users/byrne/Coding/health-platform/app/api/**/route.ts)",
+      "Bash(ls -la /Users/health-bean/Coding/chewiq/app/api/**/route.ts)",
       "Bash(ls:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "mcp__claude_ai_Notion__notion-fetch"
     ]
   }
 }

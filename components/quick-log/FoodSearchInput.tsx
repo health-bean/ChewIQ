@@ -180,7 +180,7 @@ export function FoodSearchInput({
 
     const badges = {
       allowed: (
-        <span className="rounded bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-700">
+        <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-xs font-medium text-emerald-700">
           Allowed
         </span>
       ),
@@ -195,7 +195,7 @@ export function FoodSearchInput({
         </span>
       ),
       unknown: (
-        <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-700">
+        <span className="rounded bg-warm-100 px-1.5 py-0.5 text-xs font-medium text-warm-700">
           Unknown
         </span>
       ),
@@ -259,7 +259,7 @@ export function FoodSearchInput({
       {isOpen && results.length > 0 && (
         <div
           ref={dropdownRef}
-          className="absolute z-50 mt-1 max-h-80 w-full overflow-y-auto rounded-lg border border-warm-200 bg-white shadow-lg"
+          className="absolute z-50 mt-1 max-h-80 w-full overflow-y-auto rounded-lg border border-warm-200 bg-[var(--color-surface-card)] shadow-lg"
         >
           {results.map((food, index) => (
             <button
@@ -299,7 +299,7 @@ export function FoodSearchInput({
 
       {/* No Results Message */}
       {isOpen && !loading && query.length >= 2 && results.length === 0 && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border border-warm-200 bg-white p-4 text-center text-sm text-warm-500 shadow-lg">
+        <div className="absolute z-50 mt-1 w-full rounded-lg border border-warm-200 bg-[var(--color-surface-card)] p-4 text-center text-sm text-warm-500 shadow-lg">
           No foods found for &quot;{query}&quot;
         </div>
       )}

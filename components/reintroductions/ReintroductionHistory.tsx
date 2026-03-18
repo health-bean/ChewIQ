@@ -63,12 +63,12 @@ export function ReintroductionHistory({
   const getStatusBadge = (status: ReintroductionStatus) => {
     const badges = {
       active: (
-        <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+        <span className="inline-flex items-center rounded-full bg-teal-100 px-2.5 py-0.5 text-xs font-medium text-teal-800">
           Active
         </span>
       ),
       passed: (
-        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
           Passed
         </span>
       ),
@@ -83,7 +83,7 @@ export function ReintroductionHistory({
         </span>
       ),
       cancelled: (
-        <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
+        <span className="inline-flex items-center rounded-full bg-warm-100 px-2.5 py-0.5 text-xs font-medium text-warm-800">
           Cancelled
         </span>
       ),
@@ -213,7 +213,7 @@ export function ReintroductionHistory({
             <button
               key={reintroduction.id}
               onClick={() => handleCardClick(reintroduction)}
-              className="group rounded-xl border border-warm-200 bg-white p-4 text-left transition-all hover:border-teal-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+              className="group rounded-xl border border-warm-200 bg-[var(--color-surface-card)] p-4 text-left transition-all hover:border-teal-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
             >
               {/* Food Name & Status */}
               <div className="flex items-start justify-between gap-2">

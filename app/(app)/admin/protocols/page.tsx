@@ -237,7 +237,7 @@ export default function AdminProtocolsPage() {
           const isEditingThis = editingProtocol === protocol.id;
 
           return (
-            <div key={protocol.id} className="rounded-lg border border-warm-200 bg-white">
+            <div key={protocol.id} className="rounded-lg border border-warm-200 bg-[var(--color-surface-card)]">
               {/* Header */}
               <div className="flex items-center gap-3 px-4 py-3">
                 <button onClick={() => toggleExpanded(protocol.id)}>
@@ -427,7 +427,7 @@ export default function AdminProtocolsPage() {
                               <button
                                 key={v}
                                 onClick={() => setNewRule((r) => ({ ...r, propertyValues: toggleValue(r.propertyValues, v) }))}
-                                className={`rounded px-2 py-1 text-xs ${newRule.propertyValues.includes(v) ? "bg-teal-100 text-teal-800 font-medium" : "bg-white border border-warm-200 text-warm-500"}`}
+                                className={`rounded px-2 py-1 text-xs ${newRule.propertyValues.includes(v) ? "bg-teal-100 text-teal-800 font-medium" : "bg-[var(--color-surface-card)] border border-warm-200 text-warm-500"}`}
                               >
                                 {v}
                               </button>

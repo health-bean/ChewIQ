@@ -34,8 +34,8 @@ export function ReintroductionCard({
       return {
         title: "Testing Phase",
         description: "Log this food daily and monitor symptoms",
-        icon: <Clock className="h-5 w-5 text-blue-600" />,
-        color: "blue",
+        icon: <Clock className="h-5 w-5 text-teal-600" />,
+        color: "teal",
       };
     } else if (currentPhase === "observation") {
       return {
@@ -48,7 +48,7 @@ export function ReintroductionCard({
       return {
         title: "Complete",
         description: "Ready for analysis",
-        icon: <CheckCircle className="h-5 w-5 text-green-600" />,
+        icon: <CheckCircle className="h-5 w-5 text-emerald-600" />,
         color: "green",
       };
     }
@@ -59,7 +59,7 @@ export function ReintroductionCard({
   return (
     <Card className="overflow-hidden">
       {/* Header */}
-      <div className="border-b border-warm-200 bg-gradient-to-r from-teal-50 to-blue-50 p-4">
+      <div className="border-b border-warm-200 bg-gradient-to-r from-teal-50 to-teal-50 p-4">
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-lg font-semibold text-warm-900">
@@ -83,7 +83,7 @@ export function ReintroductionCard({
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-warm-200">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-teal-500 to-blue-500 transition-all duration-500"
+            className="h-full rounded-full bg-gradient-to-r from-teal-500 to-teal-500 transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>

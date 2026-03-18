@@ -145,7 +145,7 @@ export function StartReintroductionModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-2xl rounded-2xl border border-warm-200 bg-white shadow-xl">
+      <div className="w-full max-w-2xl rounded-2xl border border-warm-200 bg-[var(--color-surface-card)] shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-warm-200 px-6 py-4">
           <h2 className="text-xl font-semibold text-warm-900">
@@ -177,11 +177,11 @@ export function StartReintroductionModal({
 
           {/* Success Message */}
           {successMessage && (
-            <div className="mb-4 flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4">
-              <CheckCircle2 className="h-5 w-5 shrink-0 text-green-600" />
+            <div className="mb-4 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
               <div className="flex-1">
-                <p className="text-sm font-medium text-green-900">Success</p>
-                <p className="mt-1 text-sm text-green-700">{successMessage}</p>
+                <p className="text-sm font-medium text-emerald-900">Success</p>
+                <p className="mt-1 text-sm text-emerald-700">{successMessage}</p>
               </div>
             </div>
           )}

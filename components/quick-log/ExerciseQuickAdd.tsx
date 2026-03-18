@@ -183,11 +183,11 @@ export function ExerciseQuickAdd({ onSuccess, onCancel }: ExerciseQuickAddProps)
 
   if (success) {
     return (
-      <div className="rounded-xl border border-green-200 bg-green-50 p-6 text-center">
-        <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-          <Activity className="h-6 w-6 text-green-600" />
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center">
+        <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50">
+          <Activity className="h-6 w-6 text-emerald-600" />
         </div>
-        <p className="text-sm font-medium text-green-800">Exercise logged successfully!</p>
+        <p className="text-sm font-medium text-emerald-800">Exercise logged successfully!</p>
       </div>
     );
   }
@@ -248,7 +248,7 @@ export function ExerciseQuickAdd({ onSuccess, onCancel }: ExerciseQuickAddProps)
               className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
                 formData.intensityLevel === level.value
                   ? "border-teal-300 bg-teal-50"
-                  : "border-warm-200 bg-white hover:bg-warm-50"
+                  : "border-warm-200 bg-[var(--color-surface-card)] hover:bg-warm-50"
               }`}
             >
               <input

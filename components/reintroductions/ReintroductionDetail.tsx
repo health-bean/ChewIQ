@@ -78,12 +78,12 @@ export function ReintroductionDetail({
   const getStatusBadge = (status: string) => {
     const badges: Record<string, React.ReactElement> = {
       active: (
-        <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+        <span className="inline-flex items-center rounded-full bg-teal-100 px-3 py-1 text-sm font-medium text-teal-800">
           Active
         </span>
       ),
       passed: (
-        <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">
+        <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-800">
           ✓ Passed
         </span>
       ),
@@ -98,7 +98,7 @@ export function ReintroductionDetail({
         </span>
       ),
       cancelled: (
-        <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800">
+        <span className="inline-flex items-center rounded-full bg-warm-100 px-3 py-1 text-sm font-medium text-warm-800">
           Cancelled
         </span>
       ),
@@ -153,7 +153,7 @@ export function ReintroductionDetail({
       </div>
 
       {/* Timeline */}
-      <div className="rounded-xl border border-warm-200 bg-white p-6">
+      <div className="rounded-xl border border-warm-200 bg-[var(--color-surface-card)] p-6">
         <h3 className="mb-4 text-base font-semibold text-warm-900">Timeline</h3>
         <div className="space-y-3">
           <div className="flex items-center gap-3 text-sm">
@@ -170,9 +170,9 @@ export function ReintroductionDetail({
           )}
           {data.status === "active" && (
             <div className="flex items-center gap-3 text-sm">
-              <Activity className="h-4 w-4 text-blue-500" />
+              <Activity className="h-4 w-4 text-teal-500" />
               <span className="text-warm-600">Current Phase:</span>
-              <span className="font-medium text-blue-600">
+              <span className="font-medium text-teal-600">
                 {data.currentPhase === "testing" ? "Testing" : "Observation"} (Day {data.currentDay || 1})
               </span>
             </div>
@@ -181,7 +181,7 @@ export function ReintroductionDetail({
       </div>
 
       {/* Food Logs */}
-      <div className="rounded-xl border border-warm-200 bg-white p-6">
+      <div className="rounded-xl border border-warm-200 bg-[var(--color-surface-card)] p-6">
         <h3 className="mb-4 text-base font-semibold text-warm-900">Food Logs</h3>
         {data.entries.length === 0 ? (
           <p className="text-sm text-warm-600">No food logs recorded yet.</p>
@@ -201,7 +201,7 @@ export function ReintroductionDetail({
       </div>
 
       {/* Symptoms */}
-      <div className="rounded-xl border border-warm-200 bg-white p-6">
+      <div className="rounded-xl border border-warm-200 bg-[var(--color-surface-card)] p-6">
         <h3 className="mb-4 text-base font-semibold text-warm-900">Symptoms Tracked</h3>
         {data.symptoms.length === 0 ? (
           <p className="text-sm text-warm-600">No symptoms recorded during this period.</p>
@@ -233,22 +233,22 @@ export function ReintroductionDetail({
         <div className={`rounded-xl border p-6 ${
           data.analysis.symptomIncrease
             ? "border-red-200 bg-red-50"
-            : "border-green-200 bg-green-50"
+            : "border-emerald-200 bg-emerald-50"
         }`}>
           <div className="flex items-start gap-3">
             {data.analysis.symptomIncrease ? (
               <TrendingUp className="h-5 w-5 shrink-0 text-red-600" />
             ) : (
-              <TrendingDown className="h-5 w-5 shrink-0 text-green-600" />
+              <TrendingDown className="h-5 w-5 shrink-0 text-emerald-600" />
             )}
             <div className="flex-1">
               <h3 className={`text-base font-semibold ${
-                data.analysis.symptomIncrease ? "text-red-900" : "text-green-900"
+                data.analysis.symptomIncrease ? "text-red-900" : "text-emerald-900"
               }`}>
                 Analysis Results
               </h3>
               <p className={`mt-2 text-sm ${
-                data.analysis.symptomIncrease ? "text-red-700" : "text-green-700"
+                data.analysis.symptomIncrease ? "text-red-700" : "text-emerald-700"
               }`}>
                 {data.analysis.recommendation}
               </p>
@@ -285,7 +285,7 @@ export function ReintroductionDetail({
           {onMarkPassed && (
             <Button
               onClick={onMarkPassed}
-              className="flex-1 bg-green-600 hover:bg-green-700"
+              className="flex-1 bg-emerald-600 hover:bg-emerald-700"
             >
               Mark as Passed
             </Button>

@@ -74,7 +74,7 @@ export function AdminChatInterface() {
       </div>
 
       {/* Input area */}
-      <div className="border-t border-warm-200 bg-white px-4 py-3">
+      <div className="border-t border-warm-200 bg-[var(--color-surface-card)] px-4 py-3">
         <div className="mx-auto max-w-2xl">
           <MessageInput onSend={sendMessage} disabled={loading} />
         </div>

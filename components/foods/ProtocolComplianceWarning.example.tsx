@@ -266,7 +266,7 @@ export function ChatInterfaceWarningExample() {
             className={`rounded-lg p-3 ${
               msg.role === "user"
                 ? "bg-teal-100 text-teal-900"
-                : "bg-white text-warm-800"
+                : "bg-[var(--color-surface-card)] text-warm-800"
             }`}
           >
             <p className="text-sm font-medium">
@@ -369,7 +369,7 @@ export function QuickAddWarningExample() {
           <button
             key={food.id}
             onClick={() => handleFoodSelect(food)}
-            className="w-full rounded-lg border border-warm-200 bg-white p-3 text-left hover:bg-warm-50"
+            className="w-full rounded-lg border border-warm-200 bg-[var(--color-surface-card)] p-3 text-left hover:bg-warm-50"
           >
             <p className="font-medium">{food.displayName}</p>
             <p className="text-xs text-warm-500">{food.categoryName}</p>

@@ -203,7 +203,7 @@ export function QuickLogPanel() {
               {items.map((item) => (
                 <span
                   key={item.id}
-                  className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-medium text-warm-700 shadow-sm"
+                  className="inline-flex items-center gap-1 rounded-full bg-[var(--color-surface-card)] px-2.5 py-1 text-xs font-medium text-warm-700 shadow-sm"
                 >
                   {item.name}
                   {item.severity && (
@@ -224,7 +224,7 @@ export function QuickLogPanel() {
 
         {/* Success message */}
         {submitted && items.length === 0 && (
-          <div className="mb-4 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+          <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
             <Check className="h-4 w-4" />
             Entries saved to timeline!
           </div>
@@ -322,7 +322,7 @@ export function QuickLogPanel() {
 
       {/* Submit bar - only for food/symptom tabs */}
       {items.length > 0 && activeTab !== "exercise" && (
-        <div className="sticky bottom-0 border-t border-warm-200 bg-white px-4 py-3">
+        <div className="sticky bottom-0 border-t border-warm-200 bg-[var(--color-surface-card)] px-4 py-3">
           <div className="mx-auto max-w-2xl">
             <Button
               onClick={handleSubmit}

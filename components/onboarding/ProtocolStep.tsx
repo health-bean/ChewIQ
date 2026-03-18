@@ -1,7 +1,7 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { ChevronRight } from "lucide-react";
+import { Button, Spinner } from "@/components/ui";
+import { cn } from "@/lib/utils";
 
 interface Protocol {
   id: string;
@@ -31,49 +31,38 @@ export function ProtocolStep({ selectedProtocolId, onSelect, onNext, onBack }: P
       .catch(() => setLoading(false));
   }, []);
 
-  const handleContinue = () => {
-    if (selectedProtocolId) {
-      onNext();
-    }
-  };
-
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-      <h2 className="text-2xl font-bold mb-2">Choose Your Protocol</h2>
-      <p className="text-gray-600 dark:text-gray-300 mb-6">
-        Select an elimination diet protocol to get started. You can change this later.
+    <div>
+      <h2 className="font-[family-name:var(--font-display)] text-xl font-bold text-[var(--color-text-primary)] mb-1">
+        Choose your protocol
+      </h2>
+      <p className="text-sm text-[var(--color-text-secondary)] mb-6">
+        Which healing approach are you following? You can change this anytime.
       </p>
 
       {loading ? (
-        <div className="text-center py-8">Loading protocols...</div>
+        <div className="flex items-center justify-center py-12">
+          <Spinner />
+        </div>
       ) : (
-        <div className="space-y-3 mb-8">
-          <button
-            onClick={() => onSelect("")}
-            className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-              selectedProtocolId === ""
-                ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                : "border-gray-200 dark:border-gray-700 hover:border-gray-300"
-            }`}
-          >
-            <div className="font-semibold">No Protocol</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Track freely without protocol restrictions
-            </div>
-          </button>
-
+        <div className="flex flex-col gap-2 mb-6 stagger-children">
           {protocols.map((protocol) => (
             <button
               key={protocol.id}
               onClick={() => onSelect(protocol.id)}
-              className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+              className={cn(
+                "w-full text-left rounded-xl p-4",
+                "bg-[var(--color-surface-card)] border transition-all duration-200 ease-[var(--ease-out-expo)]",
+                "hover:shadow-[var(--shadow-card)]",
                 selectedProtocolId === protocol.id
-                  ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                  : "border-gray-200 dark:border-gray-700 hover:border-gray-300"
-              }`}
+                  ? "border-teal-500 bg-teal-50 shadow-[var(--shadow-card)]"
+                  : "border-[var(--color-border)] hover:border-teal-300"
+              )}
             >
-              <div className="font-semibold">{protocol.name}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm font-semibold text-[var(--color-text-primary)]">
+                {protocol.name}
+              </div>
+              <div className="text-xs text-[var(--color-text-secondary)] mt-1">
                 {protocol.description}
               </div>
             </button>
@@ -81,20 +70,28 @@ export function ProtocolStep({ selectedProtocolId, onSelect, onNext, onBack }: P
         </div>
       )}
 
-      <div className="flex gap-3">
-        <button
-          onClick={onBack}
-          className="flex-1 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold py-3 px-6 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-        >
-          Back
-        </button>
-        <button
-          onClick={handleContinue}
-          disabled={selectedProtocolId === undefined}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+      <div className="flex flex-col gap-2">
+        <Button
+          onClick={onNext}
+          disabled={!selectedProtocolId}
+          className="w-full"
         >
           Continue
-          <ChevronRight className="w-5 h-5" />
+        </Button>
+        <button
+          onClick={() => {
+            onSelect("");
+            onNext();
+          }}
+          className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors py-2"
+        >
+          Skip — I&apos;ll explore freely
+        </button>
+        <button
+          onClick={onBack}
+          className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors"
+        >
+          Back
         </button>
       </div>
     </div>

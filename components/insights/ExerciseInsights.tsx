@@ -159,10 +159,10 @@ export function ExerciseInsights({ insights }: ExerciseInsightsProps) {
         ))}
       </div>
 
-      <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
+      <div className="mt-4 rounded-lg border border-teal-200 bg-teal-50 p-3">
         <div className="flex items-start gap-2">
-          <AlertCircle className="h-4 w-4 shrink-0 text-blue-600 mt-0.5" />
-          <p className="text-xs text-blue-700">
+          <AlertCircle className="h-4 w-4 shrink-0 text-teal-600 mt-0.5" />
+          <p className="text-xs text-teal-700">
             These insights show how different exercises affect your energy levels within 24 hours.
             Track energy before and after exercise for more accurate patterns.
           </p>

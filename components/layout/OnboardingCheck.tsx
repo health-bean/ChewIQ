@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { Spinner } from "@/components/ui";
 
 export function OnboardingCheck({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -38,10 +39,10 @@ export function OnboardingCheck({ children }: { children: React.ReactNode }) {
 
   if (isChecking) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-dvh flex items-center justify-center bg-[var(--color-surface)]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <Spinner />
+          <p className="text-sm text-[var(--color-text-muted)] mt-4">Loading...</p>
         </div>
       </div>
     );

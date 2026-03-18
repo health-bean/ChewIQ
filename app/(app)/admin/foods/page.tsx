@@ -175,7 +175,7 @@ export default function AdminFoodsPage() {
               {foods.map((food, i) => (
                 <tr
                   key={food.id}
-                  className={i % 2 === 0 ? "bg-white" : "bg-warm-25"}
+                  className={i % 2 === 0 ? "bg-[var(--color-surface-card)]" : "bg-warm-25"}
                 >
                   <td className="sticky left-0 z-10 bg-inherit whitespace-nowrap px-3 py-1.5 font-medium text-warm-900">
                     {food.displayName}

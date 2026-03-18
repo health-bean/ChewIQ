@@ -231,7 +231,7 @@ export function CustomFoodForm({
   };
 
   return (
-    <div className={`rounded-lg border border-warm-200 bg-white p-6 ${className}`}>
+    <div className={`rounded-lg border border-warm-200 bg-[var(--color-surface-card)] p-6 ${className}`}>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-warm-900">
           Create Custom Food
@@ -254,7 +254,7 @@ export function CustomFoodForm({
       )}
 
       {successMessage && (
-        <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+        <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
           {successMessage}
         </div>
       )}
@@ -276,7 +276,7 @@ export function CustomFoodForm({
               setFormData((prev) => ({ ...prev, displayName: e.target.value }))
             }
             placeholder="e.g., Homemade Bone Broth"
-            className="w-full rounded-lg border border-warm-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            className="w-full rounded-lg border border-warm-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
             required
           />
         </div>
@@ -295,7 +295,7 @@ export function CustomFoodForm({
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, category: e.target.value }))
             }
-            className="w-full rounded-lg border border-warm-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            className="w-full rounded-lg border border-warm-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
           >
             <option value="">Select a category (optional)</option>
             {CATEGORIES.map((cat) => (
@@ -322,7 +322,7 @@ export function CustomFoodForm({
               setFormData((prev) => ({ ...prev, subcategory: e.target.value }))
             }
             placeholder="e.g., Beef, Chicken, etc."
-            className="w-full rounded-lg border border-warm-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            className="w-full rounded-lg border border-warm-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
           />
         </div>
 
@@ -336,7 +336,7 @@ export function CustomFoodForm({
           </p>
 
           {/* Nightshade - Boolean */}
-          <div className="flex items-center justify-between rounded-lg border border-warm-200 bg-white p-3">
+          <div className="flex items-center justify-between rounded-lg border border-warm-200 bg-[var(--color-surface-card)] p-3">
             <label
               htmlFor="nightshade"
               className="text-sm font-medium text-warm-700"
@@ -350,7 +350,7 @@ export function CustomFoodForm({
               onChange={(e) =>
                 handlePropertyChange("nightshade", e.target.checked)
               }
-              className="h-4 w-4 rounded border-warm-300 text-blue-600 focus:ring-2 focus:ring-blue-500/20"
+              className="h-4 w-4 rounded border-warm-300 text-teal-600 focus:ring-2 focus:ring-teal-500/20"
             />
           </div>
 
@@ -374,7 +374,7 @@ export function CustomFoodForm({
           ).map((property) => (
             <div
               key={property}
-              className="flex items-center justify-between gap-4 rounded-lg border border-warm-200 bg-white p-3"
+              className="flex items-center justify-between gap-4 rounded-lg border border-warm-200 bg-[var(--color-surface-card)] p-3"
             >
               <label
                 htmlFor={property}
@@ -388,7 +388,7 @@ export function CustomFoodForm({
                 onChange={(e) =>
                   handlePropertyChange(property, e.target.value as TriggerLevel)
                 }
-                className="rounded-lg border border-warm-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="rounded-lg border border-warm-300 px-3 py-1.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
               >
                 {TRIGGER_LEVELS.map((level) => (
                   <option key={level} value={level}>
@@ -405,7 +405,7 @@ export function CustomFoodForm({
           <button
             type="submit"
             disabled={isSubmitting || !formData.displayName.trim()}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-teal-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? (
               <>

@@ -10,9 +10,9 @@ const typeConfig: Record<
   EntryType,
   { label: string; variant: "allowed" | "avoid" | "moderation" | "info" | "default"; bg: string }
 > = {
-  food: { label: "Food", variant: "allowed", bg: "bg-green-50 border-green-200" },
+  food: { label: "Food", variant: "allowed", bg: "bg-emerald-50 border-emerald-200" },
   symptom: { label: "Symptom", variant: "avoid", bg: "bg-red-50 border-red-200" },
-  supplement: { label: "Supplement", variant: "info", bg: "bg-blue-50 border-blue-200" },
+  supplement: { label: "Supplement", variant: "info", bg: "bg-teal-50 border-teal-200" },
   medication: { label: "Medication", variant: "moderation", bg: "bg-purple-50 border-purple-200" },
   exposure: { label: "Exposure", variant: "moderation", bg: "bg-amber-50 border-amber-200" },
   detox: { label: "Detox", variant: "default", bg: "bg-teal-50 border-teal-200" },

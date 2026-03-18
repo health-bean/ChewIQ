@@ -89,23 +89,23 @@ export function ReintroductionNotifications() {
   const getNotificationColor = (type: ReintroductionNotification["type"]) => {
     switch (type) {
       case "testing_reminder":
-        return "bg-blue-50 border-blue-200";
+        return "bg-teal-50 border-teal-200";
       case "observation_reminder":
         return "bg-purple-50 border-purple-200";
       case "analysis_ready":
-        return "bg-green-50 border-green-200";
+        return "bg-emerald-50 border-emerald-200";
       case "missed_days_warning":
         return "bg-yellow-50 border-yellow-200";
       case "missed_days_action":
         return "bg-red-50 border-red-200";
       default:
-        return "bg-gray-50 border-gray-200";
+        return "bg-warm-50 border-warm-200";
     }
   };
 
   if (loading) {
     return (
-      <div className="p-4 text-center text-gray-500">
+      <div className="p-4 text-center text-warm-500">
         Loading notifications...
       </div>
     );
@@ -136,14 +136,14 @@ export function ReintroductionNotifications() {
                 {getNotificationIcon(notification.type)}
               </span>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-warm-900">
                   {notification.title}
                 </h3>
-                <p className="text-sm text-gray-700 mt-1">
+                <p className="text-sm text-warm-700 mt-1">
                   {notification.message}
                 </p>
                 {notification.metadata.missedDays !== undefined && (
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-warm-500 mt-2">
                     Missed days: {notification.metadata.missedDays}
                   </p>
                 )}
@@ -151,7 +151,7 @@ export function ReintroductionNotifications() {
             </div>
             <button
               onClick={() => dismissNotification(notification.reintroductionId)}
-              className="text-gray-400 hover:text-gray-600 ml-2"
+              className="text-warm-400 hover:text-warm-600 ml-2"
               aria-label="Dismiss notification"
             >
               ✕
@@ -161,13 +161,13 @@ export function ReintroductionNotifications() {
           {notification.actionRequired && (
             <div className="mt-3 flex space-x-2">
               {notification.type === "analysis_ready" && (
-                <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium">
+                <button className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 text-sm font-medium">
                   View Analysis
                 </button>
               )}
               {notification.type === "missed_days_action" && (
                 <>
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium">
+                  <button className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 text-sm font-medium">
                     Extend Trial
                   </button>
                   <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm font-medium">

@@ -51,8 +51,8 @@ const INTENSITY_CONFIG: Record<
   { color: string; bgColor: string; label: string }
 > = {
   light: {
-    color: "text-green-700",
-    bgColor: "bg-green-50",
+    color: "text-emerald-700",
+    bgColor: "bg-emerald-50",
     label: "Light",
   },
   moderate: {
@@ -100,7 +100,7 @@ export function ExerciseTimelineCard({
       : null;
 
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-warm-200 bg-white px-4 py-3">
+    <div className="flex items-start gap-3 rounded-xl border border-warm-200 bg-[var(--color-surface-card)] px-4 py-3">
       {/* Icon */}
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
         <Icon className="h-4 w-4" />
@@ -153,7 +153,7 @@ export function ExerciseTimelineCard({
                     <span
                       className={`ml-1 font-medium ${
                         energyChange > 0
-                          ? "text-green-600"
+                          ? "text-emerald-600"
                           : energyChange < 0
                           ? "text-red-600"
                           : "text-warm-500"

@@ -91,8 +91,8 @@ export function ProtocolFoods({
                     onClick={() => onSelect("food", food.displayName)}
                     className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors ${
                       isSelected
-                        ? "border-green-300 bg-green-50 text-green-700"
-                        : "border-warm-200 bg-white text-warm-700 hover:bg-warm-50"
+                        ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                        : "border-warm-200 bg-[var(--color-surface-card)] text-warm-700 hover:bg-warm-50"
                     }`}
                     style={{ minHeight: "36px" }}
                   >

@@ -1,77 +1,62 @@
 "use client";
-
 import { useState } from "react";
 import { WelcomeStep } from "./WelcomeStep";
 import { ProtocolStep } from "./ProtocolStep";
-import { GoalsStep } from "./GoalsStep";
-import { TutorialStep } from "./TutorialStep";
-import { SampleDataStep } from "./SampleDataStep";
+import { ReadyStep } from "./ReadyStep";
+import { cn } from "@/lib/utils";
 
-type Step = "welcome" | "protocol" | "goals" | "tutorial" | "sample-data";
+type Step = "welcome" | "protocol" | "ready";
+const STEPS: Step[] = ["welcome", "protocol", "ready"];
+
+function ProgressDots({ current }: { current: Step }) {
+  const currentIdx = STEPS.indexOf(current);
+  return (
+    <div className="flex items-center justify-center gap-2 py-6">
+      {STEPS.map((step, i) => (
+        <div
+          key={step}
+          className={cn(
+            "h-2 rounded-full transition-all duration-300 ease-[var(--ease-out-expo)]",
+            i === currentIdx ? "w-6 bg-teal-500" : i < currentIdx ? "w-2 bg-teal-200" : "w-2 bg-warm-200"
+          )}
+        />
+      ))}
+    </div>
+  );
+}
 
 interface OnboardingData {
   protocolId?: string;
-  goals: string[];
-  loadSampleData: boolean;
 }
 
 export function OnboardingWizard() {
   const [currentStep, setCurrentStep] = useState<Step>("welcome");
-  const [data, setData] = useState<OnboardingData>({
-    goals: [],
-    loadSampleData: false,
-  });
-
-  const updateData = (updates: Partial<OnboardingData>) => {
-    setData((prev) => ({ ...prev, ...updates }));
-  };
+  const [data, setData] = useState<OnboardingData>({});
 
   const nextStep = () => {
-    const steps: Step[] = ["welcome", "protocol", "goals", "tutorial", "sample-data"];
-    const currentIndex = steps.indexOf(currentStep);
-    if (currentIndex < steps.length - 1) {
-      setCurrentStep(steps[currentIndex + 1]);
-    }
+    const idx = STEPS.indexOf(currentStep);
+    if (idx < STEPS.length - 1) setCurrentStep(STEPS[idx + 1]);
   };
 
   const prevStep = () => {
-    const steps: Step[] = ["welcome", "protocol", "goals", "tutorial", "sample-data"];
-    const currentIndex = steps.indexOf(currentStep);
-    if (currentIndex > 0) {
-      setCurrentStep(steps[currentIndex - 1]);
-    }
+    const idx = STEPS.indexOf(currentStep);
+    if (idx > 0) setCurrentStep(STEPS[idx - 1]);
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      {currentStep === "welcome" && (
-        <WelcomeStep onNext={nextStep} />
-      )}
+    <div className="animate-fade-in-up">
+      <ProgressDots current={currentStep} />
+      {currentStep === "welcome" && <WelcomeStep onNext={nextStep} />}
       {currentStep === "protocol" && (
         <ProtocolStep
           selectedProtocolId={data.protocolId}
-          onSelect={(protocolId) => updateData({ protocolId })}
+          onSelect={(id) => setData((prev) => ({ ...prev, protocolId: id }))}
           onNext={nextStep}
           onBack={prevStep}
         />
       )}
-      {currentStep === "goals" && (
-        <GoalsStep
-          selectedGoals={data.goals}
-          onUpdate={(goals) => updateData({ goals })}
-          onNext={nextStep}
-          onBack={prevStep}
-        />
-      )}
-      {currentStep === "tutorial" && (
-        <TutorialStep onNext={nextStep} onBack={prevStep} />
-      )}
-      {currentStep === "sample-data" && (
-        <SampleDataStep
-          data={data}
-          onToggleSampleData={(loadSampleData) => updateData({ loadSampleData })}
-          onBack={prevStep}
-        />
+      {currentStep === "ready" && (
+        <ReadyStep protocolId={data.protocolId} onBack={prevStep} />
       )}
     </div>
   );

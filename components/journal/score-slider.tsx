@@ -13,7 +13,7 @@ interface ScoreSliderProps {
 const colorMap: Record<string, { bg: string; accent: string; track: string }> = {
   teal: { bg: "bg-teal-50", accent: "accent-teal-600", track: "text-teal-600" },
   amber: { bg: "bg-amber-50", accent: "accent-amber-500", track: "text-amber-600" },
-  green: { bg: "bg-green-50", accent: "accent-green-600", track: "text-green-600" },
+  green: { bg: "bg-emerald-50", accent: "accent-emerald-600", track: "text-emerald-600" },
   red: { bg: "bg-red-50", accent: "accent-red-500", track: "text-red-600" },
   orange: { bg: "bg-orange-50", accent: "accent-orange-500", track: "text-orange-600" },
 };
