@@ -60,7 +60,8 @@ export async function GET(request: Request) {
       .$dynamic();
 
     if (search) {
-      query = query.where(ilike(foods.displayName, `%${search}%`));
+      const escaped = search.replace(/[%_]/g, "\\$&");
+      query = query.where(ilike(foods.displayName, `%${escaped}%`));
     }
 
     if (category) {

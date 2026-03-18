@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, and } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { conversations, messages } from "@/lib/db/schema";
 import { getSessionFromCookies } from "@/lib/auth/session";
@@ -8,6 +8,7 @@ import { buildAdminSystemPrompt } from "@/lib/ai/admin-system-prompt";
 import { adminTools } from "@/lib/ai/admin-tools";
 import { processAdminToolCall } from "@/lib/ai/admin-extract";
 import type { AIMessage } from "@/lib/ai/providers/types";
+import { rateLimit, getClientIp, ADMIN_CHAT_RATE_LIMIT } from "@/lib/rate-limit";
 import { log } from "@/lib/logger";
 
 export async function POST(request: Request) {
@@ -19,6 +20,16 @@ export async function POST(request: Request) {
     }
     if (!session.isAdmin) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // ── Rate limit ────────────────────────────────────────────────
+    const ip = getClientIp(request);
+    const rl = rateLimit(`admin-chat:${session.userId}:${ip}`, ADMIN_CHAT_RATE_LIMIT);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Too many requests. Please slow down." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } }
+      );
     }
 
     // ── Parse body ───────────────────────────────────────────────────
@@ -49,11 +60,16 @@ export async function POST(request: Request) {
 
       conversationId = newConversation.id;
     } else {
-      // Verify the conversation belongs to this user
+      // Verify the conversation belongs to this admin user
       const [conv] = await db
         .select({ id: conversations.id })
         .from(conversations)
-        .where(eq(conversations.id, conversationId))
+        .where(
+          and(
+            eq(conversations.id, conversationId),
+            eq(conversations.userId, session.userId)
+          )
+        )
         .limit(1);
 
       if (!conv) {

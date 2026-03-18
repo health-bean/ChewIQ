@@ -12,6 +12,9 @@ export async function GET(request: Request) {
     if (!session.userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    if (!session.isAdmin) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     // ── Parse query params ───────────────────────────────────────────
     const { searchParams } = new URL(request.url);

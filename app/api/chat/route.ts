@@ -16,6 +16,7 @@ import { tools } from "@/lib/ai/tools";
 import { processToolCall } from "@/lib/ai/extract";
 import { buildCoachingContext } from "@/lib/coaching/context";
 import type { AIMessage } from "@/lib/ai/providers/types";
+import { rateLimit, getClientIp, CHAT_RATE_LIMIT } from "@/lib/rate-limit";
 import { log } from "@/lib/logger";
 
 const chatSchema = z.object({
@@ -29,6 +30,16 @@ export async function POST(request: Request) {
     const session = await getSessionFromCookies();
     if (!session.userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // ── Rate limit ────────────────────────────────────────────────
+    const ip = getClientIp(request);
+    const rl = rateLimit(`chat:${session.userId}:${ip}`, CHAT_RATE_LIMIT);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Too many requests. Please slow down." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } }
+      );
     }
 
     // ── Parse body ───────────────────────────────────────────────────

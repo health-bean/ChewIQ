@@ -11,6 +11,11 @@ import {
 import { eq, ilike, and, sql } from "drizzle-orm";
 import { checkFoodCompliance } from "@/lib/protocols/compliance";
 
+/** Escape SQL LIKE wildcards in user input */
+function escapeLikeWildcards(str: string): string {
+  return str.replace(/[%_]/g, "\\$&");
+}
+
 interface LogEntry {
   entry_type: "food" | "symptom" | "supplement" | "medication" | "detox" | "exposure";
   name: string;
@@ -177,7 +182,7 @@ async function handleSearchFoods(
       foodCategories,
       eq(foodSubcategories.categoryId, foodCategories.id)
     )
-    .where(ilike(foods.displayName, `%${input.query}%`))
+    .where(ilike(foods.displayName, `%${escapeLikeWildcards(input.query)}%`))
     .limit(10);
 
   if (matchingFoods.length === 0) {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { eq, asc } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { protocols, protocolRules, protocolPhases } from "@/lib/db/schema";
+import { getSessionFromCookies } from "@/lib/auth/session";
 import { log } from "@/lib/logger";
 
 // ── GET /api/protocols/[id] ─────────────────────────────────────────────
@@ -11,6 +12,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getSessionFromCookies();
+    if (!session.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
 
     const [protocol] = await db

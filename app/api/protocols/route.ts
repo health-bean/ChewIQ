@@ -2,12 +2,18 @@ import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { protocols } from "@/lib/db/schema";
+import { getSessionFromCookies } from "@/lib/auth/session";
 import { log } from "@/lib/logger";
 
 // ── GET /api/protocols ──────────────────────────────────────────────────
 
 export async function GET() {
   try {
+    const session = await getSessionFromCookies();
+    if (!session.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const allProtocols = await db
       .select({
         id: protocols.id,

@@ -84,3 +84,5 @@ export function getClientIp(request: Request): string {
 export const AUTH_RATE_LIMIT = { limit: 10, windowSeconds: 300 } as const; // 10 per 5 min
 export const SIGNUP_RATE_LIMIT = { limit: 5, windowSeconds: 600 } as const; // 5 per 10 min
 export const PASSWORD_RESET_RATE_LIMIT = { limit: 3, windowSeconds: 600 } as const; // 3 per 10 min
+export const CHAT_RATE_LIMIT = { limit: 30, windowSeconds: 60 } as const; // 30 per minute
+export const ADMIN_CHAT_RATE_LIMIT = { limit: 60, windowSeconds: 60 } as const; // 60 per minute
