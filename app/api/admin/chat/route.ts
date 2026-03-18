@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { eq, asc, and } from "drizzle-orm";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { conversations, messages } from "@/lib/db/schema";
 import { getSessionFromCookies } from "@/lib/auth/session";
@@ -10,6 +11,11 @@ import { processAdminToolCall } from "@/lib/ai/admin-extract";
 import type { AIMessage } from "@/lib/ai/providers/types";
 import { rateLimit, getClientIp, ADMIN_CHAT_RATE_LIMIT } from "@/lib/rate-limit";
 import { log } from "@/lib/logger";
+
+const adminChatSchema = z.object({
+  message: z.string().min(1).max(50_000),
+  conversationId: z.string().uuid().optional(),
+});
 
 export async function POST(request: Request) {
   try {
@@ -24,7 +30,7 @@ export async function POST(request: Request) {
 
     // ── Rate limit ────────────────────────────────────────────────
     const ip = getClientIp(request);
-    const rl = rateLimit(`admin-chat:${session.userId}:${ip}`, ADMIN_CHAT_RATE_LIMIT);
+    const rl = await rateLimit(`admin-chat:${session.userId}:${ip}`, ADMIN_CHAT_RATE_LIMIT);
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Too many requests. Please slow down." },
@@ -34,17 +40,14 @@ export async function POST(request: Request) {
 
     // ── Parse body ───────────────────────────────────────────────────
     const body = await request.json();
-    const { message, conversationId: incomingConversationId } = body as {
-      message: string;
-      conversationId?: string;
-    };
-
-    if (!message || typeof message !== "string" || message.trim().length === 0) {
+    const parsed = adminChatSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "Message is required" },
+        { error: "Validation failed", details: parsed.error.flatten() },
         { status: 400 }
       );
     }
+    const { message, conversationId: incomingConversationId } = parsed.data;
 
     // ── Conversation: find or create ─────────────────────────────────
     let conversationId = incomingConversationId;

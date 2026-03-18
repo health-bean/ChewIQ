@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     // ── Rate limit ────────────────────────────────────────────────
     const ip = getClientIp(request);
-    const rl = rateLimit(`chat:${session.userId}:${ip}`, CHAT_RATE_LIMIT);
+    const rl = await rateLimit(`chat:${session.userId}:${ip}`, CHAT_RATE_LIMIT);
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Too many requests. Please slow down." },
