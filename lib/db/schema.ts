@@ -422,6 +422,44 @@ export const customFoodProperties = pgTable(
   ]
 );
 
+// ─── Audit Log (admin operation tracking for HIPAA compliance) ────────
+
+export const auditLog = pgTable("audit_log", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => profiles.id, { onDelete: "set null" }),
+  action: varchar("action", { length: 100 }).notNull(), // e.g. "food.update", "user.admin_toggle"
+  targetType: varchar("target_type", { length: 50 }).notNull(), // e.g. "food", "user", "protocol"
+  targetId: varchar("target_id", { length: 255 }),
+  details: jsonb("details").$type<Record<string, unknown>>(),
+  ipAddress: varchar("ip_address", { length: 45 }),
+  createdAt: timestamp("created_at").defaultNow(),
+},
+  (table) => [
+    index("audit_log_user_id_idx").on(table.userId),
+    index("audit_log_action_idx").on(table.action),
+    index("audit_log_created_at_idx").on(table.createdAt),
+  ]
+);
+
+// ─── User Notifications ──────────────────────────────────────────────
+
+export const userNotifications = pgTable("user_notifications", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => profiles.id, { onDelete: "cascade" }),
+  type: varchar("type", { length: 50 }).notNull(), // e.g. "reintroduction_reminder", "tracking_reminder", "insight"
+  title: varchar("title", { length: 255 }).notNull(),
+  body: text("body"),
+  isRead: boolean("is_read").default(false),
+  metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+  createdAt: timestamp("created_at").defaultNow(),
+},
+  (table) => [
+    index("user_notifications_user_id_read_idx").on(table.userId, table.isRead),
+  ]
+);
+
 // ─── User Food Reactions (confirmed outcomes from reintroductions) ────
 
 export const userFoodReactions = pgTable(
