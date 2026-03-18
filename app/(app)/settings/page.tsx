@@ -2,10 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Card, Spinner } from "@/components/ui";
+import { Button, Card, Select, Spinner, Progress } from "@/components/ui";
 import { useSession } from "@/hooks/use-session";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, CreditCard } from "lucide-react";
 import type { Protocol } from "@/types";
+
+interface SubscriptionInfo {
+  tier: string;
+  status: string;
+  features: string[];
+  limits: Record<string, unknown>;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+}
 
 interface PhaseState {
   protocolName?: string;
@@ -30,6 +39,39 @@ export default function SettingsPage() {
   const [loadingProtocols, setLoadingProtocols] = useState(true);
   const [phaseState, setPhaseState] = useState<PhaseState | null>(null);
   const [advancing, setAdvancing] = useState(false);
+  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
+  const [billingLoading, setBillingLoading] = useState(false);
+
+  // Fetch subscription info
+  useEffect(() => {
+    async function fetchSubscription() {
+      try {
+        const res = await fetch("/api/billing/subscription");
+        if (res.ok) {
+          const data = await res.json();
+          setSubscription(data);
+        }
+      } catch {
+        // billing not set up yet — that's fine
+      }
+    }
+    fetchSubscription();
+  }, []);
+
+  async function handleManageBilling() {
+    setBillingLoading(true);
+    try {
+      const res = await fetch("/api/billing/portal", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.url) window.location.href = data.url;
+      }
+    } catch {
+      // ignore
+    } finally {
+      setBillingLoading(false);
+    }
+  }
 
   // Fetch available protocols
   useEffect(() => {
@@ -166,30 +208,16 @@ export default function SettingsPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="protocol-select"
-                className="text-sm font-medium text-warm-700"
-              >
-                Active protocol
-              </label>
-              <select
-                id="protocol-select"
-                value={selectedProtocolId}
-                onChange={(e) => {
-                  setSelectedProtocolId(e.target.value);
-                  setSaved(false);
-                }}
-                className="w-full rounded-xl border border-warm-200 bg-white px-4 py-2.5 text-sm text-warm-900 min-h-[44px] focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-1"
-              >
-                <option value="">No protocol selected</option>
-                {protocols.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Active protocol"
+              value={selectedProtocolId}
+              onChange={(val) => {
+                setSelectedProtocolId(val);
+                setSaved(false);
+              }}
+              placeholder="No protocol selected"
+              options={protocols.map((p) => ({ value: p.id, label: p.name }))}
+            />
 
             {selectedProtocol && (
               <p className="text-sm text-warm-500">
@@ -229,15 +257,10 @@ export default function SettingsPage() {
                 </div>
                 {/* Progress bar */}
                 {phase.durationWeeks && (
-                  <div className="mt-2 h-1.5 w-full rounded-full bg-teal-200">
-                    <div
-                      className="h-1.5 rounded-full bg-teal-600 transition-all"
-                      style={{
-                        width: `${Math.min(
-                          100,
-                          (phase.dayNumber / (phase.durationWeeks * 7)) * 100
-                        )}%`,
-                      }}
+                  <div className="mt-2">
+                    <Progress
+                      value={Math.min(100, (phase.dayNumber / (phase.durationWeeks * 7)) * 100)}
+                      size="sm"
                     />
                   </div>
                 )}
@@ -283,6 +306,50 @@ export default function SettingsPage() {
         ) : (
           <p className="text-sm text-warm-500">Not signed in</p>
         )}
+      </Card>
+
+      {/* Billing */}
+      <Card header="Subscription" className="mb-4">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
+              <CreditCard className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-[var(--color-text-primary)] capitalize">
+                {subscription?.tier ?? "Free"} Plan
+              </p>
+              <p className="text-xs text-[var(--color-text-muted)]">
+                {subscription?.tier === "free"
+                  ? "Upgrade for AI insights and advanced features"
+                  : subscription?.cancelAtPeriodEnd
+                    ? "Cancels at end of period"
+                    : `Active${subscription?.currentPeriodEnd ? ` · Renews ${new Date(subscription.currentPeriodEnd).toLocaleDateString()}` : ""}`}
+              </p>
+            </div>
+          </div>
+
+          {subscription?.tier === "free" ? (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                // TODO: open checkout with price selection
+              }}
+            >
+              Upgrade
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleManageBilling}
+              loading={billingLoading}
+            >
+              Manage Subscription
+            </Button>
+          )}
+        </div>
       </Card>
 
       {/* Logout */}
