@@ -58,7 +58,7 @@ export default function LandingPage() {
         <div className="mx-auto grid max-w-3xl gap-10 sm:grid-cols-3">
           {features.map((f) => (
             <div key={f.title} className="text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-sage-50 text-sage-600">
                 <f.icon className="h-6 w-6" />
               </div>
               <h3 className="mt-4 text-sm font-semibold text-slate-900">

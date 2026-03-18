@@ -155,7 +155,7 @@ export default function ReintroductionsPage() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-sage-600 border-t-transparent" />
           <p className="mt-4 text-sm text-slate-600">Loading...</p>
         </div>
       </div>

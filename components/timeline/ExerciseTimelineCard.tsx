@@ -102,7 +102,7 @@ export function ExerciseTimelineCard({
   return (
     <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3">
       {/* Icon */}
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sage-50 text-sage-600">
         <Icon className="h-4 w-4" />
       </div>
 

@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
             link in the email to reset your password.
           </p>
           <p className="mt-6 text-sm text-slate-500">
-            <Link href="/login" className="text-indigo-600 hover:text-indigo-700">
+            <Link href="/login" className="text-sage-600 hover:text-sage-700">
               Back to login
             </Link>
           </p>
@@ -90,7 +90,7 @@ export default function ForgotPasswordPage() {
 
         <p className="mt-6 text-center text-sm text-slate-500">
           Remember your password?{" "}
-          <Link href="/login" className="text-indigo-600 hover:text-indigo-700">
+          <Link href="/login" className="text-sage-600 hover:text-sage-700">
             Log in
           </Link>
         </p>

@@ -2,11 +2,12 @@ import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
 const variantClasses = {
-  allowed: "bg-green-50 text-green-700 ring-green-600/20",
-  avoid: "bg-red-50 text-red-700 ring-red-600/20",
-  moderation: "bg-amber-50 text-amber-700 ring-amber-600/20",
-  default: "bg-slate-50 text-slate-600 ring-slate-500/20",
-  info: "bg-blue-50 text-blue-700 ring-blue-600/20",
+  allowed: "bg-emerald-50 text-emerald-700 ring-emerald-600/15",
+  avoid: "bg-red-50 text-red-700 ring-red-600/15",
+  moderation: "bg-amber-50 text-amber-700 ring-amber-600/15",
+  default: "bg-[var(--color-surface-overlay)] text-[var(--color-text-secondary)] ring-[var(--color-border)]",
+  info: "bg-sage-50 text-sage-700 ring-sage-600/15",
+  accent: "bg-coral-50 text-coral-600 ring-coral-500/15",
 } as const;
 
 type BadgeVariant = keyof typeof variantClasses;

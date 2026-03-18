@@ -25,14 +25,19 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 border-b border-[var(--color-border-light)] bg-[var(--color-surface-card)]/95 backdrop-blur-md">
       <div className="flex h-14 items-center justify-between px-4">
         {/* Logo */}
-        <span className="text-lg font-bold tracking-tight text-indigo-600">
-          ChewIQ
-        </span>
+        <Link href="/chat" className="flex items-center gap-1.5 group">
+          <span className="font-[family-name:var(--font-display)] text-xl font-bold tracking-tight text-sage-700 group-hover:text-sage-800 transition-colors">
+            Chew
+          </span>
+          <span className="font-[family-name:var(--font-display)] text-xl font-bold tracking-tight text-coral-500 group-hover:text-coral-600 transition-colors">
+            IQ
+          </span>
+        </Link>
 
-        {/* Desktop nav — hidden on mobile (mobile nav handles it) */}
+        {/* Desktop nav */}
         {!loading && user && (
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
@@ -43,10 +48,10 @@ export function Header() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+                    "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
                     isActive
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                      ? "bg-sage-50 text-sage-700"
+                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-sage-50/50"
                   )}
                 >
                   {item.label}
@@ -57,10 +62,10 @@ export function Header() {
               <Link
                 href="/admin"
                 className={cn(
-                  "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+                  "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
                   pathname.startsWith("/admin")
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                    ? "bg-sage-50 text-sage-700"
+                    : "text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-sage-50/50"
                 )}
               >
                 Admin
@@ -73,13 +78,15 @@ export function Header() {
         <div className="flex items-center gap-3">
           {!loading && user && (
             <>
-              <span className="text-sm text-slate-600">{user.firstName}</span>
+              <span className="text-sm text-[var(--color-text-secondary)]">
+                {user.firstName}
+              </span>
               <button
                 onClick={handleLogout}
                 className={cn(
                   "flex h-9 w-9 items-center justify-center rounded-lg",
-                  "text-slate-400 hover:bg-slate-100 hover:text-slate-600",
-                  "transition-colors duration-150"
+                  "text-[var(--color-text-muted)] hover:bg-sage-50 hover:text-sage-600",
+                  "transition-all duration-200"
                 )}
                 aria-label="Log out"
               >

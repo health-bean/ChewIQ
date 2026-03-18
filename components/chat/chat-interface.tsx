@@ -95,7 +95,7 @@ export function ChatInterface() {
 
               {messages.length === 0 && !loading ? (
                 <div className="flex h-full flex-col items-center justify-center pt-20 text-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sage-50 text-sage-600">
                     <MessageSquare className="h-6 w-6" />
                   </div>
                   <h2 className="mt-4 text-base font-semibold text-slate-900">

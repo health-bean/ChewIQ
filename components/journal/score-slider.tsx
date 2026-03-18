@@ -6,12 +6,12 @@ interface ScoreSliderProps {
   label: string;
   value: number | null;
   onChange: (value: number) => void;
-  color: string; // tailwind color class like "indigo" | "amber" | etc.
+  color: string; // tailwind color name: "sage" | "amber" | "green" | "red" | "orange"
   hideLabel?: boolean;
 }
 
 const colorMap: Record<string, { bg: string; accent: string; track: string }> = {
-  indigo: { bg: "bg-indigo-50", accent: "accent-indigo-600", track: "text-indigo-600" },
+  sage: { bg: "bg-sage-50", accent: "accent-sage-600", track: "text-sage-600" },
   amber: { bg: "bg-amber-50", accent: "accent-amber-500", track: "text-amber-600" },
   green: { bg: "bg-green-50", accent: "accent-green-600", track: "text-green-600" },
   red: { bg: "bg-red-50", accent: "accent-red-500", track: "text-red-600" },
@@ -19,14 +19,14 @@ const colorMap: Record<string, { bg: string; accent: string; track: string }> = 
 };
 
 export function ScoreSlider({ label, value, onChange, color, hideLabel }: ScoreSliderProps) {
-  const colors = colorMap[color] ?? colorMap.indigo;
+  const colors = colorMap[color] ?? colorMap.sage;
   const displayValue = value ?? 5;
 
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between">
         {!hideLabel && (
-          <span className="text-sm font-medium text-slate-700">{label}</span>
+          <span className="text-sm font-medium text-[var(--color-text-secondary)]">{label}</span>
         )}
         <span className={cn("text-sm font-semibold", hideLabel && "ml-auto", colors.track)}>
           {value !== null ? `${value}/10` : "—"}

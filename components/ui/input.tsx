@@ -17,7 +17,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium text-slate-700"
+            className="text-sm font-medium text-[var(--color-text-secondary)]"
           >
             {label}
           </label>
@@ -28,13 +28,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           id={inputId}
           className={cn(
             "w-full rounded-xl border px-4 py-2.5 text-sm min-h-[44px]",
-            "bg-white text-slate-900 placeholder:text-slate-400",
-            "transition-colors duration-150 ease-in-out",
+            "bg-[var(--color-surface-card)] text-[var(--color-text-primary)]",
+            "placeholder:text-[var(--color-text-muted)]",
+            "transition-all duration-200 ease-[var(--ease-out-expo)]",
             "focus:outline-none focus:ring-2 focus:ring-offset-1",
-            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-slate-50",
+            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-[var(--color-surface-overlay)]",
             error
               ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-              : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-500",
+              : "border-[var(--color-border)] focus:border-sage-500 focus:ring-sage-500",
             className
           )}
           aria-invalid={error ? true : undefined}

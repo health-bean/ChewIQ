@@ -59,7 +59,7 @@ export function ReintroductionCard({
   return (
     <Card className="overflow-hidden">
       {/* Header */}
-      <div className="border-b border-slate-200 bg-gradient-to-r from-indigo-50 to-blue-50 p-4">
+      <div className="border-b border-slate-200 bg-gradient-to-r from-sage-50 to-blue-50 p-4">
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-lg font-semibold text-slate-900">
@@ -83,7 +83,7 @@ export function ReintroductionCard({
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 transition-all duration-500"
+            className="h-full rounded-full bg-gradient-to-r from-sage-500 to-blue-500 transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>

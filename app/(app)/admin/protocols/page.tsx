@@ -194,7 +194,7 @@ export default function AdminProtocolsPage() {
         </div>
         <button
           onClick={() => setShowNewProtocol(true)}
-          className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          className="flex items-center gap-1.5 rounded-md bg-sage-600 px-3 py-2 text-sm font-medium text-white hover:bg-sage-700"
         >
           <Plus className="h-4 w-4" /> Add Protocol
         </button>
@@ -202,7 +202,7 @@ export default function AdminProtocolsPage() {
 
       {/* New protocol form */}
       {showNewProtocol && (
-        <div className="mb-4 rounded-lg border border-indigo-200 bg-indigo-50 p-4">
+        <div className="mb-4 rounded-lg border border-sage-200 bg-sage-50 p-4">
           <h3 className="mb-3 font-semibold text-slate-900">New Protocol</h3>
           <div className="flex flex-wrap gap-3">
             <input
@@ -225,7 +225,7 @@ export default function AdminProtocolsPage() {
             />
           </div>
           <div className="mt-3 flex gap-2">
-            <button onClick={handleCreateProtocol} className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700">Create</button>
+            <button onClick={handleCreateProtocol} className="rounded-md bg-sage-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-sage-700">Create</button>
             <button onClick={() => setShowNewProtocol(false)} className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50">Cancel</button>
           </div>
         </div>
@@ -313,7 +313,7 @@ export default function AdminProtocolsPage() {
                         {protocol.rules.map((rule) => {
                           if (editingRule === rule.id) {
                             return (
-                              <tr key={rule.id} className="border-b border-slate-50 bg-indigo-50/50">
+                              <tr key={rule.id} className="border-b border-slate-50 bg-sage-50/50">
                                 <td className="py-2 pr-2">
                                   <select value={editRuleData.ruleType} onChange={(e) => setEditRuleData((r) => ({ ...r, ruleType: e.target.value }))} className="rounded border border-slate-200 px-1.5 py-1 text-xs">
                                     {RULE_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -331,7 +331,7 @@ export default function AdminProtocolsPage() {
                                       <button
                                         key={v}
                                         onClick={() => setEditRuleData((r) => ({ ...r, propertyValues: toggleValue(r.propertyValues, v) }))}
-                                        className={`rounded px-1.5 py-0.5 text-xs ${editRuleData.propertyValues.includes(v) ? "bg-indigo-100 text-indigo-800 font-medium" : "bg-slate-100 text-slate-400"}`}
+                                        className={`rounded px-1.5 py-0.5 text-xs ${editRuleData.propertyValues.includes(v) ? "bg-sage-100 text-sage-800 font-medium" : "bg-slate-100 text-slate-400"}`}
                                       >
                                         {v}
                                       </button>
@@ -405,7 +405,7 @@ export default function AdminProtocolsPage() {
 
                   {/* Add rule form */}
                   {addingRuleTo === protocol.id ? (
-                    <div className="rounded-md border border-indigo-200 bg-indigo-50/50 p-3">
+                    <div className="rounded-md border border-sage-200 bg-sage-50/50 p-3">
                       <div className="flex flex-wrap items-end gap-3">
                         <div>
                           <label className="block text-xs font-medium text-slate-500 mb-1">Type</label>
@@ -427,7 +427,7 @@ export default function AdminProtocolsPage() {
                               <button
                                 key={v}
                                 onClick={() => setNewRule((r) => ({ ...r, propertyValues: toggleValue(r.propertyValues, v) }))}
-                                className={`rounded px-2 py-1 text-xs ${newRule.propertyValues.includes(v) ? "bg-indigo-100 text-indigo-800 font-medium" : "bg-white border border-slate-200 text-slate-500"}`}
+                                className={`rounded px-2 py-1 text-xs ${newRule.propertyValues.includes(v) ? "bg-sage-100 text-sage-800 font-medium" : "bg-white border border-slate-200 text-slate-500"}`}
                               >
                                 {v}
                               </button>
@@ -446,14 +446,14 @@ export default function AdminProtocolsPage() {
                         </div>
                       </div>
                       <div className="mt-3 flex gap-2">
-                        <button onClick={() => handleAddRule(protocol.id)} className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700">Add Rule</button>
+                        <button onClick={() => handleAddRule(protocol.id)} className="rounded-md bg-sage-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-sage-700">Add Rule</button>
                         <button onClick={() => setAddingRuleTo(null)} className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50">Cancel</button>
                       </div>
                     </div>
                   ) : (
                     <button
                       onClick={() => { setAddingRuleTo(protocol.id); setExpanded((prev) => new Set(prev).add(protocol.id)); }}
-                      className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700"
+                      className="flex items-center gap-1 text-sm text-sage-600 hover:text-sage-700"
                     >
                       <Plus className="h-3.5 w-3.5" /> Add Rule
                     </button>

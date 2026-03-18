@@ -180,7 +180,7 @@ export default function SettingsPage() {
                   setSelectedProtocolId(e.target.value);
                   setSaved(false);
                 }}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 min-h-[44px] focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 min-h-[44px] focus:border-sage-500 focus:outline-none focus:ring-2 focus:ring-sage-500 focus:ring-offset-1"
               >
                 <option value="">No protocol selected</option>
                 {protocols.map((p) => (
@@ -199,13 +199,13 @@ export default function SettingsPage() {
 
             {/* Phase display */}
             {phase && (
-              <div className="rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-3">
+              <div className="rounded-lg border border-sage-100 bg-sage-50 px-4 py-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-indigo-900">
+                    <p className="text-sm font-semibold text-sage-900">
                       {phase.name}
                     </p>
-                    <p className="text-xs text-indigo-600">
+                    <p className="text-xs text-sage-600">
                       Phase {phase.phaseOrder} of {phase.totalPhases}
                       {phase.durationWeeks && (
                         <> &middot; Day {phase.dayNumber} of {phase.durationWeeks * 7}</>
@@ -229,9 +229,9 @@ export default function SettingsPage() {
                 </div>
                 {/* Progress bar */}
                 {phase.durationWeeks && (
-                  <div className="mt-2 h-1.5 w-full rounded-full bg-indigo-200">
+                  <div className="mt-2 h-1.5 w-full rounded-full bg-sage-200">
                     <div
-                      className="h-1.5 rounded-full bg-indigo-600 transition-all"
+                      className="h-1.5 rounded-full bg-sage-600 transition-all"
                       style={{
                         width: `${Math.min(
                           100,

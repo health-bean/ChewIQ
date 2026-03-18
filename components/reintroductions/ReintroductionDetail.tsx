@@ -110,7 +110,7 @@ export function ReintroductionDetail({
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-sage-600" />
         <span className="ml-3 text-sm text-slate-600">Loading details...</span>
       </div>
     );

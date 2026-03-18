@@ -16,8 +16,9 @@ const typeConfig: Record<
   medication: { label: "Medication", variant: "moderation", bg: "bg-purple-50 border-purple-200" },
   exposure: { label: "Exposure", variant: "moderation", bg: "bg-amber-50 border-amber-200" },
   detox: { label: "Detox", variant: "default", bg: "bg-teal-50 border-teal-200" },
-  exercise: { label: "Exercise", variant: "info", bg: "bg-indigo-50 border-indigo-200" },
+  exercise: { label: "Exercise", variant: "info", bg: "bg-sage-50 border-sage-200" },
   energy: { label: "Energy", variant: "default", bg: "bg-yellow-50 border-yellow-200" },
+  off_protocol: { label: "Off-Protocol", variant: "moderation", bg: "bg-orange-50 border-orange-200" },
 };
 
 export function ExtractedCard({ entry }: ExtractedCardProps) {

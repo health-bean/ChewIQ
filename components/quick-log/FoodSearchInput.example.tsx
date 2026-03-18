@@ -139,7 +139,7 @@ export function FoodLogForm() {
       <button
         type="submit"
         disabled={!selectedFood}
-        className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+        className="w-full rounded-lg bg-sage-600 px-4 py-2 text-sm font-medium text-white hover:bg-sage-700 disabled:opacity-50"
       >
         Log Food
       </button>
@@ -152,8 +152,8 @@ export function FoodLogForm() {
 export function CustomStyledFoodSearch() {
   return (
     <div className="mx-auto max-w-md p-4">
-      <div className="rounded-xl border-2 border-indigo-200 bg-indigo-50 p-6">
-        <h3 className="mb-4 text-center text-xl font-bold text-indigo-900">
+      <div className="rounded-xl border-2 border-sage-200 bg-sage-50 p-6">
+        <h3 className="mb-4 text-center text-xl font-bold text-sage-900">
           What did you eat?
         </h3>
         <FoodSearchInput

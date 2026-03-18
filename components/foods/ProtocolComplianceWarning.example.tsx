@@ -59,7 +59,7 @@ export function InlineFoodSearchWarning() {
       
       <button
         onClick={() => setShowWarning(!showWarning)}
-        className="rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
+        className="rounded-lg bg-sage-600 px-4 py-2 text-white hover:bg-sage-700"
       >
         {showWarning ? "Hide Warning" : "Show Warning"}
       </button>
@@ -124,7 +124,7 @@ export function ModalFoodWarning() {
       
       <button
         onClick={() => setIsOpen(true)}
-        className="rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
+        className="rounded-lg bg-sage-600 px-4 py-2 text-white hover:bg-sage-700"
       >
         Log Almonds
       </button>
@@ -265,7 +265,7 @@ export function ChatInterfaceWarningExample() {
             key={idx}
             className={`rounded-lg p-3 ${
               msg.role === "user"
-                ? "bg-indigo-100 text-indigo-900"
+                ? "bg-sage-100 text-sage-900"
                 : "bg-white text-slate-800"
             }`}
           >

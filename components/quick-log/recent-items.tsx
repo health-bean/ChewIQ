@@ -62,7 +62,7 @@ export function RecentItems({ onSelect, selectedNames }: RecentItemsProps) {
               onClick={() => onSelect(item.entryType, item.name)}
               className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors ${
                 isSelected
-                  ? "border-indigo-300 bg-indigo-50 text-indigo-700"
+                  ? "border-sage-300 bg-sage-50 text-sage-700"
                   : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
               }`}
               style={{ minHeight: "36px" }}

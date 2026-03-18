@@ -127,7 +127,7 @@ export function FoodTimelineCard({
           {hasProperties && (
             <button
               onClick={() => setShowProperties(!showProperties)}
-              className="mt-2 text-xs font-medium text-indigo-600 hover:text-indigo-700"
+              className="mt-2 text-xs font-medium text-sage-600 hover:text-sage-700"
             >
               {showProperties ? "Hide" : "Show"} food properties
             </button>

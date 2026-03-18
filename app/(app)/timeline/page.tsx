@@ -12,6 +12,7 @@ import {
   ShieldAlert,
   Plus,
   Activity,
+  AlertTriangle,
 } from "lucide-react";
 import { Badge, Spinner } from "@/components/ui";
 import { QuickAddSheet } from "@/components/quick-log/quick-add-sheet";
@@ -32,6 +33,7 @@ const entryConfig: Record<
   detox: { icon: Droplets, label: "Detox", variant: "default" },
   exercise: { icon: Activity, label: "Exercise", variant: "info" },
   energy: { icon: Zap, label: "Energy", variant: "default" },
+  off_protocol: { icon: AlertTriangle, label: "Off-Protocol", variant: "moderation" },
 };
 
 function formatDate(date: Date): string {
@@ -107,18 +109,18 @@ export default function TimelinePage() {
     : entries;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-6">
+    <div className="mx-auto max-w-2xl px-4 py-6 animate-fade-in-up">
       {/* Date nav */}
       <div className="mb-6 flex items-center justify-between">
         <button
           onClick={() => shiftDate(-1)}
-          className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100"
+          className="flex h-10 w-10 items-center justify-center rounded-lg text-[var(--color-text-muted)] hover:bg-sage-50 hover:text-sage-600 transition-all duration-200"
           aria-label="Previous day"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
 
-        <h1 className="text-base font-semibold text-slate-900">
+        <h1 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-text-primary)]">
           {displayDate(date)}
         </h1>
 
@@ -126,10 +128,10 @@ export default function TimelinePage() {
           onClick={() => shiftDate(1)}
           disabled={isToday}
           className={cn(
-            "flex h-10 w-10 items-center justify-center rounded-lg text-slate-500",
+            "flex h-10 w-10 items-center justify-center rounded-lg text-[var(--color-text-muted)] transition-all duration-200",
             isToday
               ? "opacity-30"
-              : "hover:bg-slate-100"
+              : "hover:bg-sage-50 hover:text-sage-600"
           )}
           aria-label="Next day"
         >
@@ -142,10 +144,10 @@ export default function TimelinePage() {
         <button
           onClick={() => setShowEnergyOnly(!showEnergyOnly)}
           className={cn(
-            "flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
+            "flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200",
             showEnergyOnly
-              ? "bg-indigo-100 text-indigo-700"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              ? "bg-sage-100 text-sage-700"
+              : "bg-[var(--color-surface-overlay)] text-[var(--color-text-secondary)] hover:bg-sage-50"
           )}
         >
           <Zap className="h-3.5 w-3.5" />
@@ -160,18 +162,20 @@ export default function TimelinePage() {
         </div>
       ) : filteredEntries.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <Zap className="h-8 w-8 text-slate-300" />
-          <p className="mt-3 text-sm text-slate-500">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sage-50 text-sage-400 mb-3">
+            <Zap className="h-6 w-6" />
+          </div>
+          <p className="text-sm text-[var(--color-text-secondary)]">
             {showEnergyOnly
               ? "No entries with energy levels for this day."
               : "No entries for this day."}
           </p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-[var(--color-text-muted)]">
             Go to Chat to log food, symptoms, and more.
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 stagger-children">
           {filteredEntries.map((entry) => {
             // Render exercise entries with dedicated component
             if (entry.entryType === "exercise") {
@@ -215,28 +219,28 @@ export default function TimelinePage() {
             return (
               <div
                 key={entry.id}
-                className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3"
+                className="flex items-center gap-3 rounded-xl bg-[var(--color-surface-card)] px-4 py-3 shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-elevated)]"
               >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-500">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sage-50 text-sage-600">
                   <Icon className="h-4 w-4" />
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="truncate text-sm font-medium text-slate-900">
+                    <span className="truncate text-sm font-medium text-[var(--color-text-primary)]">
                       {entry.name}
                     </span>
                     <Badge variant={config.variant}>{config.label}</Badge>
                   </div>
                   {entry.entryTime && (
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-[var(--color-text-muted)]">
                       {formatTime(entry.entryTime)}
                     </p>
                   )}
                 </div>
 
                 {entry.severity != null && (
-                  <span className="shrink-0 text-xs font-medium text-slate-500">
+                  <span className="shrink-0 text-xs font-medium text-[var(--color-text-secondary)]">
                     {entry.severity}/10
                   </span>
                 )}
@@ -249,7 +253,7 @@ export default function TimelinePage() {
       {/* Floating Action Button */}
       <button
         onClick={() => setSheetOpen(true)}
-        className="fixed bottom-24 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 active:scale-95 transition-transform md:bottom-8 md:right-8"
+        className="fixed bottom-24 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-coral-500 text-white shadow-[var(--shadow-float)] hover:bg-coral-600 active:scale-95 transition-all duration-200 ease-[var(--ease-out-expo)] md:bottom-8 md:right-8"
         aria-label="Quick add"
       >
         <Plus className="h-6 w-6" />

@@ -124,7 +124,7 @@ export default function AdminFoodsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search foods..."
-            className="w-full rounded-md border border-slate-200 py-2 pl-9 pr-3 text-sm outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
+            className="w-full rounded-md border border-slate-200 py-2 pl-9 pr-3 text-sm outline-none focus:border-sage-400 focus:ring-1 focus:ring-sage-400"
           />
         </div>
         <div className="relative">
@@ -132,7 +132,7 @@ export default function AdminFoodsPage() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="appearance-none rounded-md border border-slate-200 py-2 pl-9 pr-8 text-sm outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
+            className="appearance-none rounded-md border border-slate-200 py-2 pl-9 pr-8 text-sm outline-none focus:border-sage-400 focus:ring-1 focus:ring-sage-400"
           >
             <option value="">All Categories</option>
             {categories.map((c) => (

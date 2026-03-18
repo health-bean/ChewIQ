@@ -138,7 +138,7 @@ export function ReintroductionHistory({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-sage-600" />
         <span className="ml-3 text-sm text-slate-600">Loading reintroductions...</span>
       </div>
     );
@@ -190,7 +190,7 @@ export function ReintroductionHistory({
               onClick={() => setSelectedFilter(filter.value)}
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                 selectedFilter === filter.value
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-sage-600 text-white"
                   : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
             >
@@ -213,11 +213,11 @@ export function ReintroductionHistory({
             <button
               key={reintroduction.id}
               onClick={() => handleCardClick(reintroduction)}
-              className="group rounded-xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-indigo-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="group rounded-xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-sage-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sage-500 focus:ring-offset-2"
             >
               {/* Food Name & Status */}
               <div className="flex items-start justify-between gap-2">
-                <h3 className="text-base font-semibold text-slate-900 group-hover:text-indigo-600">
+                <h3 className="text-base font-semibold text-slate-900 group-hover:text-sage-600">
                   {reintroduction.foodName}
                 </h3>
                 {getStatusBadge(reintroduction.status)}
@@ -248,7 +248,7 @@ export function ReintroductionHistory({
               )}
 
               {/* Click hint */}
-              <div className="mt-3 text-xs text-indigo-600 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="mt-3 text-xs text-sage-600 opacity-0 transition-opacity group-hover:opacity-100">
                 Click to view details →
               </div>
             </button>

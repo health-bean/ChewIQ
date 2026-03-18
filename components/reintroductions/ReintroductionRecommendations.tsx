@@ -75,7 +75,7 @@ export function ReintroductionRecommendations({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-sage-600" />
         <span className="ml-3 text-sm text-slate-600">Loading recommendations...</span>
       </div>
     );
@@ -129,7 +129,7 @@ export function ReintroductionRecommendations({
         {foods.map((food) => (
           <div
             key={food.id}
-            className="rounded-xl border border-slate-200 bg-white p-5 transition-all hover:border-indigo-300 hover:shadow-md"
+            className="rounded-xl border border-slate-200 bg-white p-5 transition-all hover:border-sage-300 hover:shadow-md"
           >
             {/* Header */}
             <div className="flex items-start justify-between gap-3">

@@ -56,7 +56,7 @@ export function JournalCheckIn({ onSave, onDismiss }: JournalCheckInProps) {
           label="Sleep"
           value={scores.sleepScore ?? null}
           onChange={(v) => setScore("sleepScore", v)}
-          color="indigo"
+          color="sage"
         />
         <ScoreSlider
           label="Energy"

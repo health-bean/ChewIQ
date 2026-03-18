@@ -22,7 +22,7 @@ function InsightCard({ insight }: { insight: Insight }) {
             isHelper
               ? "bg-emerald-50 text-emerald-600"
               : isPattern
-                ? "bg-indigo-50 text-indigo-600"
+                ? "bg-sage-50 text-sage-600"
                 : "bg-amber-50 text-amber-600"
           }`}
         >
@@ -212,7 +212,7 @@ export default function InsightsPage() {
 
       {totalInsights === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sage-50 text-sage-600">
             <LineChart className="h-6 w-6" />
           </div>
           <h2 className="mt-4 text-base font-semibold text-slate-900">
@@ -234,7 +234,7 @@ export default function InsightsPage() {
                 </h2>
                 <button
                   onClick={() => router.push("/reintroductions")}
-                  className="text-xs text-indigo-600 hover:text-indigo-700"
+                  className="text-xs text-sage-600 hover:text-sage-700"
                 >
                   View All →
                 </button>
@@ -250,8 +250,8 @@ export default function InsightsPage() {
           {!activeReintroduction && protocolId && totalInsights > 0 && (
             <Card>
               <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50">
-                  <Plus className="h-5 w-5 text-indigo-600" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sage-50">
+                  <Plus className="h-5 w-5 text-sage-600" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-sm font-semibold text-slate-900">

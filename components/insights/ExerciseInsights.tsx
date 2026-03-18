@@ -121,7 +121,7 @@ function ExerciseInsightCard({ data }: { data: ExerciseInsightData }) {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-slate-50 py-12 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sage-50 text-sage-600">
         <Activity className="h-6 w-6" />
       </div>
       <h3 className="mt-4 text-sm font-semibold text-slate-900">

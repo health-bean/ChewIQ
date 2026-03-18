@@ -113,7 +113,7 @@ export default function AdminUsersPage() {
                     className={cn(
                       "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
                       user.isAdmin
-                        ? "bg-indigo-50 text-indigo-700"
+                        ? "bg-sage-50 text-sage-700"
                         : "bg-slate-100 text-slate-600"
                     )}
                   >
@@ -139,7 +139,7 @@ export default function AdminUsersPage() {
                       "inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors",
                       user.isAdmin
                         ? "text-red-600 hover:bg-red-50"
-                        : "text-indigo-600 hover:bg-indigo-50",
+                        : "text-sage-600 hover:bg-sage-50",
                       updating === user.id && "opacity-50"
                     )}
                   >

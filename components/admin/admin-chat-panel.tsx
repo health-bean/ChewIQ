@@ -97,7 +97,7 @@ export function AdminChatPanel() {
             className={cn(
               "max-w-[85%] rounded-lg px-3 py-2 text-sm",
               msg.role === "user"
-                ? "ml-auto bg-indigo-600 text-white"
+                ? "ml-auto bg-sage-600 text-white"
                 : "bg-slate-100 text-slate-800"
             )}
           >
@@ -115,13 +115,13 @@ export function AdminChatPanel() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             placeholder="e.g. Set all nuts to lectin: high"
-            className="flex-1 rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
+            className="flex-1 rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-sage-400 focus:ring-1 focus:ring-sage-400"
             disabled={loading}
           />
           <button
             onClick={sendMessage}
             disabled={loading || !input.trim()}
-            className="rounded-md bg-indigo-600 p-2 text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+            className="rounded-md bg-sage-600 p-2 text-white transition-colors hover:bg-sage-700 disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />

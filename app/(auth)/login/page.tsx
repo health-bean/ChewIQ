@@ -40,12 +40,26 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center px-6 py-12">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Sign in to your ChewIQ account
+    <div className="relative flex min-h-dvh items-center justify-center px-6 py-12 overflow-hidden">
+      {/* Subtle gradient backdrop */}
+      <div className="absolute inset-0 bg-gradient-to-br from-sage-50/80 via-[var(--color-surface)] to-coral-50/30" />
+
+      <div className="relative w-full max-w-sm animate-fade-in-up">
+        {/* Brand */}
+        <div className="mb-10 text-center">
+          <div className="mb-4">
+            <span className="font-[family-name:var(--font-display)] text-4xl font-bold tracking-tight text-sage-700">
+              Chew
+            </span>
+            <span className="font-[family-name:var(--font-display)] text-4xl font-bold tracking-tight text-coral-500">
+              IQ
+            </span>
+          </div>
+          <h1 className="font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--color-text-primary)]">
+            Welcome back
+          </h1>
+          <p className="mt-1.5 text-sm text-[var(--color-text-secondary)]">
+            Sign in to continue your healing journey
           </p>
         </div>
 
@@ -80,7 +94,7 @@ export default function LoginPage() {
             <div className="text-right">
               <Link
                 href="/forgot-password"
-                className="text-xs text-indigo-600 hover:text-indigo-700"
+                className="text-xs text-sage-600 hover:text-sage-700 transition-colors"
               >
                 Forgot password?
               </Link>
@@ -92,9 +106,12 @@ export default function LoginPage() {
           </form>
         </Card>
 
-        <p className="mt-6 text-center text-sm text-slate-500">
+        <p className="mt-8 text-center text-sm text-[var(--color-text-muted)]">
           Have an invite code?{" "}
-          <Link href="/signup" className="text-indigo-600 hover:text-indigo-700">
+          <Link
+            href="/signup"
+            className="text-sage-600 hover:text-sage-700 font-medium transition-colors"
+          >
             Create an account
           </Link>
         </p>

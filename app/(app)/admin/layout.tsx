@@ -37,7 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {!chatOpen && (
           <button
             onClick={() => setChatOpen(true)}
-            className="fixed bottom-4 right-4 flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-3 text-sm font-medium text-white shadow-lg transition-colors hover:bg-indigo-700"
+            className="fixed bottom-4 right-4 flex items-center gap-2 rounded-full bg-sage-600 px-4 py-3 text-sm font-medium text-white shadow-lg transition-colors hover:bg-sage-700"
           >
             <MessageSquare className="h-4 w-4" />
             AI Assistant

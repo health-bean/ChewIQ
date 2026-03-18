@@ -224,7 +224,7 @@ export function FoodSearchInput({
           }}
           placeholder={placeholder}
           autoFocus={autoFocus}
-          className="w-full rounded-lg border border-slate-200 py-2 pl-10 pr-10 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          className="w-full rounded-lg border border-slate-200 py-2 pl-10 pr-10 text-sm focus:border-sage-500 focus:outline-none focus:ring-1 focus:ring-sage-500"
         />
         {loading && (
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -268,7 +268,7 @@ export function FoodSearchInput({
               onClick={() => handleSelect(food)}
               className={`w-full border-b border-slate-100 px-4 py-3 text-left transition-colors last:border-b-0 ${
                 index === selectedIndex
-                  ? "bg-indigo-50"
+                  ? "bg-sage-50"
                   : "hover:bg-slate-50"
               }`}
             >

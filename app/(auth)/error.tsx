@@ -31,7 +31,7 @@ export default function AuthError({
         </button>
         <Link
           href="/login"
-          className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700"
+          className="rounded-xl bg-sage-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-sage-700"
         >
           Back to login
         </Link>

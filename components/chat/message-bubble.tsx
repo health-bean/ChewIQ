@@ -7,7 +7,6 @@ interface MessageBubbleProps {
 }
 
 function formatContent(text: string): React.ReactNode[] {
-  // Split into paragraphs and handle basic **bold** syntax
   return text.split("\n\n").map((paragraph, i) => {
     const parts = paragraph.split(/(\*\*[^*]+\*\*)/g);
     return (
@@ -41,14 +40,17 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
   return (
     <div
-      className={cn("flex flex-col", isUser ? "items-end" : "items-start")}
+      className={cn(
+        "flex flex-col animate-fade-in-up",
+        isUser ? "items-end" : "items-start"
+      )}
     >
       <div
         className={cn(
           "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
           isUser
-            ? "bg-indigo-600 text-white"
-            : "bg-slate-100 text-slate-800"
+            ? "bg-sage-600 text-white shadow-sm"
+            : "bg-[var(--color-surface-card)] text-[var(--color-text-primary)] shadow-[var(--shadow-card)]"
         )}
       >
         {message.content ? formatContent(message.content) : null}
@@ -67,7 +69,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       {message.createdAt && (
         <span
           className={cn(
-            "mt-1 text-[10px] text-slate-400",
+            "mt-1 text-[10px] text-[var(--color-text-muted)]",
             isUser ? "mr-1" : "ml-1"
           )}
         >

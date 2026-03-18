@@ -89,7 +89,7 @@ export function TriggerCell({ value, property, options, onChange }: TriggerCellP
   return (
     <button
       onClick={() => setEditing(true)}
-      className={`block w-full cursor-pointer rounded px-1.5 py-1 text-center text-xs transition-all hover:ring-2 hover:ring-indigo-300 ${colorClass}`}
+      className={`block w-full cursor-pointer rounded px-1.5 py-1 text-center text-xs transition-all hover:ring-2 hover:ring-sage-300 ${colorClass}`}
       title={`${property}: ${displayValue} (click to edit)`}
     >
       {label}
