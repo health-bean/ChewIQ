@@ -27,7 +27,6 @@ function ProgressDots({ current }: { current: Step }) {
 
 interface OnboardingData {
   protocolId?: string;
-  homeTab?: "chat" | "log";
 }
 
 export function OnboardingWizard() {
@@ -57,12 +56,7 @@ export function OnboardingWizard() {
         />
       )}
       {currentStep === "ready" && (
-        <ReadyStep
-          protocolId={data.protocolId}
-          homeTab={data.homeTab}
-          onHomeTabChange={(tab) => setData((prev) => ({ ...prev, homeTab: tab }))}
-          onBack={prevStep}
-        />
+        <ReadyStep protocolId={data.protocolId} onBack={prevStep} />
       )}
     </div>
   );
