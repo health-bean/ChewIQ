@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { LineChart, TrendingUp, AlertTriangle, Heart, Zap, Plus } from "lucide-react";
-import { Card, Badge, Spinner, Button } from "@/components/ui";
+import { Card, Badge, Spinner, Button, EmptyState } from "@/components/ui";
+import { cn } from "@/lib/utils";
 import { ExerciseInsights } from "@/components/insights/ExerciseInsights";
 import { ReintroductionCard } from "@/components/reintroductions/ReintroductionCard";
 import { StartReintroductionModal } from "@/components/reintroductions/StartReintroductionModal";
@@ -18,13 +19,14 @@ function InsightCard({ insight }: { insight: Insight }) {
     <Card>
       <div className="flex items-start gap-3">
         <div
-          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+          className={cn(
+            "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
             isHelper
               ? "bg-emerald-50 text-emerald-600"
               : isPattern
                 ? "bg-teal-50 text-teal-600"
                 : "bg-amber-50 text-amber-600"
-          }`}
+          )}
         >
           {isHelper ? (
             <Heart className="h-4 w-4" />
@@ -211,18 +213,12 @@ export default function InsightsPage() {
       )}
 
       {totalInsights === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
-            <LineChart className="h-6 w-6" />
-          </div>
-          <h2 className="mt-4 text-base font-semibold text-warm-900">
-            Not enough data yet
-          </h2>
-          <p className="mt-1 max-w-xs text-sm text-warm-500">
-            Log more entries to see insights. ChewIQ identifies patterns between
-            what you eat and how you feel over time.
-          </p>
-        </div>
+        <EmptyState
+          icon={<LineChart className="h-6 w-6" />}
+          title="Not enough data yet"
+          description="Insights appear after 7+ days of tracking. Keep logging to unlock patterns."
+          className="py-20"
+        />
       ) : (
         <div className="flex flex-col gap-6">
           {/* Active Reintroduction */}

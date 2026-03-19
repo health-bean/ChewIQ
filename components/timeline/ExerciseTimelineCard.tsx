@@ -10,6 +10,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Badge } from "@/components/ui";
+import { cn } from "@/lib/utils";
 import type { ExerciseType, IntensityLevel } from "@/types";
 
 interface ExerciseTimelineCardProps {
@@ -121,7 +122,11 @@ export function ExerciseTimelineCard({
           <span className="font-medium">{durationMinutes} min</span>
           <span className="text-warm-300">•</span>
           <span
-            className={`inline-flex items-center rounded-full px-2 py-0.5 font-medium ${intensityConfig.bgColor} ${intensityConfig.color}`}
+            className={cn(
+              "inline-flex items-center rounded-full px-2 py-0.5 font-medium",
+              intensityConfig.bgColor,
+              intensityConfig.color
+            )}
           >
             {intensityConfig.label}
           </span>
@@ -151,13 +156,14 @@ export function ExerciseTimelineCard({
                   </span>
                   {energyChange !== null && (
                     <span
-                      className={`ml-1 font-medium ${
+                      className={cn(
+                        "ml-1 font-medium",
                         energyChange > 0
                           ? "text-emerald-600"
                           : energyChange < 0
-                          ? "text-red-600"
-                          : "text-warm-500"
-                      }`}
+                            ? "text-red-600"
+                            : "text-warm-500"
+                      )}
                     >
                       ({energyChange > 0 ? "+" : ""}
                       {energyChange})

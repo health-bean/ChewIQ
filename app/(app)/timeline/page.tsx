@@ -14,7 +14,7 @@ import {
   Activity,
   AlertTriangle,
 } from "lucide-react";
-import { Badge, Spinner } from "@/components/ui";
+import { Badge, Spinner, EmptyState } from "@/components/ui";
 import { QuickAddSheet } from "@/components/quick-log/quick-add-sheet";
 import { ExerciseTimelineCard } from "@/components/timeline/ExerciseTimelineCard";
 import { FoodTimelineCard } from "@/components/timeline/FoodTimelineCard";
@@ -161,19 +161,16 @@ export default function TimelinePage() {
           <Spinner />
         </div>
       ) : filteredEntries.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-teal-400 mb-3">
-            <Zap className="h-6 w-6" />
-          </div>
-          <p className="text-sm text-[var(--color-text-secondary)]">
-            {showEnergyOnly
+        <EmptyState
+          icon={<Zap className="h-6 w-6" />}
+          title={
+            showEnergyOnly
               ? "No entries with energy levels for this day."
-              : "No entries for this day."}
-          </p>
-          <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-            Go to Chat to log food, symptoms, and more.
-          </p>
-        </div>
+              : "No entries for this day."
+          }
+          description="Go to Chat to log food, symptoms, and more."
+          className="py-20"
+        />
       ) : (
         <div className="flex flex-col gap-2 stagger-children">
           {filteredEntries.map((entry) => {

@@ -12,7 +12,7 @@ import {
   Check,
   Loader2,
 } from "lucide-react";
-import { Button, Card } from "@/components/ui";
+import { Button, Card, Spinner } from "@/components/ui";
 import { ScoreSlider } from "@/components/journal/score-slider";
 import { cn } from "@/lib/utils";
 import type { JournalEntry, JournalScores } from "@/types";
@@ -157,6 +157,13 @@ export default function ReflectPage() {
     fetchEntry(date);
   }, [date, fetchEntry]);
 
+  // Cleanup auto-save timer on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, []);
+
   function shiftDate(days: number) {
     const d = new Date(date + "T12:00:00");
     d.setDate(d.getDate() + days);
@@ -300,7 +307,7 @@ export default function ReflectPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-warm-400" />
+          <Spinner />
         </div>
       ) : (
         <div className="flex flex-col gap-4">

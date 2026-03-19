@@ -83,14 +83,19 @@ export default function SignupPage() {
               autoComplete="new-password"
             />
 
-            <Input
-              label="Beta Invite Code"
-              type="text"
-              placeholder="Enter your invite code"
-              value={betaCode}
-              onChange={(e) => setBetaCode(e.target.value)}
-              required
-            />
+            <div>
+              <Input
+                label="Beta Invite Code"
+                type="text"
+                placeholder="Enter your invite code"
+                value={betaCode}
+                onChange={(e) => setBetaCode(e.target.value)}
+                required
+              />
+              <p className="mt-1.5 text-xs text-[var(--color-text-muted)]">
+                Enter the invite code you received from your practitioner or from ChewIQ.
+              </p>
+            </div>
 
             {error && (
               <p className="text-sm text-red-600" role="alert">

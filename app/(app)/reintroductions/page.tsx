@@ -19,6 +19,7 @@ export default function ReintroductionsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [protocolId, setProtocolId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -62,9 +63,10 @@ export default function ReintroductionsPage() {
 
   const handleStartReintroduction = () => {
     if (!protocolId) {
-      alert("Please select a protocol first in your settings.");
+      setErrorMessage("Please select a protocol first in your settings.");
       return;
     }
+    setErrorMessage(null);
     setIsModalOpen(true);
   };
 
@@ -88,14 +90,15 @@ export default function ReintroductionsPage() {
       });
 
       if (response.ok) {
+        setErrorMessage(null);
         fetchData();
       } else {
         const data = await response.json();
-        alert(data.error || "Failed to stop reintroduction");
+        setErrorMessage(data.error || "Failed to stop reintroduction");
       }
     } catch (error) {
       console.error("Error stopping reintroduction:", error);
-      alert("Failed to stop reintroduction");
+      setErrorMessage("Failed to stop reintroduction");
     }
   };
 
@@ -110,15 +113,16 @@ export default function ReintroductionsPage() {
       });
 
       if (response.ok) {
+        setErrorMessage(null);
         handleBackToOverview();
         fetchData();
       } else {
         const data = await response.json();
-        alert(data.error || "Failed to mark as passed");
+        setErrorMessage(data.error || "Failed to mark as passed");
       }
     } catch (error) {
       console.error("Error marking as passed:", error);
-      alert("Failed to mark as passed");
+      setErrorMessage("Failed to mark as passed");
     }
   };
 
@@ -133,15 +137,16 @@ export default function ReintroductionsPage() {
       });
 
       if (response.ok) {
+        setErrorMessage(null);
         handleBackToOverview();
         fetchData();
       } else {
         const data = await response.json();
-        alert(data.error || "Failed to mark as failed");
+        setErrorMessage(data.error || "Failed to mark as failed");
       }
     } catch (error) {
       console.error("Error marking as failed:", error);
-      alert("Failed to mark as failed");
+      setErrorMessage("Failed to mark as failed");
     }
   };
 
@@ -203,6 +208,19 @@ export default function ReintroductionsPage() {
           )}
         </div>
       </div>
+
+      {/* Error message */}
+      {errorMessage && (
+        <div className="mb-4 flex items-center justify-between rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <span>{errorMessage}</span>
+          <button
+            onClick={() => setErrorMessage(null)}
+            className="ml-3 shrink-0 text-xs font-medium text-red-600 hover:text-red-800"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Content */}
       {viewMode === "overview" && (
