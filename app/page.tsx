@@ -19,7 +19,7 @@ export default function HomePage() {
       .then(() => {
         // TODO: read user's homeTab preference and redirect accordingly
         // For now, default to timeline
-        router.replace("/timeline");
+        router.replace("/log");
       })
       .catch(() => {
         router.replace("/login");

@@ -45,7 +45,7 @@ export async function updateSession(request: NextRequest) {
     // Check if this is a protected route
     const protectedPrefixes = [
       "/chat",
-      "/timeline",
+      "/log",
       "/reflect",
       "/insights",
       "/settings",

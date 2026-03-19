@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { label: "Chat", href: "/chat" },
-  { label: "Log", href: "/timeline" },
+  { label: "Log", href: "/log" },
   { label: "Reflect", href: "/reflect" },
   { label: "Insights", href: "/insights" },
   { label: "Settings", href: "/settings" },
