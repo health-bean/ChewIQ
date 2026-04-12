@@ -46,19 +46,31 @@ describe('extractFactorsFromDay', () => {
 
 describe('analyzeSingleFactors', () => {
   it('finds food→symptom correlation above gate', () => {
+    const egg = { foodId: 'f1', name: 'Eggs', properties: [], mealType: null, time: null, protocolStatus: null };
+    const chicken = { foodId: 'f2', name: 'Chicken', properties: [], mealType: null, time: null, protocolStatus: null };
+    const headache = { name: 'Headache', severity: 5, time: null };
+
+    // 4 egg days with headache, 8 non-egg days without headache (enough "without" days for base rate)
     const days = [
-      makeDay({ date: '2026-04-01', foods: [{ foodId: 'f1', name: 'Eggs', properties: [], mealType: null, time: null, protocolStatus: null }], symptoms: [{ name: 'Headache', severity: 5, time: null }], foodCount: 1, symptomCount: 1 }),
-      makeDay({ date: '2026-04-02', foods: [{ foodId: 'f1', name: 'Eggs', properties: [], mealType: null, time: null, protocolStatus: null }], symptoms: [{ name: 'Headache', severity: 4, time: null }], foodCount: 1, symptomCount: 1 }),
-      makeDay({ date: '2026-04-03', foods: [{ foodId: 'f1', name: 'Eggs', properties: [], mealType: null, time: null, protocolStatus: null }], symptoms: [{ name: 'Headache', severity: 6, time: null }], foodCount: 1, symptomCount: 1 }),
-      makeDay({ date: '2026-04-04', foods: [{ foodId: 'f2', name: 'Chicken', properties: [], mealType: null, time: null, protocolStatus: null }], symptoms: [], foodCount: 1, symptomCount: 0 }),
-      makeDay({ date: '2026-04-05', foods: [{ foodId: 'f2', name: 'Chicken', properties: [], mealType: null, time: null, protocolStatus: null }], symptoms: [], foodCount: 1, symptomCount: 0 }),
+      makeDay({ date: '2026-04-01', foods: [egg], symptoms: [headache], foodCount: 1, symptomCount: 1 }),
+      makeDay({ date: '2026-04-02', foods: [egg], symptoms: [headache], foodCount: 1, symptomCount: 1 }),
+      makeDay({ date: '2026-04-03', foods: [egg], symptoms: [headache], foodCount: 1, symptomCount: 1 }),
+      makeDay({ date: '2026-04-04', foods: [chicken], symptoms: [], foodCount: 1, symptomCount: 0 }),
+      makeDay({ date: '2026-04-05', foods: [chicken], symptoms: [], foodCount: 1, symptomCount: 0 }),
+      makeDay({ date: '2026-04-06', foods: [chicken], symptoms: [], foodCount: 1, symptomCount: 0 }),
+      makeDay({ date: '2026-04-07', foods: [chicken], symptoms: [], foodCount: 1, symptomCount: 0 }),
+      makeDay({ date: '2026-04-08', foods: [chicken], symptoms: [], foodCount: 1, symptomCount: 0 }),
+      makeDay({ date: '2026-04-09', foods: [chicken], symptoms: [], foodCount: 1, symptomCount: 0 }),
+      makeDay({ date: '2026-04-10', foods: [egg], symptoms: [headache], foodCount: 1, symptomCount: 1 }),
+      makeDay({ date: '2026-04-11', foods: [chicken], symptoms: [], foodCount: 1, symptomCount: 0 }),
+      makeDay({ date: '2026-04-12', foods: [chicken], symptoms: [], foodCount: 1, symptomCount: 0 }),
     ];
 
     const results = analyzeSingleFactors(days);
     const eggHeadache = results.find(r => r.factor.key === 'food:eggs' && r.outcome.key === 'symptom:headache');
     expect(eggHeadache).toBeDefined();
-    expect(eggHeadache!.frequency).toBe(3);
-    expect(eggHeadache!.rateMultiplier).toBeGreaterThan(1);
+    expect(eggHeadache!.frequency).toBe(4);
+    expect(eggHeadache!.rateMultiplier).toBeGreaterThan(1.2);
   });
 
   it('respects minimum occurrence gate of 3', () => {

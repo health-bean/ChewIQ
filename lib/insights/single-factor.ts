@@ -2,6 +2,9 @@ import type { DayComposite, Factor, Outcome, SingleFactorResult } from './types'
 import { bucketScore, bucketNegativeScore } from './types';
 
 const MIN_OCCURRENCES = 3;
+const MAX_FACTOR_FREQUENCY = 0.70; // Skip factors present on >70% of days — they're constants, not signals
+const MIN_WITHOUT_DAYS = 5; // Need at least 5 days WITHOUT the factor for a meaningful base rate
+const MAX_RATE_MULTIPLIER = 5; // Cap to avoid infinite/huge multipliers from tiny base rates
 
 export function extractFactorsFromDay(day: DayComposite): Factor[] {
   const factors: Factor[] = [];
@@ -97,6 +100,14 @@ export function analyzeSingleFactors(days: DayComposite[]): SingleFactorResult[]
   for (const [, { factor }] of factorDays) {
     const fDays = factorDays.get(factor.key)!.dayIndices;
 
+    // Skip factors that appear too frequently — they're constants, not variables
+    const factorFrequency = fDays.size / totalDays;
+    if (factorFrequency > MAX_FACTOR_FREQUENCY) continue;
+
+    // Need enough "without" days to establish a meaningful base rate
+    const withoutFactor = totalDays - fDays.size;
+    if (withoutFactor < MIN_WITHOUT_DAYS) continue;
+
     for (const [, { outcome }] of outcomeDays) {
       if (isSameCategory(factor, outcome)) continue;
 
@@ -106,12 +117,14 @@ export function analyzeSingleFactors(days: DayComposite[]): SingleFactorResult[]
       if (coOccurrence < MIN_OCCURRENCES) continue;
 
       const conditionalRate = coOccurrence / fDays.size;
-      const withoutFactor = totalDays - fDays.size;
       const outcomeWithoutFactor = oDays.size - coOccurrence;
       const baseRate = withoutFactor > 0 ? outcomeWithoutFactor / withoutFactor : 0;
-      const rateMultiplier = baseRate > 0 ? conditionalRate / baseRate : conditionalRate > 0 ? 10 : 0;
+      const rateMultiplier = Math.min(
+        baseRate > 0 ? conditionalRate / baseRate : conditionalRate > 0 ? MAX_RATE_MULTIPLIER : 0,
+        MAX_RATE_MULTIPLIER,
+      );
 
-      if (rateMultiplier <= 1.0) continue;
+      if (rateMultiplier <= 1.2) continue; // Require at least 20% increase, not just any increase
 
       const lastCoDay = Math.max(...[...intersection(fDays, oDays)]);
       const recencyDays = days.length - 1 - lastCoDay;
