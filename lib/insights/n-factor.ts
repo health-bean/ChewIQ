@@ -85,7 +85,7 @@ export function analyzeMultiFactors(
           rateMultiplier,
           recencyDays,
           impactScore,
-          description: `On days with ${fA.label.toLowerCase()} + ${fB.label.toLowerCase()}, ${outcome.label.toLowerCase()} was ${Math.round(rateMultiplier * 10) / 10}x more frequent (seen ${coOccurrences} times)`,
+          description: `${outcome.label} appeared on most days you had ${fA.label.toLowerCase()} and ${fB.label.toLowerCase()}.`,
           absorbed,
         });
       }
@@ -146,7 +146,7 @@ export function analyzeMultiFactors(
         rateMultiplier,
         recencyDays,
         impactScore,
-        description: `On days with ${allFactors.map(f => f.label.toLowerCase()).join(' + ')}, ${twoF.outcome.label.toLowerCase()} was ${Math.round(rateMultiplier * 10) / 10}x more frequent (seen ${coOccurrences} times)`,
+        description: `${twoF.outcome.label} appeared on most days you had ${allFactors.map(f => f.label.toLowerCase()).join(', ')}.`,
         absorbed,
       });
     }

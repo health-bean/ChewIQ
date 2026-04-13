@@ -172,12 +172,11 @@ function computeImpact(rateMultiplier: number, frequency: number, recencyDays: n
   return multiplierScore + frequencyScore + recencyScore;
 }
 
-function formatDescription(factor: Factor, outcome: Outcome, multiplier: number, count: number, isHelper: boolean): string {
-  const mult = Math.round(multiplier * 10) / 10;
+function formatDescription(factor: Factor, outcome: Outcome, _multiplier: number, _count: number, isHelper: boolean): string {
   if (isHelper) {
-    return `On days with ${factor.label.toLowerCase()}, ${outcome.label.toLowerCase()} was ${mult}x less frequent (seen ${count} times)`;
+    return `${outcome.label} was consistently better on days with ${factor.label.toLowerCase()}.`;
   }
-  return `On days with ${factor.label.toLowerCase()}, ${outcome.label.toLowerCase()} was ${mult}x more frequent (seen ${count} times)`;
+  return `${outcome.label} appeared on days you had ${factor.label.toLowerCase()}.`;
 }
 
 function capitalize(s: string): string {

@@ -1,55 +1,97 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { DayView } from '@/components/insights/DayView';
+import { InsightSection } from '@/components/insights/InsightSection';
+import { InsightRow } from '@/components/insights/InsightRow';
+import { HelperRow } from '@/components/insights/HelperRow';
 import { AlertStack } from '@/components/insights/AlertStack';
-import { PatternCard } from '@/components/insights/PatternCard';
-import { PropertyPatternCard } from '@/components/insights/PropertyPatternCard';
-import { ProgressCard } from '@/components/insights/ProgressCard';
+import { DayView } from '@/components/insights/DayView';
 import { Spinner, Card } from '@/components/ui';
-import { Zap, ChevronDown, ChevronUp } from 'lucide-react';
-import type { DayComposite, InsightsOutput, InsightAlert, MultiFactorResult } from '@/lib/insights/types';
+import type { DayComposite, InsightsOutput, InsightAlert, SingleFactorResult, MultiFactorResult } from '@/lib/insights/types';
+
+const FACTOR_ICONS: Record<string, string> = {
+  food: '🍽️', food_property: '🧪', supplement: '💊', medication: '💉',
+  exposure: '☣️', exercise: '🏊', sleep: '😴', stress: '😤',
+  energy: '⚡', mood: '🧠', pain: '🩹', timing: '🕐', compliance: '📋',
+};
+
+const PROPERTY_ICONS: Record<string, string> = {
+  nightshade: '🌶️', histamine: '🧪', oxalate: '💎', fodmap: '🫧',
+  lectin: '🫘', salicylate: '💊', amines: '🧬', tyramine: '🧀',
+};
+
+function getIcon(result: SingleFactorResult | MultiFactorResult): string {
+  if ('factors' in result) {
+    const first = (result as MultiFactorResult).factors[0];
+    return PROPERTY_ICONS[first.key.split(':')[1]?.split('_')[0]] ?? FACTOR_ICONS[first.category] ?? '🔍';
+  }
+  const f = (result as SingleFactorResult).factor;
+  if (f.category === 'food_property') {
+    return PROPERTY_ICONS[f.key.replace('food_property:', '').split('_')[0]] ?? '🧪';
+  }
+  return FACTOR_ICONS[f.category] ?? '🔍';
+}
+
+function getTitle(result: SingleFactorResult | MultiFactorResult): string {
+  if ('factors' in result && (result as MultiFactorResult).factorCount >= 2) {
+    return (result as MultiFactorResult).factors.map(f => f.label).join(' + ');
+  }
+  return (result as SingleFactorResult).factor.label;
+}
+
+function getFoods(result: SingleFactorResult | MultiFactorResult): string[] {
+  // For food property patterns, we could list contributing foods
+  // For now, return empty — the engine would need to track this
+  return [];
+}
+
+function getPercentage(result: SingleFactorResult | MultiFactorResult): number {
+  return Math.round(result.conditionalRate * 100);
+}
+
+function isMultiFactor(result: SingleFactorResult | MultiFactorResult): boolean {
+  return 'factors' in result && (result as MultiFactorResult).factorCount >= 2;
+}
+
+type TimeRange = 30 | 90 | 180;
 
 export default function InsightsPage() {
   const [loading, setLoading] = useState(true);
   const [composite, setComposite] = useState<DayComposite | null>(null);
   const [patterns, setPatterns] = useState<InsightsOutput | null>(null);
   const [alerts, setAlerts] = useState<InsightAlert[]>([]);
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [timeRange, setTimeRange] = useState<TimeRange>(90);
 
   const today = new Date().toISOString().split('T')[0];
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      try {
-        const [dayRes, alertsRes, patternsRes] = await Promise.all([
-          fetch(`/api/insights/day?date=${today}`),
-          fetch('/api/insights/alerts'),
-          fetch('/api/insights/patterns?days=90'),
-        ]);
+  const loadData = useCallback(async (days: number) => {
+    setLoading(true);
+    try {
+      const [dayRes, alertsRes, patternsRes] = await Promise.all([
+        fetch(`/api/insights/day?date=${today}`),
+        fetch('/api/insights/alerts'),
+        fetch(`/api/insights/patterns?days=${days}`),
+      ]);
 
-        if (dayRes.ok) {
-          const data = await dayRes.json();
-          if (data) setComposite(data);
-        }
-        if (alertsRes.ok) setAlerts(await alertsRes.json());
-        if (patternsRes.ok) setPatterns(await patternsRes.json());
-      } finally {
-        setLoading(false);
+      if (dayRes.ok) {
+        const data = await dayRes.json();
+        if (data) setComposite(data);
       }
+      if (alertsRes.ok) setAlerts(await alertsRes.json());
+      if (patternsRes.ok) setPatterns(await patternsRes.json());
+    } finally {
+      setLoading(false);
     }
-    load();
   }, [today]);
+
+  useEffect(() => {
+    loadData(timeRange);
+  }, [timeRange, loadData]);
 
   const handleDismissAlert = useCallback(async (id: string) => {
     setAlerts(prev => prev.filter(a => a.id !== id));
     await fetch(`/api/insights/alerts/${id}`, { method: 'PATCH' });
   }, []);
-
-  const toggleSection = (section: string) => {
-    setExpandedSection(prev => prev === section ? null : section);
-  };
 
   if (loading) {
     return (
@@ -59,48 +101,51 @@ export default function InsightsPage() {
     );
   }
 
-  // Curate the data — show the best, not everything
-  const multiFactorTriggers = (patterns?.triggers ?? [])
-    .filter(r => 'factors' in r && (r as MultiFactorResult).factorCount >= 2)
-    .slice(0, 5);
+  // Separate and curate
+  const allTriggers = patterns?.triggers ?? [];
+  const multiTriggers = allTriggers.filter(r => isMultiFactor(r));
+  const singleTriggers = allTriggers.filter(r => !isMultiFactor(r));
+  const triggers = [...multiTriggers, ...singleTriggers]; // compounds first
 
-  const singleTriggers = (patterns?.triggers ?? [])
-    .filter(r => !('factors' in r) || (r as MultiFactorResult).factorCount < 2);
-  const topTriggers = singleTriggers.slice(0, expandedSection === 'triggers' ? 10 : 4);
-
+  const propertyPatterns = patterns?.propertyPatterns ?? [];
   const helpers = patterns?.helpers ?? [];
-  const topHelpers = helpers.slice(0, expandedSection === 'helpers' ? 10 : 3);
-
-  const propertyPatterns = (patterns?.propertyPatterns ?? []).slice(0, 5);
   const progress = patterns?.progress ?? [];
 
-  const hasAnyInsights = multiFactorTriggers.length > 0 || singleTriggers.length > 0 || helpers.length > 0 || propertyPatterns.length > 0;
+  const hasInsights = triggers.length > 0 || propertyPatterns.length > 0 || helpers.length > 0;
   const daysTracked = patterns?.dataStatus?.daysTracked ?? 0;
 
   return (
     <div className="mx-auto max-w-2xl px-4 pb-24">
-      {/* Header */}
-      <div className="py-5">
+      {/* Header + Timeframe */}
+      <div className="flex items-center justify-between py-5">
         <h1 className="font-display text-2xl text-warm-900">Insights</h1>
-        {daysTracked > 0 && (
-          <p className="text-xs text-warm-400 mt-1">
-            {daysTracked} days analyzed
-            {(patterns?.dataStatus?.twoFactorPatterns ?? 0) > 0 &&
-              ` · ${patterns!.dataStatus.twoFactorPatterns} compound patterns`}
-          </p>
-        )}
+        <div className="flex gap-1 bg-warm-100 rounded-lg p-0.5">
+          {([30, 90, 180] as TimeRange[]).map(d => (
+            <button
+              key={d}
+              onClick={() => setTimeRange(d)}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-colors ${
+                timeRange === d
+                  ? 'bg-white text-warm-900 shadow-sm'
+                  : 'text-warm-400 hover:text-warm-600'
+              }`}
+            >
+              {d}d
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Alerts */}
       {alerts.length > 0 && (
-        <div className="mb-5">
+        <div className="mb-4">
           <AlertStack alerts={alerts} onDismiss={handleDismissAlert} />
         </div>
       )}
 
       {/* Cold start */}
-      {!hasAnyInsights && (
-        <Card className="p-5 mb-5 text-center">
+      {!hasInsights && (
+        <Card className="p-5 mb-4 text-center">
           <p className="text-sm text-warm-600 font-medium">Patterns emerge with more data.</p>
           <p className="text-xs text-warm-400 mt-1">
             {daysTracked} days tracked — patterns typically appear around 14 days.
@@ -114,123 +159,104 @@ export default function InsightsPage() {
         </Card>
       )}
 
-      {hasAnyInsights && (
-        <div className="space-y-8">
+      {hasInsights && (
+        <div className="space-y-4">
+          {/* Triggers to Avoid */}
+          {triggers.length > 0 && (
+            <InsightSection
+              variant="trigger"
+              icon="⚠️"
+              title="Triggers to Avoid"
+              subtitle="These items correlate with your symptoms"
+              totalCount={triggers.length}
+              defaultVisible={3}
+            >
+              {triggers.map((r, i) => (
+                <InsightRow
+                  key={`t-${i}`}
+                  icon={getIcon(r)}
+                  title={getTitle(r)}
+                  description={r.description}
+                  percentage={getPercentage(r)}
+                  foods={getFoods(r)}
+                  isCompound={isMultiFactor(r)}
+                />
+              ))}
+            </InsightSection>
+          )}
 
-          {/* Progress — how you're doing */}
+          {/* Patterns to Watch */}
+          {propertyPatterns.length > 0 && (
+            <InsightSection
+              variant="watch"
+              icon="👁️"
+              title="Patterns to Watch"
+              subtitle="These patterns may explain multiple symptoms"
+              totalCount={propertyPatterns.length}
+              defaultVisible={2}
+            >
+              {propertyPatterns.map((p, i) => (
+                <InsightRow
+                  key={`p-${i}`}
+                  icon={PROPERTY_ICONS[p.property] ?? '🔬'}
+                  title={`${p.severity !== 'high' ? p.severity + ' ' : ''}${p.property} sensitivity`}
+                  description={p.description}
+                  percentage={Math.round((p.frequency / (daysTracked || 1)) * 100)}
+                  foods={p.foods.length > 0 ? p.foods : undefined}
+                />
+              ))}
+            </InsightSection>
+          )}
+
+          {/* Things That Help */}
+          {helpers.length > 0 && (
+            <InsightSection
+              variant="helper"
+              icon="✅"
+              title="Things That Help"
+              subtitle="Keep doing these — they're working"
+              totalCount={helpers.length}
+              defaultVisible={3}
+            >
+              {helpers.map((r, i) => (
+                <HelperRow
+                  key={`h-${i}`}
+                  icon={getIcon(r)}
+                  title={getTitle(r)}
+                  description={r.description}
+                  percentage={getPercentage(r)}
+                />
+              ))}
+            </InsightSection>
+          )}
+
+          {/* Progress */}
           {progress.length > 0 && (
-            <section>
-              <SectionHeader title="How You're Doing" />
+            <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-warm-200 p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-base">📈</span>
+                <h3 className="text-[15px] font-bold text-warm-900">Your Progress</h3>
+              </div>
               <div className="space-y-2">
                 {progress.map((o, i) => (
-                  <ProgressCard key={i} observation={o} />
+                  <div key={i} className="p-2.5 bg-emerald-50 rounded-lg">
+                    <p className="text-[13px] text-emerald-800">{o.observation}</p>
+                  </div>
                 ))}
               </div>
-            </section>
-          )}
-
-          {/* Compound Patterns — the cutting edge */}
-          {multiFactorTriggers.length > 0 && (
-            <section>
-              <div className="flex items-center gap-2 mb-1">
-                <div className="flex h-5 w-5 items-center justify-center rounded bg-teal-100">
-                  <Zap className="h-3 w-3 text-teal-600" />
-                </div>
-                <SectionHeader title="Compound Patterns" />
-              </div>
-              <p className="text-xs text-warm-400 mb-3">
-                Combinations that matter more together than individually
-              </p>
-              <div className="space-y-2">
-                {multiFactorTriggers.map((r, i) => (
-                  <PatternCard key={i} result={r} variant="multi-factor" />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Sensitivities — broad categories */}
-          {propertyPatterns.length > 0 && (
-            <section>
-              <SectionHeader title="Sensitivities" />
-              <div className="space-y-2">
-                {propertyPatterns.map((p, i) => (
-                  <PropertyPatternCard key={i} pattern={p} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Triggers */}
-          {singleTriggers.length > 0 && (
-            <section>
-              <SectionHeader title="Triggers" count={singleTriggers.length} />
-              <div className="space-y-2">
-                {topTriggers.map((r, i) => (
-                  <PatternCard key={i} result={r} variant="trigger" />
-                ))}
-              </div>
-              {singleTriggers.length > 4 && (
-                <ExpandButton
-                  expanded={expandedSection === 'triggers'}
-                  total={singleTriggers.length}
-                  shown={topTriggers.length}
-                  onClick={() => toggleSection('triggers')}
-                />
-              )}
-            </section>
-          )}
-
-          {/* What Helps */}
-          {helpers.length > 0 && (
-            <section>
-              <SectionHeader title="What Helps" count={helpers.length} />
-              <div className="space-y-2">
-                {topHelpers.map((r, i) => (
-                  <PatternCard key={i} result={r} variant="helper" />
-                ))}
-              </div>
-              {helpers.length > 3 && (
-                <ExpandButton
-                  expanded={expandedSection === 'helpers'}
-                  total={helpers.length}
-                  shown={topHelpers.length}
-                  onClick={() => toggleSection('helpers')}
-                />
-              )}
-            </section>
+            </div>
           )}
         </div>
       )}
 
       {/* Your Day */}
       <div className="mt-8 pt-6 border-t border-warm-200">
-        <SectionHeader title="Your Day" />
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-base">📅</span>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-warm-400">Your Day</h2>
+        </div>
         <DayView initialDate={today} initialComposite={composite} />
       </div>
     </div>
-  );
-}
-
-function SectionHeader({ title, count }: { title: string; count?: number }) {
-  return (
-    <h2 className="text-xs font-semibold uppercase tracking-wider text-warm-400 mb-3">
-      {title}{count !== undefined && count > 0 ? ` (${count})` : ''}
-    </h2>
-  );
-}
-
-function ExpandButton({ expanded, total, shown, onClick }: { expanded: boolean; total: number; shown: number; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex items-center justify-center gap-1 w-full py-2 mt-2 text-xs text-teal-600 font-medium hover:text-teal-700 transition-colors"
-    >
-      {expanded ? (
-        <>Show less <ChevronUp className="w-3 h-3" /></>
-      ) : (
-        <>Show {total - shown} more <ChevronDown className="w-3 h-3" /></>
-      )}
-    </button>
   );
 }
