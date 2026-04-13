@@ -218,8 +218,11 @@ export async function backfillComposites(userId: string, startDate: string, endD
 
   const missingDates = [...allDates].filter(d => !existingSet.has(d)).sort();
 
-  for (const date of missingDates) {
-    await computeAndStoreDayComposite(userId, date);
+  // Process in parallel batches of 10 instead of sequentially
+  const BATCH_SIZE = 10;
+  for (let i = 0; i < missingDates.length; i += BATCH_SIZE) {
+    const batch = missingDates.slice(i, i + BATCH_SIZE);
+    await Promise.all(batch.map(date => computeAndStoreDayComposite(userId, date)));
   }
 
   return missingDates.length;
